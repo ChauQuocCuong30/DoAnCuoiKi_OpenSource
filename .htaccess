@@ -1,0 +1,8 @@
+Options -Indexes
+RewriteEngine On
+# Chặn truy cập thư mục nội bộ khi toàn repo đặt trong htdocs.
+RewriteRule ^(?:app|bootstrap|config|routes|database|resources|storage|tests|desktop|docs|scripts|vendor|node_modules)(?:/|$) - [F,L,NC]
+RewriteRule (^|/)\. - [F,L]
+# Không cung cấp file gốc dự án qua HTTP; chỉ public/ được phục vụ.
+RewriteRule ^$ public/ [R=302,L]
+RewriteRule !^public(?:/|$) - [F,L]

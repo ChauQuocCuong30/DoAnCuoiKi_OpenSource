@@ -1,0 +1,27 @@
+name: Project checks
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  structure:
+    name: structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: python scripts/check_structure.py
+  php-lint:
+    name: php-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Show PHP version
+        run: php --version
+      - name: Check tracked PHP syntax
+        run: git ls-files -z -- '*.php' | xargs -0 -r -n 1 php -l
