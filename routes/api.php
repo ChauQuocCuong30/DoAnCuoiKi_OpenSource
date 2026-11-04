@@ -5,11 +5,16 @@ use App\Core\Response;
 use App\Core\Router;
 use App\Modules\Auth\Controllers\AuthController;
 use App\Modules\Users\Controllers\UsersController;
+use App\Modules\Learning\Controllers\LearningController;
 
 return static function (Router $router): void {
     $router->get('/api/v1/health', static function (array $params): void {
         Response::data(['status' => 'ok', 'database' => 'not_configured']);
     });
+
+    $router->post('/api/v1/learning/lessons/{id}/sessions', [LearningController::class, 'start']);
+    $router->get('/api/v1/learning/sessions/{id}', [LearningController::class, 'session']);
+    $router->post('/api/v1/learning/sessions/{id}/answers', [LearningController::class, 'answer']);
 
     // Auth 
     $router->post('/api/v1/auth/register', [AuthController::class, 'register']);

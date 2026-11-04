@@ -16,7 +16,7 @@ if (is_file($envPath)) {
     }
 }
 
-$get = static fn (string $key, string $default = ''): string => $env[$key] ?? $default;
+$get = static fn (string $key, string $default = ''): string => (($value = getenv($key)) !== false ? $value : ($env[$key] ?? $default));
 
 return [
     'host' => $get('DB_HOST', '127.0.0.1'),
