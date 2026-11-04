@@ -273,3 +273,32 @@ body.dark-mode-bg {
     transform: translateY(6px);
     box-shadow: 0 0 0 #46a302;
 }
+/* Shared player for database-backed flashcards and exercise types. */
+[hidden] { display: none !important; }
+.learning-player { max-width: 720px; margin: auto; padding: 24px; color: #f2f5f7; }
+.player-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.player-header h1 { font-size: 20px; }
+.player-header a { color: #c4d1d9; text-decoration: none; font-size: 24px; }
+.player-content { padding: 28px 0; text-align: center; }
+.player-content h2 { font-size: 28px; }
+.word-image { width: 180px; height: 180px; object-fit: contain; }
+#fc-translation { color: #80df49; }
+#fc-pronunciation, #progress, .lesson-node-wrapper small { color: #b4c4ce; }
+.learning-player button, .learning-player .btn-continue { margin: 8px; padding: 12px 20px; border-radius: 12px; border: 2px solid #465662; background: #263641; color: white; cursor: pointer; font: inherit; }
+.learning-player button:disabled { opacity: .5; cursor: default; }
+.learning-player button:focus-visible, .answer-option:focus-within { outline: 3px solid #1cb0f6; }
+#btn-submit, #btn-start, #btn-next-question { background: #3e8b00; }
+.answer-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.answer-option { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 20px; border: 2px solid #465662; border-radius: 16px; cursor: pointer; }
+.answer-option:has(input:checked) { border-color: #1cb0f6; background: #153f55; }
+.answer-option img { width: 110px; height: 110px; object-fit: contain; }
+.pair-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin: 16px 0; }
+.learning-player input[type=text], .learning-player select { background: #20313c; color: #fff; border: 2px solid #465662; border-radius: 8px; padding: 12px; max-width: 100%; font: inherit; }
+.learning-summary { text-align: center; padding: 24px 0; }
+.lesson-node-wrapper small { display: block; text-align: center; margin-top: 8px; }
+#feedback { min-height: 28px; text-align: center; color: #b7e9ff; }
+@media (max-width: 500px) { .learning-player { padding: 16px; } .player-header { flex-wrap: wrap; } .pair-row { flex-direction: column; align-items: stretch; } }
+.learning-player { width: 100%; box-sizing: border-box; }
+.learning-path-container { width: min(500px, 100%); box-sizing: border-box; }
+.dark-mode-bg .lesson-name { color: #eef4f7; }
+.dark-mode-bg .locked .lesson-name { color: #b4c4ce; }

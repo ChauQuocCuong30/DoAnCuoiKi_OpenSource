@@ -3,55 +3,58 @@ declare(strict_types=1);
 
 namespace App\Modules\Learning\Controllers;
 
-use App\Core\Controller;
+use App\Core\{ApiException, Controller, Database, Request, Response, Session};
+use App\Middleware\Auth;
+use App\Modules\Learning\Repositories\LearningRepository;
 use App\Modules\Learning\Services\LearningService;
 
-class LearningController extends Controller {
-    private LearningService $learningService;
-
-    public function __construct() {
-        $this->learningService = new LearningService();
+final class LearningController extends Controller
+{
+    private function service(): LearningService
+    {
+        return new LearningService(new LearningRepository(Database::connection()));
     }
 
-    public function index(array $params = []): void {
-        try {
-            $data = $this->learningService->getLearningPathData();
-            $this->render('learning/index', $data);
-        } catch (\Throwable $e) {
-            // In chi tiết lỗi ra màn hình để debug
-            header('Content-Type: text/plain; charset=utf-8');
-            echo "=== CHI TIẾT LỖI PHP ===\n";
-            echo "Thông điệp: " . $e->getMessage() . "\n";
-            echo "File: " . $e->getFile() . " (Dòng " . $e->getLine() . ")\n\n";
-            echo "Trace:\n" . $e->getTraceAsString();
-            exit;
-        }
+    private function id(array $params): int
+    {
+        $id = filter_var($params['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        if ($id === false || $id === null) { throw new ApiException('VALIDATION_FAILED', 'ID không hợp lệ.', 422); }
+        return $id;
     }
 
-    public function lesson(array $params): void {
-        try {
-            $id = $params['id'] ?? null;
-            
-            if (!$id) {
-                echo "Thiếu ID bài học.";
-                return;
-            }
+    private function viewData(): array
+    {
+        $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
+        return ['basePath' => $base, 'csrfToken' => Session::csrfToken()];
+    }
 
-            $data = $this->learningService->getLessonFlashcards($id);
-            
-            if (empty($data['words'])) {
-                echo "Bài học này chưa có từ vựng.";
-                return;
-            }
+    public function index(array $params = []): void
+    {
+        $user = Auth::user();
+        $this->render('learning/index', $this->service()->getLearningPathData($user) + $this->viewData());
+    }
 
-            $this->render('learning/flashcard', $data);
-        } catch (\Throwable $e) {
-            header('Content-Type: text/plain; charset=utf-8');
-            echo "=== CHI TIẾT LỖI PHP ===\n";
-            echo "Thông điệp: " . $e->getMessage() . "\n";
-            echo "File: " . $e->getFile() . " (Dòng " . $e->getLine() . ")\n\n";
-            echo "Trace:\n" . $e->getTraceAsString();
-            exit;
-        } 
+    public function lesson(array $params): void
+    {
+        $user = Auth::user();
+        $this->render('learning/flashcard', $this->service()->getLessonFlashcards($this->id($params), (int) $user['id']) + $this->viewData());
+    }
+
+    public function start(array $params): void
+    {
+        $user = Auth::user(); Session::verifyCsrf();
+        Response::data($this->service()->start((int) $user['id'], $this->id($params)));
+    }
+
+    public function session(array $params): void
+    {
+        $user = Auth::user();
+        Response::data($this->service()->getSession((int) $user['id'], $this->id($params)));
+    }
+
+    public function answer(array $params): void
+    {
+        $user = Auth::user(); Session::verifyCsrf();
+        Response::data($this->service()->answer((int) $user['id'], $this->id($params), Request::json()));
     }
 }
