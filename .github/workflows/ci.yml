@@ -52,8 +52,8 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y mariadb-client php-mysql php-mbstring
       - name: Initialize isolated test database
         run: |
-          mysql -h 127.0.0.1 -u root -pintegration-only doulingo_learning_test < database/migrations/001_create_tables.sql
-          mysql -h 127.0.0.1 -u root -pintegration-only doulingo_learning_test < database/seeds/001_demo_data.sql
+          mysql --skip-ssl -h 127.0.0.1 -u root -pintegration-only doulingo_learning_test < database/migrations/001_create_tables.sql
+          mysql --skip-ssl -h 127.0.0.1 -u root -pintegration-only doulingo_learning_test < database/seeds/001_demo_data.sql
       - run: php tests/integration/learning.php
       - name: Install browser test runner
         run: |
