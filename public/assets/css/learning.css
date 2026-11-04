@@ -133,3 +133,143 @@ body {
     40% { transform: translateY(-10px); }
     60% { transform: translateY(-5px); }
 }
+/* Nền Dark Mode cho toàn bộ trang Flashcard */
+body.dark-mode-bg {
+    background-color: #131415;
+    color: #ffffff;
+    font-family: 'Nunito', sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Khung chứa Flashcard */
+.flashcard-container {
+    width: 100%;
+    max-width: 600px;
+    height: 90vh;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Header & Nút tắt */
+.flashcard-header {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.btn-close {
+    color: #afafaf;
+    font-size: 24px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.2s;
+}
+
+.btn-close:hover {
+    color: #ffffff;
+}
+
+/* Nội dung chính */
+.flashcard-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex-grow: 1;
+    justify-content: center;
+}
+
+.fc-word {
+    font-size: 56px;
+    margin: 0 0 10px 0;
+    font-weight: 800;
+}
+
+.fc-pronunciation {
+    font-size: 22px;
+    color: #afafaf;
+    margin: 0 0 25px 0;
+}
+
+/* Nút phát âm */
+.btn-listen {
+    background-color: transparent;
+    color: #1cb0f6; /* Xanh dương Duolingo */
+    border: 2px solid #1cb0f6;
+    padding: 12px 24px;
+    border-radius: 16px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.2s;
+}
+
+.btn-listen:hover {
+    background-color: rgba(28, 176, 246, 0.1);
+}
+
+/* Đường kẻ ngang */
+.fc-divider {
+    width: 80%;
+    border: none;
+    border-top: 2px solid #37464f;
+    margin: 40px 0;
+}
+
+/* Bản dịch & Ví dụ */
+.fc-translation {
+    font-size: 36px;
+    margin: 0 0 20px 0;
+    color: #58cc02; /* Xanh lá nhấn mạnh */
+}
+
+.fc-example {
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+.ex-en {
+    color: #ffffff;
+    margin: 0 0 5px 0;
+}
+
+.ex-vi {
+    color: #afafaf;
+    font-style: italic;
+    margin: 0;
+}
+
+/* Footer & Nút Tiếp tục 3D */
+.flashcard-footer {
+    width: 100%;
+    padding-bottom: 20px;
+}
+
+.btn-continue {
+    width: 100%;
+    background-color: #58cc02;
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 16px;
+    font-size: 20px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #46a302;
+    text-transform: uppercase;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.btn-continue:active {
+    transform: translateY(6px);
+    box-shadow: 0 0 0 #46a302;
+}
