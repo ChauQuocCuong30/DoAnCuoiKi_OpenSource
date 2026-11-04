@@ -16,5 +16,6 @@ if ($relative === '' || $relative === '/') {
 }
 
 $router = new Router();
+(require dirname(__DIR__) . '/routes/web.php')($router);
 (require dirname(__DIR__) . '/routes/api.php')($router);
 $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $relative);

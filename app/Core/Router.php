@@ -5,30 +5,30 @@ namespace App\Core;
 
 final class Router
 {
-    /** @var array<int, array{method: string, pattern: string, handler: callable}> */
+    /** @var array<int, array{method: string, pattern: string, handler: callable|array}> */
     private array $routes = [];
 
-    public function get(string $path, callable $handler): void
+    public function get(string $path, callable|array $handler): void
     {
         $this->add('GET', $path, $handler);
     }
 
-    public function post(string $path, callable $handler): void
+    public function post(string $path, callable|array $handler): void
     {
         $this->add('POST', $path, $handler);
     }
 
-    public function patch(string $path, callable $handler): void
+    public function patch(string $path, callable|array $handler): void
     {
         $this->add('PATCH', $path, $handler);
     }
 
-    public function delete(string $path, callable $handler): void
+    public function delete(string $path, callable|array $handler): void
     {
         $this->add('DELETE', $path, $handler);
     }
 
-    private function add(string $method, string $path, callable $handler): void
+    private function add(string $method, string $path, callable|array $handler): void
     {
 
         $pattern = '#^' . preg_replace('#\{([a-zA-Z_][a-zA-Z0-9_]*)\}#', '(?P<$1>[^/]+)', $path) . '$#';
@@ -49,7 +49,7 @@ final class Router
                 continue;
             }
             $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
-            ($route['handler'])($params);
+            $this->invoke($route['handler'], $params);
             return;
         }
 
@@ -57,5 +57,19 @@ final class Router
             Response::error('METHOD_NOT_ALLOWED', 'Method not allowed', 405);
         }
         Response::error('NOT_FOUND', 'Route not found', 404);
+    }
+
+    private function invoke(callable|array $handler, array $params): void
+    {
+        if (is_array($handler) && !is_callable($handler)) {
+            [$class, $action] = $handler;
+
+            if (!is_string($class) || !class_exists($class) || !method_exists($class, $action)) {
+                Response::error('INTERNAL_ERROR', 'Handler not found', 500);
+            }
+            $handler = [new $class(), $action];
+        }
+
+        $handler($params);
     }
 }
