@@ -30,7 +30,6 @@ final class Router
 
     private function add(string $method, string $path, callable|array $handler): void
     {
-
         $pattern = '#^' . preg_replace('#\{([a-zA-Z_][a-zA-Z0-9_]*)\}#', '(?P<$1>[^/]+)', $path) . '$#';
         $this->routes[] = ['method' => $method, 'pattern' => $pattern, 'handler' => $handler];
     }
@@ -61,15 +60,21 @@ final class Router
 
     private function invoke(callable|array $handler, array $params): void
     {
-        if (is_array($handler) && !is_callable($handler)) {
-            [$class, $action] = $handler;
-
-            if (!is_string($class) || !class_exists($class) || !method_exists($class, $action)) {
-                Response::error('INTERNAL_ERROR', 'Handler not found', 500);
+        try {
+            if (is_array($handler) && !is_callable($handler)) {
+                [$class, $action] = $handler;
+                if (!is_string($class) || !class_exists($class) || !method_exists($class, $action)) {
+                    throw new ApiException('INTERNAL_ERROR', 'Handler not found', 500);
+                }
+                $handler = [new $class(), $action];
             }
-            $handler = [new $class(), $action];
-        }
 
-        $handler($params);
+            $handler($params);
+        } catch (ApiException $e) {
+            Response::error($e->errorCode, $e->getMessage(), $e->status, $e->details);
+        } catch (\Throwable $e) {
+            error_log($e::class . ': ' . $e->getMessage());
+            Response::error('INTERNAL_ERROR', 'Internal server error', 500);
+        }
     }
 }
