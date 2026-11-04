@@ -65,6 +65,7 @@ Xác thực bằng phiên PHP: đăng nhập thành công backend gửi cookie p
 | 403 | `ACCOUNT_DEACTIVATED` | Tài khoản đã ngưng hoạt động |
 | 404 | `NOT_FOUND` | Không có đường dẫn này |
 | 404 | `USER_NOT_FOUND` | Không có người dùng này |
+| 405 | `METHOD_NOT_ALLOWED` | Sai phương thức HTTP |
 | 409 | `EMAIL_ALREADY_EXISTS` | Email đã được đăng ký |
 | 422 | `VALIDATION_FAILED` | Dữ liệu gửi lên không hợp lệ |
 | 500 | `INTERNAL_ERROR` | Lỗi máy chủ (không lộ chi tiết) |
