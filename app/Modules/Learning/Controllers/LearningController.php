@@ -52,6 +52,6 @@ class LearningController extends Controller {
             echo "File: " . $e->getFile() . " (Dòng " . $e->getLine() . ")\n\n";
             echo "Trace:\n" . $e->getTraceAsString();
             exit;
-        }
+        } 
     }
 }

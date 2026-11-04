@@ -20,4 +20,4 @@ class Controller {
 
         require_once $viewFile;
     }
-}
+} 

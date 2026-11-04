@@ -33,5 +33,5 @@ class LearningService {
             'lesson_id' => $lessonId,
             'words' => $words
         ];
-    }
+    } 
 }

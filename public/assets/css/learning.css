@@ -263,7 +263,7 @@ body.dark-mode-bg {
     border-radius: 16px;
     font-size: 20px;
     font-weight: 800;
-    cursor: pointer;
+    cursor: pointer; 
     box-shadow: 0 6px 0 #46a302;
     text-transform: uppercase;
     transition: transform 0.1s, box-shadow 0.1s;

@@ -51,7 +51,7 @@
                             } else {
                                 $linkHref = "/doulingo/public/learning/lesson/1"; // Các cấp khác
                             }
-                        ?>
+                        ?> 
                         
                         <div class="lesson-node-wrapper <?= $positionClass ?> <?= $statusClass ?>">
                             <a href="<?= $linkHref ?>" class="lesson-node btn-duo" <?= $statusClass === 'locked' ? 'onclick="return false;"' : '' ?>>

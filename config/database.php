@@ -10,7 +10,7 @@ if (is_file($envPath)) {
         $line = trim($line);
         if ($line === '' || $line[0] === '#' || !str_contains($line, '=')) {
             continue;
-        }
+        } 
         [$key, $value] = explode('=', $line, 2);
         $env[trim($key)] = trim($value, " \t\"'");
     }

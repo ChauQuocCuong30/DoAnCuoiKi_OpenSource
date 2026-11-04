@@ -242,7 +242,7 @@
             function renderWord(index) {
                 if (index >= words.length) {
                     window.location.href = '/doulingo/public/learning?completed=1';
-                    return;
+                    return; 
                 }
                 const currentWord = words[index];
                 document.getElementById('fc-word').textContent = currentWord.english;

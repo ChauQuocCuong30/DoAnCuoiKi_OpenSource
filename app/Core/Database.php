@@ -18,7 +18,7 @@ final class Database
             $host = '127.0.0.1';
             $port = 3306;
             $database = 'doulingo';
-            $username = 'root';
+            $username = 'root'; 
             $password = '';
             $charset = 'utf8mb4';
 

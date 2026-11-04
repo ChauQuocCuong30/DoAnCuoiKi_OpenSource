@@ -30,4 +30,4 @@ class LearningRepository {
         $stmt->execute(['lesson_id' => $lessonId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-}
+} 
