@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 $escape = static fn ($v): string => htmlspecialchars((string) $v, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+$activeAdminPage = 'words';
 ?>
 <!doctype html>
 <html lang="vi">
@@ -13,19 +14,7 @@ $escape = static fn ($v): string => htmlspecialchars((string) $v, ENT_QUOTES | E
     <script defer src="<?= $escape($appBase . '/assets/js/admin-books.js') ?>"></script>
 </head>
 <body data-app-base="<?= $escape($appBase) ?>" data-import-page="<?= $section === 'import' ? '1' : '0' ?>">
-<header class="site-header">
-    <a class="brand" href="<?= $escape($appBase . '/admin/words') ?>"><span class="brand-mark" aria-hidden="true">d.</span> doulingo<span class="brand-tag">QUẢN TRỊ NỘI DUNG</span></a>
-    <nav aria-label="Điều hướng quản trị">
-        <a class="nav-current" href="<?= $escape($appBase . '/admin/words') ?>" aria-current="page">Kệ sách</a>
-        <a href="<?= $escape($appBase . '/admin/topics') ?>">Chủ đề</a>
-        <details class="more-nav"><summary>Công cụ khác</summary><div>
-            <a href="<?= $escape($appBase . '/admin/lessons') ?>">Bài học</a>
-            <a href="<?= $escape($appBase . '/admin/exercises') ?>">Câu hỏi</a>
-            <a href="<?= $escape($appBase . '/admin/dictionary') ?>">Tra từ điển</a>
-            <a href="<?= $escape($appBase . '/learning') ?>">Trang học tập</a>
-        </div></details>
-    </nav>
-</header>
+<?php require __DIR__ . '/_header.php'; ?>
 <main>
     <div id="message" class="notice" role="status" aria-live="polite">Đang tải kệ sách…</div>
     <section id="library-view">
@@ -52,7 +41,7 @@ $escape = static fn ($v): string => htmlspecialchars((string) $v, ENT_QUOTES | E
         </div>
     </section>
 </main>
-<footer class="site-footer"><span>DOULINGO / THE WORD COLLECTION</span><span>Gom từ thành sách. Giữ tri thức gọn gàng.</span></footer>
+<?php require __DIR__ . '/_footer.php'; ?>
 
 <dialog id="import-dialog" aria-labelledby="import-title">
     <div class="dialog-heading"><div><p class="eyebrow">XÂY THÊM NHỮNG TRANG SÁCH</p><h2 id="import-title">Thêm dữ liệu hàng loạt</h2></div><button type="button" data-close="import-dialog" class="icon-button" aria-label="Đóng nhập dữ liệu">×</button></div>

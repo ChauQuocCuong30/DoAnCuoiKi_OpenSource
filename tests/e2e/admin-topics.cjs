@@ -1,0 +1,104 @@
+// Run after tests/integration/admin-books.php on the isolated test server.
+const { chromium } = require('playwright');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const base = process.env.TEST_BASE_URL;
+if (!base) throw new Error('Set TEST_BASE_URL to the isolated test server.');
+(async () => {
+    const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE, args: ['--no-sandbox'] });
+    try {
+        const guest = await browser.newContext();
+        assert.equal((await guest.request.get(base + '/admin/topics')).status(), 401);
+        const reader = await browser.newContext();
+        await reader.request.post(base + '/api/v1/auth/login', { data: { email: 'books-user@example.test', password: 'books-test-password-123' } });
+        assert.equal((await reader.request.get(base + '/admin/topics')).status(), 403);
+        const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+        assert.equal((await context.request.post(base + '/api/v1/auth/login', { data: { email: 'books-admin@example.test', password: 'books-test-password-123' } })).status(), 200);
+        const api = async (path) => {
+            const response = await context.request.get(base + '/api/v1/admin/content/' + path);
+            assert.equal(response.status(), 200); return (await response.json()).data;
+        };
+        const boot = await api('bootstrap');
+        assert.equal((await context.request.post(base + '/admin/topics', { form: { name: 'No token' } })).status(), 403);
+        const listBefore = (await api('books')).items;
+        const maxPosition = Math.max(0, ...listBefore.map((b) => Number(b.position)));
+        const page = await context.newPage();
+        const errors = []; page.on('pageerror', (e) => errors.push(e.message));
+        await page.goto(base + '/admin/topics');
+        assert.equal(await page.locator('nav [aria-current=page]').textContent(), 'Chủ đề');
+        assert.equal(await page.locator('#topic-form [name=position]').count(), 0, 'No manual order input');
+        assert.equal(await page.locator('#topic-form [name=id]').inputValue(), '');
+        assert.equal(await page.locator('#topic-code').textContent(), 'Tự động khi lưu');
+        assert.equal(await page.locator('#topic-position').textContent(), 'Tự xếp cuối kệ');
+        assert.equal(await page.locator('body').evaluate((el) => getComputedStyle(el).backgroundColor), 'rgb(238, 231, 216)');
+        const title = 'Thế giới hoang dã';
+        await page.getByLabel('Tên chủ đề', { exact: true }).fill(title);
+        await page.getByLabel(/Mô tả/).fill('Khám phá từ vựng về thiên nhiên và động vật.');
+        await page.getByRole('button', { name: 'Tạo chủ đề →', exact: true }).click();
+        await page.waitForURL(/\/admin\/topics\?edit=\d+$/);
+        const id = new URL(page.url()).searchParams.get('edit');
+        const code = 'CD' + id.padStart(6, '0');
+        assert.equal(await page.locator('#topic-code').textContent(), code);
+        assert.match(await page.locator('.notice[role=status]').textContent(), new RegExp(code));
+        let created = (await api('books')).items.find((b) => String(b.id) === id);
+        assert.equal(Number(created.position), maxPosition + 1);
+        assert.equal(created.name, title);
+        if (process.env.ADMIN_SCREENSHOT_DIR) {
+            fs.mkdirSync(process.env.ADMIN_SCREENSHOT_DIR, { recursive: true });
+            await page.screenshot({ path: process.env.ADMIN_SCREENSHOT_DIR + '/topics-desktop.png', fullPage: true });
+        }
+        // Invalid URL re-renders the same styled form and keeps the identity and entered data.
+        await page.getByLabel(/Ảnh chủ đề/).fill('http://example.test/image.png');
+        const badResponse = page.waitForResponse((r) => r.request().method() === 'POST' && r.url().endsWith('/admin/topics'));
+        await page.getByRole('button', { name: 'Lưu thay đổi →', exact: true }).click();
+        assert.equal((await badResponse).status(), 422);
+        await page.getByRole('alert').waitFor();
+        assert.equal(await page.getByLabel('Tên chủ đề', { exact: true }).inputValue(), title);
+        assert.equal(await page.locator('#topic-code').textContent(), code);
+        assert.equal(await page.locator('#topic-position').textContent(), 'Tập ' + String(maxPosition + 1).padStart(2, '0'));
+        await page.getByLabel(/Ảnh chủ đề/).fill('');
+        await page.locator('#topic-status').selectOption('0');
+        await page.getByRole('button', { name: 'Lưu thay đổi →', exact: true }).click();
+        await page.waitForURL(/\/admin\/topics\?edit=\d+$/);
+        await page.locator('.notice[role=status]').waitFor();
+        created = (await api('books')).items.find((b) => String(b.id) === id);
+        assert.equal(Number(created.position), maxPosition + 1); assert.equal(Number(created.is_active), 0);
+        const post = (form) => context.request.post(base + '/admin/topics', { maxRedirects: 0, form: { csrf_token: boot.csrf_token, id: '', description: '', image: '', is_active: '1', ...form } });
+        const renamed = title + ' mới';
+        const update = await post({ id, name: renamed, position: '999999', is_active: '1' });
+        assert.equal(update.status(), 303);
+        created = (await api('books')).items.find((b) => String(b.id) === id);
+        assert.equal(Number(created.position), maxPosition + 1, 'Server ignores forged order on edit');
+        assert.equal(created.name, renamed);
+        const marker = 'Topic pagination fixture';
+        for (let i = 0; i < 21; i++) assert.equal((await post({ name: marker + ' ' + i, position: '1' })).status(), 303);
+        const fixtureBooks = (await api('books')).items.filter((b) => b.name.startsWith(marker));
+        assert.equal(fixtureBooks.length, 21);
+        assert.equal(new Set(fixtureBooks.map((b) => b.position)).size, 21);
+        assert.equal(Number(fixtureBooks[0].position), maxPosition + 2, 'Forged order on create also ignored');
+        await page.goto(base + '/admin/topics?q=' + encodeURIComponent(marker));
+        assert.equal(await page.locator('#topic-list tbody tr').count(), 20);
+        await page.getByRole('link', { name: 'Trang sau →', exact: true }).click();
+        assert.equal(await page.locator('#topic-list tbody tr').count(), 1);
+        assert.match(await page.locator('.pagination').textContent(), /Trang 2 \/ 2/);
+        assert.equal(await page.locator('#topic-search').inputValue(), marker);
+        await page.goto(base + '/admin/topics?edit=' + id);
+        await page.setViewportSize({ width: 390, height: 844 });
+        assert(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), 'Mobile topic form has no horizontal overflow');
+        await page.getByLabel('Tên chủ đề', { exact: true }).fill(renamed);
+        await page.getByRole('button', { name: 'Lưu thay đổi →', exact: true }).click();
+        await page.locator('.notice[role=status]').waitFor();
+        if (process.env.ADMIN_SCREENSHOT_DIR) await page.screenshot({ path: process.env.ADMIN_SCREENSHOT_DIR + '/topics-mobile.png', fullPage: true });
+        await page.getByRole('link', { name: 'Mở cuốn sách này ↗', exact: true }).click();
+        await page.locator('#topic-title').waitFor({ state: 'visible' });
+        assert.equal(await page.locator('#topic-title').textContent(), renamed);
+        assert.equal(await page.locator('nav [aria-current=page]').textContent(), 'Kệ sách');
+        // Existing hostile fixture remains escaped in both the form and list.
+        const hostile = (await api('books')).items.find((b) => b.name.includes('onerror='));
+        await page.goto(base + '/admin/topics?edit=' + hostile.id);
+        assert.equal(await page.locator('.topic-book-preview img, .topic-list img').count(), 0);
+        assert.equal(await page.evaluate(() => window.adminXss), undefined);
+        assert.equal(errors.length, 0, errors.join('\n'));
+        console.log('PASS: shared topics theme, automatic IDs/order, protected old position, invalid form rendering, auth/CSRF, pagination, book navigation, XSS and mobile submission');
+    } finally { await browser.close(); }
+})().catch((error) => { console.error(error); process.exit(1); });

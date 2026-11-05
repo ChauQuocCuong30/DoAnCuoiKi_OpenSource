@@ -27,7 +27,7 @@ final class TopicController
         AdminCsrf::verify($_POST['csrf_token'] ?? null);
         $form = [];
         try {
-            foreach (['id', 'name', 'description', 'image', 'position', 'is_active'] as $key) {
+            foreach (['id', 'name', 'description', 'image', 'is_active'] as $key) {
                 $value = $_POST[$key] ?? '';
                 if (!is_string($value)) {
                     throw new ApiException('VALIDATION_FAILED', 'Dữ liệu biểu mẫu không hợp lệ.', 422);
@@ -35,13 +35,15 @@ final class TopicController
                 $form[$key] = trim($value);
             }
             $id = $form['id'] === '' ? null : $this->positive($form['id']);
+            if ($id !== null) {
+                $form['position'] = (new TopicRepository())->find($id)['position'];
+            }
             if ($form['name'] === '' || mb_strlen($form['name'], 'UTF-8') > 150
                 || mb_strlen($form['description'], 'UTF-8') > 5000) {
                 throw new ApiException('VALIDATION_FAILED', 'Tên bắt buộc, tối đa 150 ký tự; mô tả tối đa 5000 ký tự.', 422);
             }
-            $position = $this->positive($form['position']);
-            if ($position > 2147483647 || !in_array($form['is_active'], ['0', '1'], true)) {
-                throw new ApiException('VALIDATION_FAILED', 'Thứ tự hoặc trạng thái không hợp lệ.', 422);
+            if (!in_array($form['is_active'], ['0', '1'], true)) {
+                throw new ApiException('VALIDATION_FAILED', 'Trạng thái không hợp lệ.', 422);
             }
             $image = $form['image'];
             if ($image !== '' && (strlen($image) > 255
@@ -53,10 +55,10 @@ final class TopicController
             }
             $id = (new TopicRepository())->save($id, [
                 'name' => $form['name'], 'description' => $form['description'] === '' ? null : $form['description'],
-                'image' => $image ?: null, 'position' => $position,
+                'image' => $image ?: null,
                 'is_active' => (int) $form['is_active'],
             ]);
-            $_SESSION['admin_topics_notice'] = 'Đã lưu chủ đề. ID: ' . $id;
+            $_SESSION['admin_topics_notice'] = 'Đã lưu chủ đề ' . sprintf('CD%06d', $id) . '.';
             header('Location: ' . $this->base() . '/admin/topics?edit=' . $id, true, 303);
             exit;
         } catch (ApiException $e) {
@@ -67,7 +69,7 @@ final class TopicController
     private function positive(mixed $value): int
     {
         if (!is_string($value) || !preg_match('/^[1-9][0-9]{0,17}$/D', $value)) {
-            throw new ApiException('VALIDATION_FAILED', 'ID/thứ tự phải là số nguyên dương.', 422);
+            throw new ApiException('VALIDATION_FAILED', 'ID/trang phải là số nguyên dương.', 422);
         }
         return (int) $value;
     }
