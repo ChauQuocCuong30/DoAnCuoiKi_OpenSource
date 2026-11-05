@@ -140,8 +140,11 @@ LessonReviewHook::afterSessionCompleted(PDO, userId, sessionId) → commit.
 - Báo cáo khởi tạo được lưu vào rules_json.review_initialization để có thể đối chiếu.
 
 Flashcard Reviews vẫn là tự đánh giá 0–5, chưa phải bộ trò chơi chấm đáp án của Danh.
-Điểm mở rộng window.DoulingoReviewCard vẫn cần Danh cung cấp renderer chung nếu muốn
-tái sử dụng cùng thành phần trình bày. Không coi điểm mở rộng này là đã kết nối.
+public/assets/js/learning.js hiện cung cấp DoulingoWordCard.render/media cho trang học
+và DoulingoReviewCard cho trang ôn. /reviews tải cùng file JS; phần player không khởi
+động khi không có learning-data. Nội dung từ được escape, chỉ cho media nội bộ/HTTPS.
+Learning giữ các ID DOM cũ để không phá các thao tác và kiểm thử đã có.
+Trang lộ trình và kết quả bài học có liên kết sang /reviews; Reviews có liên kết về /learning.
 
 ## 7. Nhắc học
 
@@ -209,8 +212,13 @@ với Auth, Router và Learning thật.
 
 Code được chuẩn bị từ main b7485f5d9a369e7869154c6ef094f63940c4f3be
 và Tuan 9f5a03881218b01bc8a8105f400c425695708e9d.
-Phiên hỗ trợ này không có môi trường chạy PHP/MySQL.
-Chưa xác nhận PASS cho code đợt tích hợp mới; không dùng kết quả cũ thay cho chạy lại.
+Phiên hỗ trợ không có runtime cục bộ; dùng GitHub Actions chạy PHP/MySQL và Playwright.
+Workflow CI hiện có được bổ sung ba unit Reviews và hai bộ integration, dùng database
+riêng doulingo_ci_sm2_test để không đụng dữ liệu Learning dùng cho kiểm tra trình duyệt.
+Đợt chạy 42053910510 đã hoàn tất thành công các bước unit Reviews và database Reviews/
+Notifications. Kiểm tra PR để xem trạng thái CI mới nhất cho mọi commit tiếp theo.
+E2E bổ sung kiểm tra trang ôn, phiên đăng nhập, redirect khách, renderer chung, lịch sử,
+nhắc học, escape dữ liệu và bố cục trên màn hình nhỏ.
 
 Sau khi pull nhánh Tuan, chạy ba unit Reviews, unit Learning và hai integration Reviews/
 Notifications trong database riêng kết thúc _sm2_test.

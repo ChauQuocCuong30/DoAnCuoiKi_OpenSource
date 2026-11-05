@@ -194,6 +194,7 @@ $reviewApiBase = $reviewApiBase ?? rtrim(
         </footer>
     </main>
 
+    <script src="<?= htmlspecialchars($reviewApiBase . '/assets/js/learning.js', ENT_QUOTES, 'UTF-8') ?>"></script>
     <?php require __DIR__ . '/script.php'; ?>
 </body>
 </html>

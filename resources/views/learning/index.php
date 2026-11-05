@@ -12,6 +12,7 @@
     <header class="learning-summary">
         <h1>Lộ trình của bạn</h1>
         <p><?= $escape($stats['xp']) ?> XP · Chuỗi <?= $escape($stats['streak']) ?> ngày</p>
+        <a href="<?= $escape($basePath) ?>/reviews">Ôn tập từ vựng →</a>
     </header>
     <?php foreach ($topics as $topic): ?>
         <section class="topic-section">
