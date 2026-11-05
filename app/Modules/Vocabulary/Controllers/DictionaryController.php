@@ -8,6 +8,7 @@ use App\Core\Response;
 use App\Middleware\Auth;
 use App\Modules\Vocabulary\Services\DictionaryService;
 use App\Modules\Vocabulary\Services\DictionaryNormalizer;
+use App\Modules\Vocabulary\Services\DictionaryDraftStore;
 
 final class DictionaryController
 {
@@ -39,6 +40,8 @@ final class DictionaryController
 
         // Chuyển thành danh sách từng nghĩa.
         $data = (new DictionaryNormalizer())->normalize($lookup);
+
+        $data['lookup_token'] = (new DictionaryDraftStore())->remember($data);
 
         // LIÊN QUAN DANH:
         // Kết quả này dành cho Admin chọn nội dung.

@@ -3,14 +3,18 @@ declare(strict_types=1);
 
 use App\Core\Response;
 use App\Core\Router;
-use App\Modules\Vocabulary\Controllers\DictionaryController;
 use App\Modules\Auth\Controllers\AuthController;
 use App\Modules\Users\Controllers\UsersController;
+use App\Modules\Learning\Controllers\LearningController;
 
 return static function (Router $router): void {
     $router->get('/api/v1/health', static function (array $params): void {
         Response::data(['status' => 'ok', 'database' => 'not_configured']);
     });
+
+    $router->post('/api/v1/learning/lessons/{id}/sessions', [LearningController::class, 'start']);
+    $router->get('/api/v1/learning/sessions/{id}', [LearningController::class, 'session']);
+    $router->post('/api/v1/learning/sessions/{id}/answers', [LearningController::class, 'answer']);
 
     // Auth
     $router->post('/api/v1/auth/register', [AuthController::class, 'register']);
@@ -22,10 +26,9 @@ return static function (Router $router): void {
     $router->patch('/api/v1/users/me', [UsersController::class, 'updateMe']);
     $router->patch('/api/v1/users/{id}/status', [UsersController::class, 'updateStatus']);
 
-    // TOÀN: tra từ để Admin chuẩn bị nội dung học.
-    $router->get('/api/v1/admin/dictionary',[DictionaryController::class, 'lookup']);
-
-        // API on tap va nhac hoc.
+    // Content module registers dictionary and content routes together.
+    \App\Modules\Admin\Controllers\ContentApiController::register($router);
+    // API on tap va nhac hoc.
     $reviewRoutes = [
         'GET' => [
             '/api/v1/reviews/bootstrap',

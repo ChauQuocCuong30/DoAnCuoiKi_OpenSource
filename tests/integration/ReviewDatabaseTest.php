@@ -23,6 +23,7 @@ $trigger = null;
 $checks = 0;
 $skips = 0;
 $failed = false;
+$bridgeTopic = null;
 
 function dbCheck(bool $condition, string $message): void
 {
@@ -615,6 +616,167 @@ try {
             'Same key succeeds after rollback'
         );
     }
+
+    // 17. Real Learning -> Reviews integration with private immutable targets.
+    $learning = new \App\Modules\Learning\Services\LearningService(
+        new \App\Modules\Learning\Repositories\LearningRepository($pdo)
+    );
+    $topicPosition = 1 + (int) $pdo->query('SELECT COALESCE(MAX(position),0) FROM topics')->fetchColumn();
+    $pdo->prepare('INSERT INTO topics (name,position) VALUES (?,?)')
+        ->execute(['Tuan bridge integration ' . bin2hex(random_bytes(5)), $topicPosition]);
+    $bridgeTopic = (int) $pdo->lastInsertId();
+    $pdo->prepare('INSERT INTO lessons (topic_id,name,position,question_count,pass_percent,xp_reward)
+        VALUES (?,?,1,1,70,3)')->execute([$bridgeTopic, 'Tuan bridge integration']);
+    $bridgeLesson = (int) $pdo->lastInsertId();
+    $bridgeWords = [];
+    foreach (['bridge-alpha', 'bridge-beta'] as $english) {
+        $pdo->prepare('INSERT INTO words (topic_id,english,vietnamese,part_of_speech) VALUES (?,?,?,?)')
+            ->execute([$bridgeTopic, $english, 'tu kiem thu', 'noun']);
+        $bridgeWords[] = (int) $pdo->lastInsertId();
+    }
+    [$wordA, $wordB] = $bridgeWords;
+    foreach ($bridgeWords as $wordId) {
+        $pdo->prepare('INSERT INTO lesson_words (lesson_id,word_id) VALUES (?,?)')
+            ->execute([$bridgeLesson, $wordId]);
+    }
+    $contentFor = static fn (int $wordId): string => json_encode([
+        'prompt' => 'Bridge test', 'target_word_ids' => [$wordId],
+        'options' => [['id' => 'a', 'text' => 'yes'], ['id' => 'b', 'text' => 'no']],
+    ], JSON_THROW_ON_ERROR);
+    $pdo->prepare('INSERT INTO exercises (lesson_id,word_id,type,content_json,answer_json)
+        VALUES (?,?,\'choose_meaning\',?,?)')
+        ->execute([$bridgeLesson, $wordA, $contentFor($wordA), '{"correct_option_ids":["a"]}']);
+    $bridgeExercise = (int) $pdo->lastInsertId();
+
+    $lesson = $learning->start($u1, $bridgeLesson);
+    dbCheck(!str_contains(json_encode($lesson), 'target_word_ids'), 'Learning keeps target IDs private');
+    $query = $pdo->prepare('SELECT snapshot_json FROM session_questions WHERE id=?');
+    $query->execute([$lesson['question']['id']]);
+    $frozen = json_decode($query->fetchColumn(), true, 512, JSON_THROW_ON_ERROR);
+    dbCheck($frozen['target_word_ids'] === [$wordA], 'Learning freezes target IDs in server snapshot');
+
+    // An admin editing the exercise after start must not change the learned word.
+    $pdo->prepare('UPDATE exercises SET word_id=?,content_json=? WHERE id=?')
+        ->execute([$wordB, $contentFor($wordB), $bridgeExercise]);
+    $lastAnswer = [
+        'question_id' => $lesson['question']['id'],
+        'request_key' => requestKey(),
+        'answer' => ['option_id' => 'a'],
+    ];
+    $completed = $learning->answer($u1, $lesson['id'], $lastAnswer)['session'];
+    dbCheck($completed['status'] === 'completed'
+        && $completed['review_initialization']['initialized'] === 1,
+        'Completed real lesson initializes review schedule');
+    $query = $pdo->prepare('SELECT * FROM user_review_states WHERE user_id=? AND word_id IN (?,?) ORDER BY id');
+    $query->execute([$u1, $wordA, $wordB]);
+    $states = $query->fetchAll(PDO::FETCH_ASSOC);
+    dbCheck(count($states) === 1 && (int) $states[0]['word_id'] === $wordA,
+        'Bridge uses original targets after content edit');
+    $firstState = $states[0];
+    $due = new DateTimeImmutable($firstState['next_review_at'], new DateTimeZone('UTC'));
+    $first = new DateTimeImmutable($firstState['first_learned_at'], new DateTimeZone('UTC'));
+    dbCheck($due->getTimestamp() - $first->getTimestamp() === 86400,
+        'First schedule is one day after server completion');
+    $replayed = $learning->answer($u1, $lesson['id'], $lastAnswer);
+    $query->execute([$u1, $wordA, $wordB]);
+    $xpQuery = $pdo->prepare('SELECT COUNT(*) FROM xp_transactions WHERE session_id=?');
+    $xpQuery->execute([$lesson['id']]);
+    dbCheck($replayed['replayed'] && $query->fetchAll(PDO::FETCH_ASSOC) === $states
+        && (int) $xpQuery->fetchColumn() === 1,
+        'Lesson final-answer retry preserves schedule and rewards');
+
+    // Relearning a known word must preserve every scheduling column.
+    $pdo->prepare('UPDATE exercises SET word_id=?,content_json=? WHERE id=?')
+        ->execute([$wordA, $contentFor($wordA), $bridgeExercise]);
+    $againLesson = $learning->start($u1, $bridgeLesson);
+    $learning->answer($u1, $againLesson['id'], [
+        'question_id' => $againLesson['question']['id'], 'request_key' => requestKey(),
+        'answer' => ['option_id' => 'a'],
+    ]);
+    dbCheck(fetchState($pdo, (int) $firstState['id']) === $firstState,
+        'Real lesson replay does not reset existing review state');
+
+    // The Learning endpoint must never open a shared-table SM-2 session.
+    try {
+        $learning->getSession($u1, $start['session_id']);
+        throw new RuntimeException('Learning accepted an SM-2 session.');
+    } catch (\App\Core\ApiException $error) {
+        dbCheck($error->errorCode === 'SESSION_NOT_FOUND', 'Learning rejects SM-2 mode session');
+    }
+
+    $pdo->prepare('UPDATE users SET current_hp=1,next_hp_at=NULL WHERE id=?')->execute([$u2]);
+    $failedLesson = $learning->start($u2, $bridgeLesson);
+    $failedLesson = $learning->answer($u2, $failedLesson['id'], [
+        'question_id' => $failedLesson['question']['id'], 'request_key' => requestKey(),
+        'answer' => ['option_id' => 'b'],
+    ])['session'];
+    $countState = $pdo->prepare('SELECT COUNT(*) FROM user_review_states WHERE user_id=? AND word_id=?');
+    $countState->execute([$u2, $wordA]);
+    dbCheck($failedLesson['status'] === 'failed' && (int) $countState->fetchColumn() === 0,
+        'Failed lesson creates no learned review state');
+
+    // Reject cross-user calls even from the private integration hook.
+    $pdo->beginTransaction();
+    try {
+        expectCode(static function () use ($pdo, $u2, $lesson): void {
+            \App\Modules\Reviews\Services\LessonReviewHook::afterSessionCompleted($pdo, $u2, $lesson['id']);
+        }, 'NOT_FOUND');
+    } finally {
+        $pdo->rollBack();
+    }
+
+    // Fault at schedule insertion must roll back the final answer, XP and completion.
+    $pdo->prepare('UPDATE exercises SET word_id=?,content_json=? WHERE id=?')
+        ->execute([$wordB, $contentFor($wordB), $bridgeExercise]);
+    $rollbackLesson = $learning->start($u1, $bridgeLesson);
+    $rollbackBody = [
+        'question_id' => $rollbackLesson['question']['id'], 'request_key' => requestKey(),
+        'answer' => ['option_id' => 'a'],
+    ];
+    $trigger = 'tu_bridge_fail_' . bin2hex(random_bytes(5));
+    try {
+        $pdo->exec('CREATE TRIGGER `' . $trigger . '` BEFORE INSERT ON user_review_states
+            FOR EACH ROW BEGIN IF NEW.user_id=' . $u1 . ' AND NEW.word_id=' . $wordB . " THEN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Tuan bridge rollback test';
+            END IF; END");
+    } catch (PDOException $error) {
+        $trigger = null;
+        $skips++;
+        echo 'SKIP bridge rollback fault injection: cannot create test trigger.' . PHP_EOL;
+    }
+    if ($trigger !== null) {
+        $threw = false;
+        try { $learning->answer($u1, $rollbackLesson['id'], $rollbackBody); }
+        catch (PDOException $error) { $threw = true; }
+        $query = $pdo->prepare('SELECT status FROM learning_sessions WHERE id=?');
+        $query->execute([$rollbackLesson['id']]);
+        $submissionCount = $pdo->prepare('SELECT COUNT(*) FROM answer_submissions WHERE request_key=?');
+        $submissionCount->execute([$rollbackBody['request_key']]);
+        $xpQuery->execute([$rollbackLesson['id']]);
+        dbCheck($threw && $query->fetchColumn() === 'in_progress'
+            && (int) $submissionCount->fetchColumn() === 0 && (int) $xpQuery->fetchColumn() === 0,
+            'Bridge failure rolls back final answer, completion and XP together');
+        $pdo->exec('DROP TRIGGER `' . $trigger . '`');
+        $trigger = null;
+    }
+    $retried = $learning->answer($u1, $rollbackLesson['id'], $rollbackBody);
+    dbCheck($retried['session']['status'] === 'completed'
+        && $retried['session']['review_initialization']['initialized'] === 1,
+        'Same lesson answer succeeds after bridge rollback');
+
+    // Older in-progress snapshots remain finishable; never guess their missing target IDs.
+    $legacy = $learning->start($u1, $bridgeLesson);
+    $pdo->prepare("UPDATE session_questions SET snapshot_json=JSON_REMOVE(snapshot_json,'$.target_word_ids')
+        WHERE session_id=?")->execute([$legacy['id']]);
+    $legacy = $learning->answer($u1, $legacy['id'], [
+        'question_id' => $legacy['question']['id'], 'request_key' => requestKey(),
+        'answer' => ['option_id' => 'a'],
+    ])['session'];
+    dbCheck($legacy['status'] === 'completed'
+        && $legacy['review_initialization']['legacy_questions'] === 1
+        && $legacy['review_initialization']['initialized'] === 0,
+        'Legacy snapshot completes with explicit missing-target report');
+
 } catch (Throwable $error) {
     $failed = true;
     fwrite(STDERR, $error->getMessage() . PHP_EOL);
@@ -660,6 +822,16 @@ try {
         $pdo->prepare(
             'DELETE FROM users WHERE id=?'
         )->execute([$userId]);
+    }
+
+    if ($bridgeTopic !== null) {
+        $pdo->prepare('DELETE e FROM exercises e JOIN lessons l ON l.id=e.lesson_id WHERE l.topic_id=?')
+            ->execute([$bridgeTopic]);
+        $pdo->prepare('DELETE lw FROM lesson_words lw JOIN lessons l ON l.id=lw.lesson_id WHERE l.topic_id=?')
+            ->execute([$bridgeTopic]);
+        $pdo->prepare('DELETE FROM lessons WHERE topic_id=?')->execute([$bridgeTopic]);
+        $pdo->prepare('DELETE FROM words WHERE topic_id=?')->execute([$bridgeTopic]);
+        $pdo->prepare('DELETE FROM topics WHERE id=?')->execute([$bridgeTopic]);
     }
 }
 

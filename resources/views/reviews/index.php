@@ -31,6 +31,10 @@ $reviewApiBase = $reviewApiBase ?? rtrim(
 </head>
 <body>
     <main class="review-shell">
+        <nav aria-label="Điều hướng học tập" style="display:flex;gap:20px;margin-bottom:24px;flex-wrap:wrap">
+            <a href="<?= htmlspecialchars($reviewApiBase . '/learning', ENT_QUOTES, 'UTF-8') ?>">← Bài học</a>
+            <a href="<?= htmlspecialchars($reviewApiBase . '/profile', ENT_QUOTES, 'UTF-8') ?>">Hồ sơ của bạn</a>
+        </nav>
         <header>
             <div>
                 <p class="eyebrow">GÓC ÔN TẬP CỦA BẠN</p>

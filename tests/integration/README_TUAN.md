@@ -15,7 +15,10 @@
 | tests/unit/ | Kiểm thử thuật toán, dữ liệu hỗ trợ và đầu vào |
 | tests/integration/ | Kiểm thử database, gửi trùng, nhiều thiết bị và rollback |
 
-Không sửa Core, Auth, Users, bootstrap, config, routes, public hoặc database của nhóm.
+Không sửa schema database, Core, Auth hoặc Users.
+Đợt tích hợp bổ sung route chung và sửa nhỏ ba file Learning đã có:
+ExerciseService.php (snapshot target_word_ids), LearningRepository.php (mode và gọi hook),
+LearningService.php (gọi hook trước commit). Cần Danh/Toàn review các điểm nối này.
 
 ## 2. Quy tắc SM-2
 
@@ -47,7 +50,7 @@ Giữ nguyên các bộ đếm Learning đã ghi.
 Hỗ trợ en_vi, vi_en, listening và spelling.
 Không khởi tạo thẻ listening khi từ chưa có audio.
 
-## 4. Các API cần Toàn nối vào router
+## 4. Các API đã đăng ký trong router
 
 Tất cả API nghiệp vụ cần phiên đăng nhập hợp lệ.
 Mọi POST cần header X-CSRF-Token khớp token trong phiên.
@@ -114,46 +117,31 @@ require $projectRoot . '/resources/views/reviews/index.php';
 Apache trên máy Tuấn dùng cổng 8081.
 Cổng Apache không thay thế cổng kết nối MySQL.
 
-Các route chưa tự được đăng ký chỉ bằng việc thêm module.
+routes/web.php đã đăng ký /reviews và giữ các trang Auth/Learning trên main.
+routes/api.php giữ API học, bổ sung Reviews và gọi ContentApiController::register.
+ContentController::register nối các trang quản trị đã có; không viết lại nghiệp vụ Cường.
 
-## 6. Điểm nối với Danh
+## 6. Điểm nối với Danh — đã bổ sung vào code
 
-Sau khi backend xác minh bài học hoàn thành, gọi hook trong
-chính transaction lưu kết quả bài học:
+Luồng: snapshot từ phía server → hoàn thành bài → thưởng XP →
+LessonReviewHook::afterSessionCompleted(PDO, userId, sessionId) → commit.
 
-```php
-use App\Modules\Reviews\Services\LessonReviewHook;
+- ExerciseService giữ target_word_ids ở cấp riêng của snapshot, không đưa vào content công khai.
+- LearningRepository chỉ đọc session mode=lesson; không nhận session SM-2.
+- Hook xác minh chủ sở hữu, mode, trạng thái completed và toàn bộ câu đã xử lý.
+- Chỉ lấy từ trong snapshot của câu đã học; không đọc lại bài tập hiện tại sau khi Admin sửa.
+- Mặc định tạo chiều en_vi, hẹn ôn lần đầu sau 24 giờ từ finished_at UTC.
+- Học lại không đặt lại lịch cũ; retry câu cuối không thưởng hoặc tạo lịch lần nữa.
+- Lỗi ghi lịch làm rollback câu trả lời cuối, kết quả bài và XP cùng transaction.
+- Không gọi ReviewModuleFactory trong transaction; hook dùng chính PDO của Learning.
+- Session cũ thiếu target_word_ids được phép hoàn thành và báo legacy_questions trong
+  session.review_initialization. Không suy đoán từ từ nội dung hiện tại.
+  Học một lượt mới sau cập nhật để ghi nhận chính xác các từ còn thiếu lịch.
+- Báo cáo khởi tạo được lưu vào rules_json.review_initialization để có thể đối chiếu.
 
-LessonReviewHook::afterLessonCompleted(
-    $pdo,
-    $userId,
-    $learnedWordIds,
-    $completedAtUtc,
-    ['en_vi']
-);
-```
-
-- Transaction Learning phải khóa users row đầu tiên.
-- learnedWordIds lấy từ snapshot bài học phía server.
-- completedAtUtc là thời gian do server xác định.
-- Hook không tự commit.
-- Learning commit sau khi toàn bộ bước thành công; lỗi thì rollback.
-
-Danh có thể cung cấp renderer dùng chung qua:
-
-```javascript
-window.DoulingoReviewCard = ({
-    word,
-    direction,
-    revealed,
-    escape
-}) => {
-    // Trả HTML từ component chung và escape nội dung dữ liệu.
-};
-```
-
-Nếu chưa có renderer, giao diện sử dụng flashcard chữ đơn giản.
-Không triển khai lại bộ trò chơi của Danh.
+Flashcard Reviews vẫn là tự đánh giá 0–5, chưa phải bộ trò chơi chấm đáp án của Danh.
+Điểm mở rộng window.DoulingoReviewCard vẫn cần Danh cung cấp renderer chung nếu muốn
+tái sử dụng cùng thành phần trình bày. Không coi điểm mở rộng này là đã kết nối.
 
 ## 7. Nhắc học
 
@@ -175,6 +163,7 @@ Chạy tại thư mục gốc dự án:
 ```
 
 Số kiểm tra mong đợi lần lượt: 112, 17, 21.
+Có thể chạy thêm tests/unit/learning.php để kiểm tra hồi quy phần của Danh.
 
 Đã tạo DB thử doulingo_sm2_test và nhập
 database/samples/doulingo_initial.sql một lần.
@@ -201,7 +190,12 @@ Chạy kiểm thử database:
 
 Kết quả Reviews đã xác nhận trên máy Tuấn:
 
-Integration checks=25 skips=0 result=PASS.
+Integration checks=25 skips=0 result=PASS. (Kết quả trước đợt tích hợp.)
+
+ReviewDatabaseTest.php hiện thêm kiểm tra Learning thật: snapshot riêng, đổi nội dung giữa
+lượt học, tạo lịch +1 ngày, retry, học lại, sai mode, học thất bại, quyền sở hữu, rollback
+XP/kết quả/câu trả lời khi ghi lịch lỗi và snapshot cũ. Vì đã thêm ca kiểm tra, tổng mới
+lớn hơn 25. Cần result=PASS và skips=0 để xác nhận đủ các ca lỗi/concurrency.
 
 Kết quả Notifications mong đợi:
 
@@ -211,14 +205,26 @@ Cần lưu kết quả thực tế của từng lần chạy vào mô tả PR.
 Kiểm thử database chưa thay thế việc kiểm thử toàn luồng web
 với Auth, Router và Learning thật.
 
-## 9. Chia PR theo chức năng
+## 9. Trạng thái kiểm tra đợt tích hợp
 
-1. Tuan - Hoàn thiện chức năng tính lịch SM-2
-2. Tuan - Hoàn thiện chức năng ôn tập và lưu lịch cá nhân
-3. Tuan - Hoàn thiện chức năng nhắc học trong ứng dụng
-4. Tuan - Hoàn thiện chức năng giao diện ôn tập
+Code được chuẩn bị từ main b7485f5d9a369e7869154c6ef094f63940c4f3be
+và Tuan 9f5a03881218b01bc8a8105f400c425695708e9d.
+Phiên hỗ trợ này không có môi trường chạy PHP/MySQL.
+Chưa xác nhận PASS cho code đợt tích hợp mới; không dùng kết quả cũ thay cho chạy lại.
 
-Chọn file theo từng chức năng khi commit.
-Không đưa chức năng tiếp theo vào cùng nhánh khi PR trước còn mở.
-Sau khi nhóm trưởng merge, đồng bộ code rồi tiếp tục.
-Nhóm trưởng review và merge PR.
+Sau khi pull nhánh Tuan, chạy ba unit Reviews, unit Learning và hai integration Reviews/
+Notifications trong database riêng kết thúc _sm2_test.
+Không chạy tests/integration/learning.php của Danh trên DB đang chứa tài khoản:
+file đó yêu cầu database thử riêng hoàn toàn mới và có thể chỉnh seed để thử nghiệm.
+
+Kiểm tra web: /login → /learning → hoàn thành một lượt mới → /reviews.
+Lịch đầu tiên hẹn ngày kế tiếp, nên danh sách đến hạn có thể vẫn là 0.
+Đối chiếu user_review_states của đúng tài khoản hoặc chờ đến hạn;
+không chỉnh ngày trên database dùng chung chỉ để làm demo.
+Không có migration mới, không xóa hay import lại database đang sử dụng.
+
+## 10. PR và nhánh nộp bài
+
+Dùng nhánh Tuan và cập nhật PR #19 hiện có cho toàn bộ phần Reviews/Notifications.
+Tuan-chay-thu chỉ là bản chạy thử cũ; không tạo thêm PR từ nhánh đó.
+Nhóm trưởng và Danh review điểm nối Learning; nhóm trưởng merge PR vào main.

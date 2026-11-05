@@ -82,10 +82,11 @@
         try {
             const url = new URL(value, location.href);
 
-            return ['http:', 'https:'].includes(url.protocol)
-                && url.origin === location.origin
-                ? url.href
-                : '';
+            // Match Learning's media policy: local resources or HTTPS content media.
+            return !url.username && !url.password
+                && (url.protocol === 'https:'
+                    || (url.protocol === 'http:' && url.origin === location.origin))
+                ? url.href : '';
         } catch (_) {
             return '';
         }

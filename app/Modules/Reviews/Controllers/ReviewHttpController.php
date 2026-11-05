@@ -31,16 +31,23 @@ final class ReviewHttpController
     // Hien thi trang on sau khi dang nhap.
     public function index(array $params): void
     {
-        Auth::user();
-        $this->csrfToken();
-
-        header('Content-Type: text/html; charset=utf-8');
-        header('Cache-Control: no-store');
-
         $reviewApiBase = rtrim(
             str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')),
             '/.'
         );
+        try {
+            Auth::user();
+        } catch (ApiException $error) {
+            if ($error->status !== 401) {
+                throw $error;
+            }
+            header('Cache-Control: no-store');
+            header('Location: ' . $reviewApiBase . '/login', true, 303);
+            return;
+        }
+        $this->csrfToken();
+        header('Content-Type: text/html; charset=utf-8');
+        header('Cache-Control: no-store');
 
         $projectRoot = dirname(__DIR__, 4);
 

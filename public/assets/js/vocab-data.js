@@ -1,0 +1,75 @@
+/* Dữ liệu từ vựng tạm thời theo trình độ (demo).
+   Sau này thay bằng API do module Vocabulary cung cấp. */
+window.DOULINGO_VOCAB = {
+  a1: [
+    { en: 'apple', vi: 'quả táo', ex: 'I eat an apple every day.', exVi: 'Tôi ăn một quả táo mỗi ngày.' },
+    { en: 'water', vi: 'nước', ex: 'Can I have some water?', exVi: 'Cho tôi xin chút nước được không?' },
+    { en: 'house', vi: 'ngôi nhà', ex: 'This is my house.', exVi: 'Đây là nhà của tôi.' },
+    { en: 'book', vi: 'quyển sách', ex: 'She reads a book.', exVi: 'Cô ấy đọc một quyển sách.' },
+    { en: 'friend', vi: 'bạn bè', ex: 'He is my friend.', exVi: 'Anh ấy là bạn của tôi.' },
+    { en: 'family', vi: 'gia đình', ex: 'I love my family.', exVi: 'Tôi yêu gia đình tôi.' },
+    { en: 'school', vi: 'trường học', ex: 'We go to school by bike.', exVi: 'Chúng tôi đi học bằng xe đạp.' },
+    { en: 'tea', vi: 'trà', ex: 'I like hot tea.', exVi: 'Tôi thích trà nóng.' },
+    { en: 'milk', vi: 'sữa', ex: 'The baby drinks milk.', exVi: 'Em bé uống sữa.' },
+    { en: 'dog', vi: 'con chó', ex: 'The dog is very friendly.', exVi: 'Con chó rất thân thiện.' },
+    { en: 'cat', vi: 'con mèo', ex: 'The cat sleeps on the sofa.', exVi: 'Con mèo ngủ trên ghế sofa.' },
+    { en: 'car', vi: 'xe hơi', ex: 'My father has a new car.', exVi: 'Bố tôi có một chiếc xe hơi mới.' },
+    { en: 'sun', vi: 'mặt trời', ex: 'The sun is bright today.', exVi: 'Hôm nay mặt trời rất sáng.' },
+    { en: 'red', vi: 'màu đỏ', ex: 'She wears a red dress.', exVi: 'Cô ấy mặc váy màu đỏ.' },
+    { en: 'happy', vi: 'vui vẻ', ex: 'I am happy today.', exVi: 'Hôm nay tôi vui.' },
+    { en: 'eat', vi: 'ăn', ex: 'We eat dinner at six.', exVi: 'Chúng tôi ăn tối lúc sáu giờ.' },
+    { en: 'drink', vi: 'uống', ex: 'I drink coffee in the morning.', exVi: 'Tôi uống cà phê vào buổi sáng.' },
+    { en: 'sleep', vi: 'ngủ', ex: 'I sleep eight hours a night.', exVi: 'Tôi ngủ tám tiếng mỗi đêm.' },
+    { en: 'morning', vi: 'buổi sáng', ex: 'Good morning!', exVi: 'Chào buổi sáng!' },
+    { en: 'name', vi: 'tên', ex: 'What is your name?', exVi: 'Bạn tên là gì?' }
+  ],
+  a2: [
+    { en: 'travel', vi: 'du lịch', ex: 'I love to travel by train.', exVi: 'Tôi thích đi du lịch bằng tàu hỏa.' },
+    { en: 'weather', vi: 'thời tiết', ex: 'The weather is nice today.', exVi: 'Hôm nay thời tiết đẹp.' },
+    { en: 'kitchen', vi: 'nhà bếp', ex: 'My mother is in the kitchen.', exVi: 'Mẹ tôi đang ở trong bếp.' },
+    { en: 'holiday', vi: 'kỳ nghỉ', ex: 'We are on holiday this week.', exVi: 'Tuần này chúng tôi đang nghỉ lễ.' },
+    { en: 'ticket', vi: 'vé', ex: 'I bought two tickets.', exVi: 'Tôi đã mua hai chiếc vé.' },
+    { en: 'hospital', vi: 'bệnh viện', ex: 'She works at a hospital.', exVi: 'Cô ấy làm việc ở bệnh viện.' },
+    { en: 'borrow', vi: 'mượn', ex: 'Can I borrow your pen?', exVi: 'Tôi mượn bút của bạn được không?' },
+    { en: 'early', vi: 'sớm', ex: 'I get up early every day.', exVi: 'Ngày nào tôi cũng dậy sớm.' },
+    { en: 'important', vi: 'quan trọng', ex: 'This meeting is important.', exVi: 'Cuộc họp này rất quan trọng.' },
+    { en: 'expensive', vi: 'đắt tiền', ex: 'This bag is too expensive.', exVi: 'Chiếc túi này đắt quá.' },
+    { en: 'neighbor', vi: 'hàng xóm', ex: 'My neighbor is very kind.', exVi: 'Hàng xóm của tôi rất tốt bụng.' },
+    { en: 'delicious', vi: 'ngon', ex: 'The soup is delicious.', exVi: 'Món súp rất ngon.' },
+    { en: 'cook', vi: 'nấu ăn', ex: 'He likes to cook dinner.', exVi: 'Anh ấy thích nấu bữa tối.' },
+    { en: 'invite', vi: 'mời', ex: 'I want to invite you to my party.', exVi: 'Tôi muốn mời bạn đến buổi tiệc của tôi.' },
+    { en: 'repair', vi: 'sửa chữa', ex: 'They repair bikes here.', exVi: 'Họ sửa xe đạp ở đây.' },
+    { en: 'countryside', vi: 'miền quê', ex: 'We live in the countryside.', exVi: 'Chúng tôi sống ở miền quê.' },
+    { en: 'receive', vi: 'nhận', ex: 'I received your message.', exVi: 'Tôi đã nhận được tin nhắn của bạn.' },
+    { en: 'journey', vi: 'hành trình', ex: 'The journey took three hours.', exVi: 'Hành trình mất ba tiếng.' },
+    { en: 'restaurant', vi: 'nhà hàng', ex: 'Let us eat at a restaurant.', exVi: 'Chúng ta hãy ăn ở nhà hàng nhé.' },
+    { en: 'schedule', vi: 'lịch trình', ex: 'My schedule is full today.', exVi: 'Lịch trình hôm nay của tôi kín rồi.' }
+  ],
+  b1: [
+    { en: 'achieve', vi: 'đạt được', ex: 'She worked hard to achieve her goal.', exVi: 'Cô ấy làm việc chăm chỉ để đạt được mục tiêu.' },
+    { en: 'environment', vi: 'môi trường', ex: 'We must protect the environment.', exVi: 'Chúng ta phải bảo vệ môi trường.' },
+    { en: 'opportunity', vi: 'cơ hội', ex: 'This job is a great opportunity.', exVi: 'Công việc này là một cơ hội tuyệt vời.' },
+    { en: 'experience', vi: 'kinh nghiệm', ex: 'He has ten years of experience.', exVi: 'Anh ấy có mười năm kinh nghiệm.' },
+    { en: 'improve', vi: 'cải thiện', ex: 'I want to improve my English.', exVi: 'Tôi muốn cải thiện tiếng Anh của mình.' },
+    { en: 'community', vi: 'cộng đồng', ex: 'The community helps each other.', exVi: 'Cộng đồng giúp đỡ lẫn nhau.' },
+    { en: 'decision', vi: 'quyết định', ex: 'It was a difficult decision.', exVi: 'Đó là một quyết định khó khăn.' },
+    { en: 'reliable', vi: 'đáng tin cậy', ex: 'She is a reliable colleague.', exVi: 'Cô ấy là một đồng nghiệp đáng tin cậy.' },
+    { en: 'challenge', vi: 'thử thách', ex: 'Learning a language is a challenge.', exVi: 'Học một ngôn ngữ là một thử thách.' },
+    { en: 'convenient', vi: 'thuận tiện', ex: 'The shop is in a convenient place.', exVi: 'Cửa hàng ở một nơi thuận tiện.' },
+    { en: 'damage', vi: 'thiệt hại', ex: 'The storm caused serious damage.', exVi: 'Cơn bão gây thiệt hại nghiêm trọng.' },
+    { en: 'encourage', vi: 'khuyến khích', ex: 'Teachers encourage students to ask questions.', exVi: 'Giáo viên khuyến khích học sinh đặt câu hỏi.' },
+    { en: 'independent', vi: 'độc lập', ex: 'He wants to be independent.', exVi: 'Anh ấy muốn được độc lập.' },
+    { en: 'knowledge', vi: 'kiến thức', ex: 'Reading gives us knowledge.', exVi: 'Đọc sách mang lại cho ta kiến thức.' },
+    { en: 'negotiate', vi: 'đàm phán', ex: 'They negotiate the price.', exVi: 'Họ đàm phán về giá.' },
+    { en: 'responsibility', vi: 'trách nhiệm', ex: 'It is your responsibility.', exVi: 'Đó là trách nhiệm của bạn.' },
+    { en: 'suggest', vi: 'đề nghị', ex: 'I suggest we leave early.', exVi: 'Tôi đề nghị chúng ta đi sớm.' },
+    { en: 'support', vi: 'hỗ trợ', ex: 'My family supports me.', exVi: 'Gia đình hỗ trợ tôi.' },
+    { en: 'tradition', vi: 'truyền thống', ex: 'Tet is a traditional holiday.', exVi: 'Tết là một ngày lễ truyền thống.' },
+    { en: 'valuable', vi: 'có giá trị', ex: 'Time is valuable.', exVi: 'Thời gian rất có giá trị.' }
+  ]
+};
+window.DOULINGO_LEVELS = {
+  a1: { tag: 'A1', name: 'Mới bắt đầu' },
+  a2: { tag: 'A2', name: 'Cơ bản' },
+  b1: { tag: 'B1', name: 'Trung cấp' }
+};
