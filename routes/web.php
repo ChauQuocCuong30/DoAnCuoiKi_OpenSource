@@ -4,5 +4,12 @@ declare(strict_types=1);
 use App\Core\Router;
 
 return static function (Router $router): void {
-    // Mỗi người thêm route trang web của mình tại đây qua Pull Request.
+    $router->get('/login', [\App\Modules\Auth\Controllers\AuthPageController::class, 'login']);
+    $router->get('/register', [\App\Modules\Auth\Controllers\AuthPageController::class, 'register']);
+    $router->get('/profile', [\App\Modules\Auth\Controllers\AuthPageController::class, 'profile']);
+    $router->get('/welcome', [\App\Modules\Auth\Controllers\AuthPageController::class, 'welcome']);
+    $router->get('/start', [\App\Modules\Auth\Controllers\OnboardingController::class, 'start']);
+    $router->get('/level', [\App\Modules\Auth\Controllers\OnboardingController::class, 'level']);
+    $router->get('/placement', [\App\Modules\Auth\Controllers\OnboardingController::class, 'placement']);
+    $router->get('/lesson', [\App\Modules\Auth\Controllers\OnboardingController::class, 'lesson']);
 };
