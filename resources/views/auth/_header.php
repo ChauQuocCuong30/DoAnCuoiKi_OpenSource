@@ -10,6 +10,8 @@ $e = static fn (string $v): string => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= $e($title) ?> - Doulingo</title>
     <link rel="stylesheet" href="<?= $e($base) ?>/assets/css/auth.css">
+    <link rel="stylesheet" href="<?= $e($base) ?>/assets/css/transition.css">
+    <script src="<?= $e($base) ?>/assets/js/transition.js"></script>
 </head>
 <body data-base="<?= $e($base) ?>">
 <div class="auth-layout">
@@ -43,6 +45,9 @@ $e = static fn (string $v): string => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
         </div>
     </aside>
     <main class="auth-card">
+        <?php if (in_array($view ?? '', ['login', 'register'], true)): ?>
+        <a class="back-welcome" href="<?= $e($base) ?>/welcome">← Quay về</a>
+        <?php endif; ?>
         <div class="logo logo-mobile">
             <svg width="32" height="32" viewBox="0 0 40 40" aria-hidden="true">
                 <rect width="40" height="40" rx="11" class="lg-bg"/>

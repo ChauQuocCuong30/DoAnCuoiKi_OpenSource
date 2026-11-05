@@ -15,6 +15,8 @@ $e = static fn (string $v): string => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= $e($base) ?>/assets/css/welcome.css">
     <script>document.documentElement.classList.add('js');</script>
+    <link rel="stylesheet" href="<?= $e($base) ?>/assets/css/transition.css">
+    <script src="<?= $e($base) ?>/assets/js/transition.js"></script>
 </head>
 <body>
 <div class="grain" aria-hidden="true"></div>
@@ -45,13 +47,7 @@ $e = static fn (string $v): string => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
     </div>
 
     <nav class="nav" aria-label="Chính">
-        <a class="nl" href="<?= $e($base) ?>/register">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h16M4 15h10"/></svg><span>Đăng ký</span>
-        </a>
         <a class="brand" href="<?= $e($base) ?>/welcome">Doulingo<small>Học từ vựng</small></a>
-        <a class="nr" href="<?= $e($base) ?>/login"><span>Đăng nhập</span>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>
-        </a>
     </nav>
 </section>
 
