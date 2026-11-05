@@ -73,6 +73,31 @@ kiểm tra trùng lại và ghi cả đợt trong một transaction; gửi lại
   Quy tắc bảo vệ từ đã có lịch sử học vẫn áp dụng khi sửa nghĩa.
 - Quyền admin, phiên đăng nhập và CSRF vẫn bắt buộc.
 
+## Quản lý chủ đề và mã tự động
+
+Trang `/admin/topics` dùng chung header, footer, nền kem, kiểu chữ và nút với kệ sách.
+Biểu mẫu chỉ cần tên; mô tả và ảnh là tùy chọn. Có tìm kiếm, phân trang, sửa,
+ẩn/hiện và liên kết mở sách tương ứng.
+
+- Mã hiển thị tự động dạng **CD000001**, **CD000002** dựa trên `topics.id` tự tăng.
+  Mã có thể có khoảng trống giữa các số; không phải số thứ tự liên tục.
+- Không thay ID của chủ đề cũ hay các khóa ngoại đang tham chiếu.
+- Chủ đề mới tự nhận `position` lớn nhất hiện có cộng 1, tính cả chủ đề ẩn.
+  Không cần nhập mã hoặc thứ tự trên biểu mẫu.
+- Sửa tên, mô tả, ảnh hoặc trạng thái giữ nguyên ID/mã và vị trí cũ.
+  Giá trị `position` gửi từ biểu mẫu cũ cũng được bỏ qua.
+- Ghi trong transaction, khóa cuối chỉ mục thứ tự và thử lại tối đa ba lần nếu
+  có xung đột khi nhiều người tạo cùng lúc. Nếu vẫn bận, biểu mẫu giữ dữ liệu để lưu lại.
+
+**Cập nhật trang chủ đề không cần migration hoặc import SQL mới.**
+
+File bổ sung cho trang này: `public/assets/css/admin-topics.css`,
+`resources/views/admin/_header.php`, `resources/views/admin/_footer.php`,
+`tests/integration/admin-topics.php`, `tests/e2e/admin-topics.cjs`.
+Các file sửa: `TopicController.php`, `TopicRepository.php`, view `topics.php`,
+view `books.php` (dùng header/footer chung), workflow CI và tài liệu này.
+Không xóa file nào.
+
 ## Danh sách file
 
 | Loại | File | Mục đích |
@@ -82,7 +107,7 @@ kiểm tra trùng lại và ghi cả đợt trong một transaction; gửi lại
 | Sửa | `app/Modules/Admin/Controllers/ContentApiController.php` | API sách, bộ mẫu, tải CSV, xem trước/nhập |
 | Sửa | `app/Modules/Admin/Services/ContentCsvImporter.php` | CSV gọn, chọn sách, bỏ qua trùng và kiểm tra lại lúc ghi |
 | Sửa | `app/Modules/Vocabulary/Repositories/ContentRepository.php` | Truy vấn thống kê sách; giữ các quy tắc ghi cũ |
-| Sửa | `resources/views/admin/topics.php` | Liên kết quay về kệ sách |
+| Sửa | `resources/views/admin/topics.php` | Giao diện chủ đề đồng bộ kệ sách, mã và thứ tự tự động |
 | Sửa | `.github/workflows/ci.yml` | Chạy thêm kiểm thử admin |
 | Thêm | `app/Modules/Admin/Services/VocabularySamples.php` | Đọc và kiểm tra bộ mẫu nội bộ |
 | Thêm | `database/migrations/002_ensure_word_sources.sql` | Bổ sung bảng metadata nếu chưa có |
@@ -105,11 +130,13 @@ git ls-files -z -- '*.php' | xargs -0 -r -n 1 php -l
 php tests/unit/learning.php
 php tests/integration/learning.php
 php tests/integration/admin-books.php
+php tests/integration/admin-topics.php
 node --check public/assets/js/admin-books.js
 # Khởi động PHP bằng cùng cấu hình DB test trước khi chạy trình duyệt:
 # php -S 127.0.0.1:8085 -t public
 TEST_BASE_URL=http://127.0.0.1:8085 node tests/e2e/learning.cjs
 TEST_BASE_URL=http://127.0.0.1:8085 node tests/e2e/admin-books.cjs
+TEST_BASE_URL=http://127.0.0.1:8085 node tests/e2e/admin-topics.cjs
 ```
 
 Trình duyệt cần Playwright/Chromium như job CI hiện có; không thêm thư viện frontend
