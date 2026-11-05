@@ -27,6 +27,7 @@ jobs:
         run: git ls-files -z -- '*.php' | xargs -0 -r -n 1 php -l
       - run: php tests/unit/learning.php
       - run: node --check public/assets/js/learning.js
+      - run: node --check public/assets/js/admin-books.js
   learning-integration:
     runs-on: ubuntu-latest
     services:
@@ -54,6 +55,7 @@ jobs:
         run: |
           mysql --skip-ssl -h 127.0.0.1 -u root -pintegration-only doulingo_learning_test < database/migrations/001_create_tables.sql
           mysql --skip-ssl -h 127.0.0.1 -u root -pintegration-only doulingo_learning_test < database/seeds/001_demo_data.sql
+          mysql --skip-ssl -h 127.0.0.1 -u root -pintegration-only doulingo_learning_test < database/migrations/002_ensure_word_sources.sql
       - run: php tests/integration/learning.php
       - name: Install browser test runner
         run: |
@@ -67,3 +69,7 @@ jobs:
             sleep 0.5
           done
           TEST_BASE_URL=http://127.0.0.1:8085 NODE_PATH=/tmp/learning-playwright/node_modules node tests/e2e/learning.cjs
+      - name: Admin vocabulary integration and browser regression
+        run: |
+          php tests/integration/admin-books.php
+          TEST_BASE_URL=http://127.0.0.1:8085 NODE_PATH=/tmp/learning-playwright/node_modules node tests/e2e/admin-books.cjs
