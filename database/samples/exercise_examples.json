@@ -1,0 +1,285 @@
+{
+    "choose_meaning": {
+      "lesson_id": 1,
+      "word_id": 1,
+      "type": "choose_meaning",
+      "difficulty": 1,
+      "is_active": 0,
+      "content_json": {
+        "schema_version": 1,
+        "instruction": "Thay hướng dẫn theo nội dung bài",
+        "prompt": "sữa",
+        "target_word_ids": [
+          1
+        ],
+        "options": [
+          {
+            "id": "a",
+            "text": "milk"
+          },
+          {
+            "id": "b",
+            "text": "tea"
+          }
+        ]
+      },
+      "answer_json": {
+        "correct_option_ids": [
+          "a"
+        ]
+      }
+    },
+    "choose_image": {
+      "lesson_id": 1,
+      "word_id": 1,
+      "type": "choose_image",
+      "difficulty": 1,
+      "is_active": 0,
+      "content_json": {
+        "schema_version": 1,
+        "instruction": "Thay hướng dẫn theo nội dung bài",
+        "prompt": "sữa",
+        "target_word_ids": [
+          1
+        ],
+        "options": [
+          {
+            "id": "a",
+            "text": "milk",
+            "image": "https://example.invalid/milk.png"
+          },
+          {
+            "id": "b",
+            "text": "tea",
+            "image": "https://example.invalid/tea.png"
+          }
+        ]
+      },
+      "answer_json": {
+        "correct_option_ids": [
+          "a"
+        ]
+      }
+    },
+    "fill_blank": {
+      "lesson_id": 1,
+      "word_id": 1,
+      "type": "fill_blank",
+      "difficulty": 1,
+      "is_active": 0,
+      "content_json": {
+        "schema_version": 1,
+        "instruction": "Thay hướng dẫn theo nội dung bài",
+        "prompt": "I drink ____.",
+        "target_word_ids": [
+          1
+        ]
+      },
+      "answer_json": {
+        "accepted_answers": [
+          "milk"
+        ],
+        "normalization": {
+          "trim": true,
+          "case_sensitive": false
+        }
+      }
+    },
+    "token_order": {
+      "lesson_id": 1,
+      "word_id": 1,
+      "type": "token_order",
+      "difficulty": 1,
+      "is_active": 0,
+      "content_json": {
+        "schema_version": 1,
+        "instruction": "Thay hướng dẫn theo nội dung bài",
+        "target_word_ids": [
+          1
+        ],
+        "tokens": [
+          {
+            "id": "t1",
+            "text": "I"
+          },
+          {
+            "id": "t2",
+            "text": "drink"
+          },
+          {
+            "id": "t3",
+            "text": "milk"
+          }
+        ]
+      },
+      "answer_json": {
+        "accepted_sequences": [
+          [
+            "t1",
+            "t2",
+            "t3"
+          ]
+        ]
+      }
+    },
+    "listen_select": {
+      "lesson_id": 1,
+      "word_id": 1,
+      "type": "listen_select",
+      "difficulty": 1,
+      "is_active": 0,
+      "content_json": {
+        "schema_version": 1,
+        "instruction": "Thay hướng dẫn theo nội dung bài",
+        "prompt": "sữa",
+        "target_word_ids": [
+          1
+        ],
+        "options": [
+          {
+            "id": "a",
+            "text": "milk"
+          },
+          {
+            "id": "b",
+            "text": "tea"
+          }
+        ],
+        "audio": "https://example.invalid/milk.mp3"
+      },
+      "answer_json": {
+        "correct_option_ids": [
+          "a"
+        ]
+      }
+    },
+    "listen_type": {
+      "lesson_id": 1,
+      "word_id": 1,
+      "type": "listen_type",
+      "difficulty": 1,
+      "is_active": 0,
+      "content_json": {
+        "schema_version": 1,
+        "instruction": "Thay hướng dẫn theo nội dung bài",
+        "prompt": "sữa",
+        "target_word_ids": [
+          1
+        ],
+        "audio": "https://example.invalid/milk.mp3"
+      },
+      "answer_json": {
+        "accepted_answers": [
+          "milk"
+        ],
+        "normalization": {
+          "trim": true,
+          "case_sensitive": false
+        }
+      }
+    },
+    "match_pairs": {
+      "lesson_id": 1,
+      "word_id": null,
+      "type": "match_pairs",
+      "difficulty": 1,
+      "is_active": 0,
+      "content_json": {
+        "schema_version": 1,
+        "instruction": "Thay hướng dẫn theo nội dung bài",
+        "target_word_ids": [
+          1,
+          2
+        ],
+        "left": [
+          {
+            "id": "l1",
+            "text": "sữa"
+          },
+          {
+            "id": "l2",
+            "text": "trà"
+          }
+        ],
+        "right": [
+          {
+            "id": "r2",
+            "text": "tea"
+          },
+          {
+            "id": "r1",
+            "text": "milk"
+          }
+        ]
+      },
+      "answer_json": {
+        "pairs": [
+          {
+            "left_id": "l1",
+            "right_id": "r1",
+            "word_id": 1
+          },
+          {
+            "left_id": "l2",
+            "right_id": "r2",
+            "word_id": 2
+          }
+        ]
+      }
+    },
+    "translate_text": {
+      "lesson_id": 1,
+      "word_id": 1,
+      "type": "translate_text",
+      "difficulty": 1,
+      "is_active": 0,
+      "content_json": {
+        "schema_version": 1,
+        "instruction": "Thay hướng dẫn theo nội dung bài",
+        "prompt": "sữa",
+        "target_word_ids": [
+          1
+        ]
+      },
+      "answer_json": {
+        "accepted_answers": [
+          "milk"
+        ],
+        "normalization": {
+          "trim": true,
+          "case_sensitive": false
+        }
+      }
+    },
+    "sound_discrimination": {
+      "lesson_id": 1,
+      "word_id": 1,
+      "type": "sound_discrimination",
+      "difficulty": 1,
+      "is_active": 0,
+      "content_json": {
+        "schema_version": 1,
+        "instruction": "Thay hướng dẫn theo nội dung bài",
+        "prompt": "sữa",
+        "target_word_ids": [
+          1
+        ],
+        "options": [
+          {
+            "id": "a",
+            "text": "milk"
+          },
+          {
+            "id": "b",
+            "text": "tea"
+          }
+        ],
+        "audio": "https://example.invalid/milk.mp3"
+      },
+      "answer_json": {
+        "correct_option_ids": [
+          "a"
+        ]
+      }
+    }
+  }
