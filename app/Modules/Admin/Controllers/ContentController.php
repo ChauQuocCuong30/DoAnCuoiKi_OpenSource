@@ -11,6 +11,7 @@ final class ContentController
     // LIÊN QUAN CƯỜNG: một lần đăng ký toàn bộ route web của phần 2.
     public static function register(Router $router): void
     {
+        $router->get('/admin', [self::class, 'words']);
         $router->get('/admin/dictionary', [
             DictionaryPageController::class,
             'index',
@@ -54,6 +55,7 @@ final class ContentController
         );
         header('Content-Type: text/html; charset=utf-8');
         header('Cache-Control: no-store');
-        require dirname(__DIR__, 4) . '/resources/views/admin/content.php';
+        $view = in_array($section, ['words', 'import'], true) ? 'books' : 'content';
+        require dirname(__DIR__, 4) . '/resources/views/admin/' . $view . '.php';
     }
 }

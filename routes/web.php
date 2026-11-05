@@ -2,12 +2,15 @@
 declare(strict_types=1);
 
 use App\Core\Router;
+use App\Modules\Admin\Controllers\ContentController;
 use App\Modules\Auth\Controllers\AuthPageController;
 use App\Modules\Auth\Controllers\OnboardingController;
 use App\Modules\Learning\Controllers\GuestLearningController;
 use App\Modules\Learning\Controllers\LearningStudioController;
 
 return static function (Router $router): void {
+    ContentController::register($router);
+
     $router->get(
         '/login',
         [AuthPageController::class, 'login']

@@ -28,6 +28,19 @@ final class ContentRepository
         $s = $this->db->prepare($sql);
         $s->execute($args);
     }
+    public function books(): array
+    {
+        // Count all persisted words, including hidden ones; no lesson/history writes.
+        return $this->rows(
+            'SELECT t.id,t.name,t.description,t.position,t.is_active,
+             COALESCE(w.word_count,0) word_count,
+             COALESCE(w.active_word_count,0) active_word_count
+             FROM topics t LEFT JOIN (
+                 SELECT topic_id,COUNT(*) word_count,SUM(is_active=1) active_word_count
+                 FROM words GROUP BY topic_id
+             ) w ON w.topic_id=t.id ORDER BY t.position,t.id',
+        );
+    }
     public function transaction(callable $work): mixed
     {
         $nested = $this->db->inTransaction();

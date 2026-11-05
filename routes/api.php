@@ -3,13 +3,15 @@ declare(strict_types=1);
 
 use App\Core\Response;
 use App\Core\Router;
-use App\Modules\Vocabulary\Controllers\DictionaryController;
+use App\Modules\Admin\Controllers\ContentApiController;
 use App\Modules\Auth\Controllers\AuthController;
 use App\Modules\Users\Controllers\UsersController;
 use App\Modules\Learning\Controllers\LearningController;
 use App\Modules\Learning\Controllers\GuestLearningController;
 
 return static function (Router $router): void {
+    ContentApiController::register($router);
+
     $router->get(
         '/api/v1/health',
         static function (array $params): void {
@@ -74,10 +76,5 @@ return static function (Router $router): void {
     $router->patch(
         '/api/v1/users/{id}/status',
         [UsersController::class, 'updateStatus']
-    );
-
-    $router->get(
-        '/api/v1/admin/dictionary',
-        [DictionaryController::class, 'lookup']
     );
 };
