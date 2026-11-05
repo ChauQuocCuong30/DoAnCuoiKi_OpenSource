@@ -2,7 +2,8 @@
 declare(strict_types=1);
 
 use App\Core\Router;
+use App\Modules\Reviews\Controllers\ReviewHttpController;
 
 return static function (Router $router): void {
-    // Mỗi người thêm route trang web của mình tại đây qua Pull Request.
+    $router->get('/reviews', [ReviewHttpController::class, 'index']);
 };
