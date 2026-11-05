@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use App\Core\Router;
+use App\Modules\Learning\Controllers\LearningController;
 
 return static function (Router $router): void {
     $router->get('/login', [\App\Modules\Auth\Controllers\AuthPageController::class, 'login']);
@@ -12,4 +13,7 @@ return static function (Router $router): void {
     $router->get('/level', [\App\Modules\Auth\Controllers\OnboardingController::class, 'level']);
     $router->get('/placement', [\App\Modules\Auth\Controllers\OnboardingController::class, 'placement']);
     $router->get('/lesson', [\App\Modules\Auth\Controllers\OnboardingController::class, 'lesson']);
+
+    $router->get('/learning', [LearningController::class, 'index']);
+    $router->get('/learning/lesson/{id}', [LearningController::class, 'lesson']);
 };
