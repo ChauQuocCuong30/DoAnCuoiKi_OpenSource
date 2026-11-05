@@ -23,8 +23,9 @@ final class ContentCsvImporter
         'audio_license',
     ];
     public function __construct(private ContentRepository $repo) {}
-    public function preview(string $csv): array
+    public function preview(string $csv, string $duplicateMode = 'error', ?int $topicId = null): array
     {
+        self::duplicateMode($duplicateMode);
         if (strlen($csv) > 1048576) {
             throw new ApiException(
                 'CSV_TOO_LARGE',
@@ -42,10 +43,14 @@ final class ContentCsvImporter
         rewind($stream);
         try {
             $headers = fgetcsv($stream, 0, ',', '"', '');
-            if ($headers !== self::HEADERS) {
+            $required = ['english', 'vietnamese', 'part_of_speech', 'example'];
+            if ($topicId === null) $required[] = 'topic_id';
+            if (!is_array($headers) || array_diff($required, $headers)
+                || array_diff($headers, self::HEADERS)
+                || count(array_unique($headers)) !== count($headers)) {
                 ContentInput::fail(
-                    'Header CSV phải đúng thứ tự: ' .
-                        implode(',', self::HEADERS),
+                    'CSV cần các cột: ' . implode(',', $required) .
+                    '. Các cột bổ sung được phép: ' . implode(',', self::HEADERS),
                 );
             }
             $rows = [];
@@ -53,12 +58,14 @@ final class ContentCsvImporter
             $seen = [];
             $record = 1;
             $topics = [];
+            $skipped = 0;
+            $records = 0;
             while (($values = fgetcsv($stream, 0, ',', '"', '')) !== false) {
                 $record++;
                 if ($values === [null]) {
                     continue;
                 }
-                if ($record > 1001) {
+                if (++$records > 1000) {
                     ContentInput::fail('Mỗi đợt tối đa 1000 bản ghi.');
                 }
                 try {
@@ -66,23 +73,29 @@ final class ContentCsvImporter
                         ContentInput::fail('Thiếu hoặc thừa cột.');
                     }
                     $b = array_combine($headers, $values);
+                    if ($topicId !== null) {
+                        if (($b['topic_id'] ?? '') !== '' && ContentInput::id($b['topic_id']) !== $topicId) {
+                            ContentInput::fail('topic_id trong CSV khác sách đang chọn.');
+                        }
+                        $b['topic_id'] = $topicId;
+                    }
                     $b['is_active'] = 1;
                     $data = ContentInput::word($b);
                     $w = $data['word'];
-                    $topicId = $w['topic_id'];
-                    $topics[$topicId] ??= $this->repo->rows(
+                    $rowTopic = $w['topic_id'];
+                    $topics[$rowTopic] ??= $this->repo->rows(
                         'SELECT is_active FROM topics WHERE id=?',
-                        [$topicId],
+                        [$rowTopic],
                     );
                     if (
-                        !$topics[$topicId] ||
-                        (int) $topics[$topicId][0]['is_active'] !== 1
+                        !$topics[$rowTopic] ||
+                        (int) $topics[$rowTopic][0]['is_active'] !== 1
                     ) {
                         ContentInput::fail('Chủ đề không tồn tại hoặc đã ẩn.');
                     }
                     $identity = json_encode(
                         [
-                            $topicId,
+                            $rowTopic,
                             mb_strtolower($w['english'], 'UTF-8'),
                             $w['part_of_speech'],
                             mb_strtolower($w['vietnamese'], 'UTF-8'),
@@ -90,6 +103,7 @@ final class ContentCsvImporter
                         JSON_THROW_ON_ERROR,
                     );
                     if (isset($seen[$identity])) {
+                        if ($duplicateMode === 'skip') { $skipped++; continue; }
                         ContentInput::fail(
                             'Trùng bản ghi ' .
                                 $seen[$identity] .
@@ -98,6 +112,7 @@ final class ContentCsvImporter
                     }
                     $seen[$identity] = $record;
                     if ($this->repo->duplicate($w) !== null) {
+                        if ($duplicateMode === 'skip') { $skipped++; continue; }
                         ContentInput::fail(
                             'Từ/nghĩa đã có trong database, kể cả từ đã ẩn.',
                         );
@@ -114,13 +129,14 @@ final class ContentCsvImporter
                     }
                 }
             }
-            if (!$rows && !$errors) {
+            if (!$rows && !$errors && $skipped === 0) {
                 ContentInput::fail('CSV không có dữ liệu.');
             }
             return [
                 'rows' => $errors ? [] : $rows,
                 'errors' => $errors,
                 'valid_count' => $errors ? 0 : count($rows),
+                'skipped_count' => $skipped,
             ];
         } finally {
             fclose($stream);
@@ -174,12 +190,20 @@ final class ContentCsvImporter
             ContentInput::fail('CSV thiếu dấu đóng ngoặc kép.');
         }
     }
-    public function commit(array $rows): array
+    public static function duplicateMode(string $mode): string
     {
+        if (!in_array($mode, ['error', 'skip'], true)) {
+            ContentInput::fail('Chế độ từ trùng phải là error hoặc skip.');
+        }
+        return $mode;
+    }
+    public function commit(array $rows, string $duplicateMode = 'error'): array
+    {
+        self::duplicateMode($duplicateMode);
         if (!$rows || count($rows) > 1000) {
             ContentInput::fail('Bản xem trước không hợp lệ.');
         }
-        return $this->repo->transaction(function () use ($rows) {
+        return $this->repo->transaction(function () use ($rows, $duplicateMode) {
             // Khóa các chủ đề theo cùng thứ tự; mọi ghi CSV là một transaction.
             $topics = array_values(
                 array_unique(
@@ -191,14 +215,20 @@ final class ContentCsvImporter
                 $this->repo->topic((int) $id);
             }
             $ids = [];
+            $skipped = 0;
             foreach ($rows as $row) {
+                // Recheck after topic locks: another import may have committed since preview.
+                if ($duplicateMode === 'skip' && $this->repo->duplicate($row['word'], null, true) !== null) {
+                    $skipped++;
+                    continue;
+                }
                 $ids[] = $this->repo->saveWord(
                     null,
                     $row['word'],
                     $row['source'],
                 );
             }
-            return ['imported' => count($ids), 'word_ids' => $ids];
+            return ['imported' => count($ids), 'skipped' => $skipped, 'word_ids' => $ids];
         });
     }
 }

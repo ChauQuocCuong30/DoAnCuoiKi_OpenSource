@@ -9,6 +9,7 @@ use App\Modules\Admin\Services\AdminCsrf;
 use App\Middleware\Auth;
 use App\Modules\Admin\Requests\ContentInput as Input;
 use App\Modules\Admin\Services\ContentCsvImporter;
+use App\Modules\Admin\Services\VocabularySamples;
 use App\Modules\Vocabulary\Repositories\ContentRepository;
 use App\Modules\Vocabulary\Controllers\DictionaryController;
 
@@ -37,6 +38,10 @@ final class ContentApiController
             self::class,
             'commit',
         ]);
+        $router->get('/api/v1/admin/content/books', [self::class, 'books']);
+        $router->get('/api/v1/admin/content/samples', [self::class, 'samples']);
+        $router->get('/api/v1/admin/content/csv/template', [self::class, 'template']);
+        $router->post('/api/v1/admin/content/samples/preview', [self::class, 'samplePreview']);
         $router->get('/api/v1/admin/content/{kind}', [self::class, 'listing']);
         $router->get('/api/v1/admin/content/{kind}/{id}', [
             self::class,
@@ -94,6 +99,44 @@ final class ContentApiController
             ),
         );
     }
+    public function books(array $params): void
+    {
+        $this->admin();
+        Response::data(['items' => (new ContentRepository())->books()]);
+    }
+    public function samples(array $params): void
+    {
+        $this->admin();
+        Response::data(['items' => (new VocabularySamples())->catalog()]);
+    }
+    public function template(array $params): void
+    {
+        $this->admin();
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="vocabulary_template.csv"');
+        echo "\xEF\xBB\xBF";
+        readfile(dirname(__DIR__, 4) . '/database/samples/vocabulary_quick_template.csv');
+    }
+    public function samplePreview(array $params): void
+    {
+        $this->admin();
+        $this->csrf();
+        unset($_SESSION['admin_content_csv']);
+        $b = $this->body();
+        $key = Input::text($b, 'sample_key', 60);
+        $topic = Input::id($b['topic_id'] ?? null);
+        $mode = ContentCsvImporter::duplicateMode(Input::text($b, 'duplicate_mode', 10));
+        $preview = (new ContentCsvImporter(new ContentRepository()))->preview(
+            (new VocabularySamples())->csv($key, $topic), $mode, $topic,
+        );
+        foreach ($preview['rows'] as &$row) {
+            $row['source']['provider'] = 'sample_bundle';
+            $row['source']['sample_key'] = $key;
+            $row['source']['sample_version'] = 1;
+        }
+        unset($row);
+        $this->respondPreview($preview, $mode);
+    }
     public function show(array $params): void
     {
         $this->admin();
@@ -150,22 +193,31 @@ final class ContentApiController
         if (filesize($file['tmp_name']) > 1048576) {
             throw new ApiException('CSV_TOO_LARGE', 'CSV tối đa 1 MiB.', 413);
         }
+        $mode = ContentCsvImporter::duplicateMode(Input::text($_POST + ['duplicate_mode' => 'error'], 'duplicate_mode', 10));
+        $topic = ($_POST['topic_id'] ?? '') === '' ? null : Input::id($_POST['topic_id']);
         $preview = (new ContentCsvImporter(new ContentRepository()))->preview(
-            (string) file_get_contents($file['tmp_name']),
+            (string) file_get_contents($file['tmp_name']), $mode, $topic,
         );
+        $this->respondPreview($preview, $mode);
+    }
+    private function respondPreview(array $preview, string $mode): never
+    {
         $token = null;
-        if (!$preview['errors']) {
+        if (!$preview['errors'] && $preview['rows']) {
             $token = bin2hex(random_bytes(32));
             $_SESSION['admin_content_csv'] = [
                 'token' => $token,
                 'expires' => time() + 900,
                 'rows' => $preview['rows'],
+                'duplicate_mode' => $mode,
+                'skipped_count' => $preview['skipped_count'],
             ];
         }
         Response::data([
             'preview_token' => $token,
             'valid_count' => $preview['valid_count'],
             'errors' => $preview['errors'],
+            'skipped_count' => $preview['skipped_count'],
             'sample' => array_slice(
                 array_column($preview['rows'], 'word'),
                 0,
@@ -195,8 +247,9 @@ final class ContentApiController
             Response::data($draft['result']);
         }
         $result = (new ContentCsvImporter(new ContentRepository()))->commit(
-            $draft['rows'],
+            $draft['rows'], $draft['duplicate_mode'] ?? 'error',
         );
+        $result['skipped'] += $draft['skipped_count'] ?? 0;
         $_SESSION['admin_content_csv']['result'] = $result;
         unset($_SESSION['admin_content_csv']['rows']);
         Response::data($result, 201);

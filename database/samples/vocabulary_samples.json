@@ -1,0 +1,1472 @@
+[
+  {
+    "key": "drinks",
+    "name": "Đồ uống và giao tiếp",
+    "level": "A1–A2",
+    "words": [
+      {
+        "english": "milk",
+        "vietnamese": "sữa",
+        "part_of_speech": "noun",
+        "example": "I drink milk.",
+        "example_translation": "Tôi uống sữa."
+      },
+      {
+        "english": "tea",
+        "vietnamese": "trà",
+        "part_of_speech": "noun",
+        "example": "Would you like some tea?",
+        "example_translation": "Bạn có muốn uống chút trà không?"
+      },
+      {
+        "english": "coffee",
+        "vietnamese": "cà phê",
+        "part_of_speech": "noun",
+        "example": "My father drinks coffee every morning.",
+        "example_translation": "Bố tôi uống cà phê mỗi sáng."
+      },
+      {
+        "english": "sugar",
+        "vietnamese": "đường",
+        "part_of_speech": "noun",
+        "example": "I do not put sugar in my tea.",
+        "example_translation": "Tôi không cho đường vào trà."
+      },
+      {
+        "english": "hello",
+        "vietnamese": "xin chào",
+        "part_of_speech": "interjection",
+        "example": "Hello, Anna!",
+        "example_translation": "Xin chào Anna!"
+      },
+      {
+        "english": "water",
+        "vietnamese": "nước",
+        "part_of_speech": "noun",
+        "example": "Please drink some water.",
+        "example_translation": "Hãy uống một ít nước."
+      },
+      {
+        "english": "juice",
+        "vietnamese": "nước ép",
+        "part_of_speech": "noun",
+        "example": "This orange juice is fresh.",
+        "example_translation": "Nước cam ép này rất tươi."
+      },
+      {
+        "english": "lemonade",
+        "vietnamese": "nước chanh",
+        "part_of_speech": "noun",
+        "example": "She makes lemonade for us.",
+        "example_translation": "Cô ấy làm nước chanh cho chúng tôi."
+      },
+      {
+        "english": "cup",
+        "vietnamese": "cốc",
+        "part_of_speech": "noun",
+        "example": "This cup is clean.",
+        "example_translation": "Cái cốc này sạch."
+      },
+      {
+        "english": "glass",
+        "vietnamese": "ly",
+        "part_of_speech": "noun",
+        "example": "Please bring me a glass of water.",
+        "example_translation": "Làm ơn mang cho tôi một ly nước."
+      },
+      {
+        "english": "bottle",
+        "vietnamese": "chai",
+        "part_of_speech": "noun",
+        "example": "The bottle is on the table.",
+        "example_translation": "Cái chai ở trên bàn."
+      },
+      {
+        "english": "drink",
+        "vietnamese": "uống",
+        "part_of_speech": "verb",
+        "example": "I drink water after lunch.",
+        "example_translation": "Tôi uống nước sau bữa trưa."
+      },
+      {
+        "english": "thirsty",
+        "vietnamese": "khát nước",
+        "part_of_speech": "adjective",
+        "example": "I am thirsty after the walk.",
+        "example_translation": "Tôi khát nước sau khi đi bộ."
+      },
+      {
+        "english": "hot",
+        "vietnamese": "nóng",
+        "part_of_speech": "adjective",
+        "example": "The tea is hot.",
+        "example_translation": "Trà còn nóng."
+      },
+      {
+        "english": "cold",
+        "vietnamese": "lạnh",
+        "part_of_speech": "adjective",
+        "example": "I would like a cold drink.",
+        "example_translation": "Tôi muốn một thức uống lạnh."
+      },
+      {
+        "english": "please",
+        "vietnamese": "làm ơn",
+        "part_of_speech": "adverb",
+        "example": "Please open the door.",
+        "example_translation": "Làm ơn mở cửa."
+      },
+      {
+        "english": "thanks",
+        "vietnamese": "cảm ơn",
+        "part_of_speech": "interjection",
+        "example": "Thanks for your help!",
+        "example_translation": "Cảm ơn sự giúp đỡ của bạn!"
+      },
+      {
+        "english": "goodbye",
+        "vietnamese": "tạm biệt",
+        "part_of_speech": "interjection",
+        "example": "Goodbye, see you tomorrow!",
+        "example_translation": "Tạm biệt, hẹn gặp bạn ngày mai!"
+      },
+      {
+        "english": "welcome",
+        "vietnamese": "chào mừng",
+        "part_of_speech": "interjection",
+        "example": "Welcome to our school!",
+        "example_translation": "Chào mừng bạn đến với trường chúng tôi!"
+      },
+      {
+        "english": "sorry",
+        "vietnamese": "xin lỗi",
+        "part_of_speech": "interjection",
+        "example": "Sorry, I am late.",
+        "example_translation": "Xin lỗi, tôi đến muộn."
+      }
+    ]
+  },
+  {
+    "key": "food",
+    "name": "Thức ăn",
+    "level": "A1–A2",
+    "words": [
+      {
+        "english": "apple",
+        "vietnamese": "quả táo",
+        "part_of_speech": "noun",
+        "example": "I eat an apple every day.",
+        "example_translation": "Tôi ăn một quả táo mỗi ngày."
+      },
+      {
+        "english": "banana",
+        "vietnamese": "quả chuối",
+        "part_of_speech": "noun",
+        "example": "This banana is ripe.",
+        "example_translation": "Quả chuối này đã chín."
+      },
+      {
+        "english": "orange",
+        "vietnamese": "quả cam",
+        "part_of_speech": "noun",
+        "example": "She buys an orange at the market.",
+        "example_translation": "Cô ấy mua một quả cam ở chợ."
+      },
+      {
+        "english": "rice",
+        "vietnamese": "cơm",
+        "part_of_speech": "noun",
+        "example": "We eat rice for dinner.",
+        "example_translation": "Chúng tôi ăn cơm vào bữa tối."
+      },
+      {
+        "english": "bread",
+        "vietnamese": "bánh mì",
+        "part_of_speech": "noun",
+        "example": "I have bread for breakfast.",
+        "example_translation": "Tôi ăn bánh mì vào bữa sáng."
+      },
+      {
+        "english": "egg",
+        "vietnamese": "quả trứng",
+        "part_of_speech": "noun",
+        "example": "There is an egg in the bowl.",
+        "example_translation": "Có một quả trứng trong bát."
+      },
+      {
+        "english": "fish",
+        "vietnamese": "cá",
+        "part_of_speech": "noun",
+        "example": "We have fish for lunch.",
+        "example_translation": "Chúng tôi ăn cá vào bữa trưa."
+      },
+      {
+        "english": "meat",
+        "vietnamese": "thịt",
+        "part_of_speech": "noun",
+        "example": "He does not eat meat.",
+        "example_translation": "Anh ấy không ăn thịt."
+      },
+      {
+        "english": "chicken",
+        "vietnamese": "thịt gà",
+        "part_of_speech": "noun",
+        "example": "My mother cooks chicken tonight.",
+        "example_translation": "Mẹ tôi nấu thịt gà tối nay."
+      },
+      {
+        "english": "vegetable",
+        "vietnamese": "rau củ",
+        "part_of_speech": "noun",
+        "example": "A carrot is a vegetable.",
+        "example_translation": "Cà rốt là một loại rau củ."
+      },
+      {
+        "english": "carrot",
+        "vietnamese": "củ cà rốt",
+        "part_of_speech": "noun",
+        "example": "The rabbit eats a carrot.",
+        "example_translation": "Con thỏ ăn một củ cà rốt."
+      },
+      {
+        "english": "potato",
+        "vietnamese": "củ khoai tây",
+        "part_of_speech": "noun",
+        "example": "This potato is very big.",
+        "example_translation": "Củ khoai tây này rất to."
+      },
+      {
+        "english": "tomato",
+        "vietnamese": "quả cà chua",
+        "part_of_speech": "noun",
+        "example": "I cut a tomato for the salad.",
+        "example_translation": "Tôi cắt một quả cà chua để làm món rau trộn."
+      },
+      {
+        "english": "soup",
+        "vietnamese": "súp",
+        "part_of_speech": "noun",
+        "example": "The soup smells good.",
+        "example_translation": "Món súp có mùi thơm."
+      },
+      {
+        "english": "noodle",
+        "vietnamese": "sợi mì",
+        "part_of_speech": "noun",
+        "example": "A noodle falls from my fork.",
+        "example_translation": "Một sợi mì rơi khỏi nĩa của tôi."
+      },
+      {
+        "english": "cheese",
+        "vietnamese": "phô mai",
+        "part_of_speech": "noun",
+        "example": "I like cheese on my bread.",
+        "example_translation": "Tôi thích phô mai trên bánh mì."
+      },
+      {
+        "english": "salt",
+        "vietnamese": "muối",
+        "part_of_speech": "noun",
+        "example": "Please add a little salt.",
+        "example_translation": "Hãy thêm một chút muối."
+      },
+      {
+        "english": "breakfast",
+        "vietnamese": "bữa sáng",
+        "part_of_speech": "noun",
+        "example": "Breakfast is ready.",
+        "example_translation": "Bữa sáng đã sẵn sàng."
+      },
+      {
+        "english": "lunch",
+        "vietnamese": "bữa trưa",
+        "part_of_speech": "noun",
+        "example": "We have lunch at twelve.",
+        "example_translation": "Chúng tôi ăn trưa lúc mười hai giờ."
+      },
+      {
+        "english": "dinner",
+        "vietnamese": "bữa tối",
+        "part_of_speech": "noun",
+        "example": "Dinner is on the table.",
+        "example_translation": "Bữa tối đã được dọn trên bàn."
+      }
+    ]
+  },
+  {
+    "key": "animals",
+    "name": "Động vật",
+    "level": "A1–A2",
+    "words": [
+      {
+        "english": "dog",
+        "vietnamese": "con chó",
+        "part_of_speech": "noun",
+        "example": "The dog is sleeping.",
+        "example_translation": "Con chó đang ngủ."
+      },
+      {
+        "english": "cat",
+        "vietnamese": "con mèo",
+        "part_of_speech": "noun",
+        "example": "My cat has green eyes.",
+        "example_translation": "Con mèo của tôi có đôi mắt xanh."
+      },
+      {
+        "english": "bird",
+        "vietnamese": "con chim",
+        "part_of_speech": "noun",
+        "example": "A bird is in the tree.",
+        "example_translation": "Một con chim ở trên cây."
+      },
+      {
+        "english": "rabbit",
+        "vietnamese": "con thỏ",
+        "part_of_speech": "noun",
+        "example": "The rabbit has long ears.",
+        "example_translation": "Con thỏ có đôi tai dài."
+      },
+      {
+        "english": "elephant",
+        "vietnamese": "con voi",
+        "part_of_speech": "noun",
+        "example": "The elephant is very large.",
+        "example_translation": "Con voi rất to."
+      },
+      {
+        "english": "tiger",
+        "vietnamese": "con hổ",
+        "part_of_speech": "noun",
+        "example": "The tiger lives in the forest.",
+        "example_translation": "Con hổ sống trong rừng."
+      },
+      {
+        "english": "lion",
+        "vietnamese": "con sư tử",
+        "part_of_speech": "noun",
+        "example": "The lion has a thick mane.",
+        "example_translation": "Con sư tử có bờm dày."
+      },
+      {
+        "english": "monkey",
+        "vietnamese": "con khỉ",
+        "part_of_speech": "noun",
+        "example": "The monkey climbs a tree.",
+        "example_translation": "Con khỉ trèo lên cây."
+      },
+      {
+        "english": "bear",
+        "vietnamese": "con gấu",
+        "part_of_speech": "noun",
+        "example": "The bear is looking for food.",
+        "example_translation": "Con gấu đang tìm thức ăn."
+      },
+      {
+        "english": "horse",
+        "vietnamese": "con ngựa",
+        "part_of_speech": "noun",
+        "example": "The horse runs fast.",
+        "example_translation": "Con ngựa chạy nhanh."
+      },
+      {
+        "english": "cow",
+        "vietnamese": "con bò",
+        "part_of_speech": "noun",
+        "example": "The cow eats grass.",
+        "example_translation": "Con bò ăn cỏ."
+      },
+      {
+        "english": "pig",
+        "vietnamese": "con lợn",
+        "part_of_speech": "noun",
+        "example": "The pig is near the farm.",
+        "example_translation": "Con lợn ở gần trang trại."
+      },
+      {
+        "english": "duck",
+        "vietnamese": "con vịt",
+        "part_of_speech": "noun",
+        "example": "The duck swims in the pond.",
+        "example_translation": "Con vịt bơi trong ao."
+      },
+      {
+        "english": "sheep",
+        "vietnamese": "con cừu",
+        "part_of_speech": "noun",
+        "example": "The sheep has thick wool.",
+        "example_translation": "Con cừu có bộ lông dày."
+      },
+      {
+        "english": "goat",
+        "vietnamese": "con dê",
+        "part_of_speech": "noun",
+        "example": "The goat stands on a rock.",
+        "example_translation": "Con dê đứng trên một tảng đá."
+      },
+      {
+        "english": "mouse",
+        "vietnamese": "con chuột",
+        "part_of_speech": "noun",
+        "example": "A mouse is under the chair.",
+        "example_translation": "Một con chuột ở dưới ghế."
+      },
+      {
+        "english": "frog",
+        "vietnamese": "con ếch",
+        "part_of_speech": "noun",
+        "example": "The frog jumps into the water.",
+        "example_translation": "Con ếch nhảy xuống nước."
+      },
+      {
+        "english": "snake",
+        "vietnamese": "con rắn",
+        "part_of_speech": "noun",
+        "example": "The snake moves slowly.",
+        "example_translation": "Con rắn di chuyển chậm."
+      },
+      {
+        "english": "shark",
+        "vietnamese": "cá mập",
+        "part_of_speech": "noun",
+        "example": "The shark lives in the sea.",
+        "example_translation": "Cá mập sống ở biển."
+      },
+      {
+        "english": "dolphin",
+        "vietnamese": "cá heo",
+        "part_of_speech": "noun",
+        "example": "The dolphin jumps out of the water.",
+        "example_translation": "Cá heo nhảy lên khỏi mặt nước."
+      }
+    ]
+  },
+  {
+    "key": "family",
+    "name": "Gia đình và con người",
+    "level": "A1–A2",
+    "words": [
+      {
+        "english": "family",
+        "vietnamese": "gia đình",
+        "part_of_speech": "noun",
+        "example": "My family lives in Nha Trang.",
+        "example_translation": "Gia đình tôi sống ở Nha Trang."
+      },
+      {
+        "english": "father",
+        "vietnamese": "bố",
+        "part_of_speech": "noun",
+        "example": "My father works in an office.",
+        "example_translation": "Bố tôi làm việc ở văn phòng."
+      },
+      {
+        "english": "mother",
+        "vietnamese": "mẹ",
+        "part_of_speech": "noun",
+        "example": "My mother likes reading.",
+        "example_translation": "Mẹ tôi thích đọc sách."
+      },
+      {
+        "english": "brother",
+        "vietnamese": "anh/em trai",
+        "part_of_speech": "noun",
+        "example": "My brother is a student.",
+        "example_translation": "Em trai tôi là học sinh."
+      },
+      {
+        "english": "sister",
+        "vietnamese": "chị/em gái",
+        "part_of_speech": "noun",
+        "example": "My sister plays the piano.",
+        "example_translation": "Chị tôi chơi đàn piano."
+      },
+      {
+        "english": "grandfather",
+        "vietnamese": "ông",
+        "part_of_speech": "noun",
+        "example": "My grandfather tells good stories.",
+        "example_translation": "Ông tôi kể những câu chuyện hay."
+      },
+      {
+        "english": "grandmother",
+        "vietnamese": "bà",
+        "part_of_speech": "noun",
+        "example": "My grandmother grows flowers.",
+        "example_translation": "Bà tôi trồng hoa."
+      },
+      {
+        "english": "parent",
+        "vietnamese": "cha hoặc mẹ",
+        "part_of_speech": "noun",
+        "example": "Each child comes with a parent.",
+        "example_translation": "Mỗi đứa trẻ đến cùng cha hoặc mẹ."
+      },
+      {
+        "english": "child",
+        "vietnamese": "đứa trẻ",
+        "part_of_speech": "noun",
+        "example": "The child is playing outside.",
+        "example_translation": "Đứa trẻ đang chơi ở bên ngoài."
+      },
+      {
+        "english": "baby",
+        "vietnamese": "em bé",
+        "part_of_speech": "noun",
+        "example": "The baby is smiling.",
+        "example_translation": "Em bé đang mỉm cười."
+      },
+      {
+        "english": "son",
+        "vietnamese": "con trai",
+        "part_of_speech": "noun",
+        "example": "Their son is six years old.",
+        "example_translation": "Con trai của họ sáu tuổi."
+      },
+      {
+        "english": "daughter",
+        "vietnamese": "con gái",
+        "part_of_speech": "noun",
+        "example": "Her daughter likes drawing.",
+        "example_translation": "Con gái của cô ấy thích vẽ."
+      },
+      {
+        "english": "uncle",
+        "vietnamese": "chú/bác/cậu",
+        "part_of_speech": "noun",
+        "example": "My uncle visits us on Sunday.",
+        "example_translation": "Chú tôi đến thăm chúng tôi vào Chủ nhật."
+      },
+      {
+        "english": "aunt",
+        "vietnamese": "cô/dì",
+        "part_of_speech": "noun",
+        "example": "My aunt lives near the beach.",
+        "example_translation": "Dì tôi sống gần bãi biển."
+      },
+      {
+        "english": "cousin",
+        "vietnamese": "anh/chị/em họ",
+        "part_of_speech": "noun",
+        "example": "My cousin studies English.",
+        "example_translation": "Em họ tôi học tiếng Anh."
+      },
+      {
+        "english": "friend",
+        "vietnamese": "bạn bè",
+        "part_of_speech": "noun",
+        "example": "My friend helps me with homework.",
+        "example_translation": "Bạn tôi giúp tôi làm bài tập."
+      },
+      {
+        "english": "neighbor",
+        "vietnamese": "hàng xóm",
+        "part_of_speech": "noun",
+        "example": "Our neighbor has a small dog.",
+        "example_translation": "Hàng xóm của chúng tôi có một con chó nhỏ."
+      },
+      {
+        "english": "man",
+        "vietnamese": "người đàn ông",
+        "part_of_speech": "noun",
+        "example": "The man is waiting for a bus.",
+        "example_translation": "Người đàn ông đang đợi xe buýt."
+      },
+      {
+        "english": "woman",
+        "vietnamese": "người phụ nữ",
+        "part_of_speech": "noun",
+        "example": "The woman is a doctor.",
+        "example_translation": "Người phụ nữ là bác sĩ."
+      },
+      {
+        "english": "person",
+        "vietnamese": "người",
+        "part_of_speech": "noun",
+        "example": "One person is waiting outside.",
+        "example_translation": "Một người đang đợi bên ngoài."
+      }
+    ]
+  },
+  {
+    "key": "school",
+    "name": "Trường học",
+    "level": "A1–A2",
+    "words": [
+      {
+        "english": "school",
+        "vietnamese": "trường học",
+        "part_of_speech": "noun",
+        "example": "Our school has a large library.",
+        "example_translation": "Trường chúng tôi có một thư viện lớn."
+      },
+      {
+        "english": "student",
+        "vietnamese": "học sinh sinh viên",
+        "part_of_speech": "noun",
+        "example": "I am a university student.",
+        "example_translation": "Tôi là sinh viên đại học."
+      },
+      {
+        "english": "teacher",
+        "vietnamese": "giáo viên",
+        "part_of_speech": "noun",
+        "example": "The teacher writes on the board.",
+        "example_translation": "Giáo viên viết lên bảng."
+      },
+      {
+        "english": "classroom",
+        "vietnamese": "phòng học",
+        "part_of_speech": "noun",
+        "example": "The classroom is on the second floor.",
+        "example_translation": "Phòng học ở tầng hai."
+      },
+      {
+        "english": "book",
+        "vietnamese": "quyển sách",
+        "part_of_speech": "noun",
+        "example": "This book has many pictures.",
+        "example_translation": "Quyển sách này có nhiều hình ảnh."
+      },
+      {
+        "english": "notebook",
+        "vietnamese": "quyển vở",
+        "part_of_speech": "noun",
+        "example": "I write new words in my notebook.",
+        "example_translation": "Tôi viết từ mới vào vở."
+      },
+      {
+        "english": "pen",
+        "vietnamese": "bút mực",
+        "part_of_speech": "noun",
+        "example": "This pen is blue.",
+        "example_translation": "Cây bút mực này màu xanh."
+      },
+      {
+        "english": "pencil",
+        "vietnamese": "bút chì",
+        "part_of_speech": "noun",
+        "example": "I draw with a pencil.",
+        "example_translation": "Tôi vẽ bằng bút chì."
+      },
+      {
+        "english": "eraser",
+        "vietnamese": "cục tẩy",
+        "part_of_speech": "noun",
+        "example": "Can I borrow your eraser?",
+        "example_translation": "Tôi có thể mượn cục tẩy của bạn không?"
+      },
+      {
+        "english": "ruler",
+        "vietnamese": "thước kẻ",
+        "part_of_speech": "noun",
+        "example": "The ruler is in my bag.",
+        "example_translation": "Thước kẻ ở trong cặp tôi."
+      },
+      {
+        "english": "desk",
+        "vietnamese": "bàn học",
+        "part_of_speech": "noun",
+        "example": "My desk is near the window.",
+        "example_translation": "Bàn học của tôi ở gần cửa sổ."
+      },
+      {
+        "english": "chair",
+        "vietnamese": "ghế",
+        "part_of_speech": "noun",
+        "example": "Please sit on this chair.",
+        "example_translation": "Hãy ngồi lên chiếc ghế này."
+      },
+      {
+        "english": "board",
+        "vietnamese": "bảng",
+        "part_of_speech": "noun",
+        "example": "Look at the board.",
+        "example_translation": "Hãy nhìn lên bảng."
+      },
+      {
+        "english": "lesson",
+        "vietnamese": "bài học",
+        "part_of_speech": "noun",
+        "example": "The English lesson starts at eight.",
+        "example_translation": "Tiết học tiếng Anh bắt đầu lúc tám giờ."
+      },
+      {
+        "english": "homework",
+        "vietnamese": "bài tập về nhà",
+        "part_of_speech": "noun",
+        "example": "I do my homework after dinner.",
+        "example_translation": "Tôi làm bài tập về nhà sau bữa tối."
+      },
+      {
+        "english": "exam",
+        "vietnamese": "kỳ thi",
+        "part_of_speech": "noun",
+        "example": "Our exam is next week.",
+        "example_translation": "Kỳ thi của chúng tôi diễn ra vào tuần tới."
+      },
+      {
+        "english": "question",
+        "vietnamese": "câu hỏi",
+        "part_of_speech": "noun",
+        "example": "I have a question.",
+        "example_translation": "Tôi có một câu hỏi."
+      },
+      {
+        "english": "answer",
+        "vietnamese": "câu trả lời",
+        "part_of_speech": "noun",
+        "example": "Your answer is correct.",
+        "example_translation": "Câu trả lời của bạn đúng."
+      },
+      {
+        "english": "library",
+        "vietnamese": "thư viện",
+        "part_of_speech": "noun",
+        "example": "We read books in the library.",
+        "example_translation": "Chúng tôi đọc sách trong thư viện."
+      },
+      {
+        "english": "university",
+        "vietnamese": "trường đại học",
+        "part_of_speech": "noun",
+        "example": "She studies at a university.",
+        "example_translation": "Cô ấy học tại một trường đại học."
+      }
+    ]
+  },
+  {
+    "key": "travel",
+    "name": "Du lịch và di chuyển",
+    "level": "A1–A2",
+    "words": [
+      {
+        "english": "travel",
+        "vietnamese": "du lịch",
+        "part_of_speech": "verb",
+        "example": "We travel by train.",
+        "example_translation": "Chúng tôi đi du lịch bằng tàu hỏa."
+      },
+      {
+        "english": "trip",
+        "vietnamese": "chuyến đi",
+        "part_of_speech": "noun",
+        "example": "Our trip lasts three days.",
+        "example_translation": "Chuyến đi của chúng tôi kéo dài ba ngày."
+      },
+      {
+        "english": "ticket",
+        "vietnamese": "vé",
+        "part_of_speech": "noun",
+        "example": "I buy a ticket online.",
+        "example_translation": "Tôi mua vé trực tuyến."
+      },
+      {
+        "english": "passport",
+        "vietnamese": "hộ chiếu",
+        "part_of_speech": "noun",
+        "example": "Keep your passport in a safe place.",
+        "example_translation": "Hãy giữ hộ chiếu ở nơi an toàn."
+      },
+      {
+        "english": "airport",
+        "vietnamese": "sân bay",
+        "part_of_speech": "noun",
+        "example": "We arrive at the airport early.",
+        "example_translation": "Chúng tôi đến sân bay sớm."
+      },
+      {
+        "english": "plane",
+        "vietnamese": "máy bay",
+        "part_of_speech": "noun",
+        "example": "The plane leaves at nine.",
+        "example_translation": "Máy bay khởi hành lúc chín giờ."
+      },
+      {
+        "english": "train",
+        "vietnamese": "tàu hỏa",
+        "part_of_speech": "noun",
+        "example": "This train goes to Hanoi.",
+        "example_translation": "Chuyến tàu này đi Hà Nội."
+      },
+      {
+        "english": "bus",
+        "vietnamese": "xe buýt",
+        "part_of_speech": "noun",
+        "example": "I go to school by bus.",
+        "example_translation": "Tôi đi học bằng xe buýt."
+      },
+      {
+        "english": "car",
+        "vietnamese": "ô tô",
+        "part_of_speech": "noun",
+        "example": "Their car is red.",
+        "example_translation": "Ô tô của họ màu đỏ."
+      },
+      {
+        "english": "bicycle",
+        "vietnamese": "xe đạp",
+        "part_of_speech": "noun",
+        "example": "I ride my bicycle to the park.",
+        "example_translation": "Tôi đạp xe đến công viên."
+      },
+      {
+        "english": "taxi",
+        "vietnamese": "xe taxi",
+        "part_of_speech": "noun",
+        "example": "We take a taxi to the hotel.",
+        "example_translation": "Chúng tôi đi taxi đến khách sạn."
+      },
+      {
+        "english": "station",
+        "vietnamese": "nhà ga",
+        "part_of_speech": "noun",
+        "example": "The station is near the market.",
+        "example_translation": "Nhà ga ở gần chợ."
+      },
+      {
+        "english": "hotel",
+        "vietnamese": "khách sạn",
+        "part_of_speech": "noun",
+        "example": "Our hotel is near the beach.",
+        "example_translation": "Khách sạn của chúng tôi ở gần bãi biển."
+      },
+      {
+        "english": "room",
+        "vietnamese": "phòng",
+        "part_of_speech": "noun",
+        "example": "This room has two beds.",
+        "example_translation": "Phòng này có hai giường."
+      },
+      {
+        "english": "map",
+        "vietnamese": "bản đồ",
+        "part_of_speech": "noun",
+        "example": "I use a map to find the museum.",
+        "example_translation": "Tôi dùng bản đồ để tìm bảo tàng."
+      },
+      {
+        "english": "beach",
+        "vietnamese": "bãi biển",
+        "part_of_speech": "noun",
+        "example": "The beach is beautiful today.",
+        "example_translation": "Bãi biển hôm nay rất đẹp."
+      },
+      {
+        "english": "island",
+        "vietnamese": "hòn đảo",
+        "part_of_speech": "noun",
+        "example": "We visit a small island.",
+        "example_translation": "Chúng tôi đến thăm một hòn đảo nhỏ."
+      },
+      {
+        "english": "mountain",
+        "vietnamese": "ngọn núi",
+        "part_of_speech": "noun",
+        "example": "That mountain is very high.",
+        "example_translation": "Ngọn núi kia rất cao."
+      },
+      {
+        "english": "luggage",
+        "vietnamese": "hành lý",
+        "part_of_speech": "noun",
+        "example": "My luggage is heavy.",
+        "example_translation": "Hành lý của tôi nặng."
+      },
+      {
+        "english": "holiday",
+        "vietnamese": "kỳ nghỉ",
+        "part_of_speech": "noun",
+        "example": "We spend our holiday by the sea.",
+        "example_translation": "Chúng tôi dành kỳ nghỉ ở bên bờ biển."
+      }
+    ]
+  },
+  {
+    "key": "home",
+    "name": "Nhà cửa và đồ dùng",
+    "level": "A1–A2",
+    "words": [
+      {
+        "english": "house",
+        "vietnamese": "ngôi nhà",
+        "part_of_speech": "noun",
+        "example": "Their house has a small garden.",
+        "example_translation": "Ngôi nhà của họ có một khu vườn nhỏ."
+      },
+      {
+        "english": "home",
+        "vietnamese": "nhà nơi sinh sống",
+        "part_of_speech": "noun",
+        "example": "I go home after school.",
+        "example_translation": "Tôi về nhà sau giờ học."
+      },
+      {
+        "english": "door",
+        "vietnamese": "cửa ra vào",
+        "part_of_speech": "noun",
+        "example": "Please close the door.",
+        "example_translation": "Hãy đóng cửa ra vào."
+      },
+      {
+        "english": "window",
+        "vietnamese": "cửa sổ",
+        "part_of_speech": "noun",
+        "example": "The window is open.",
+        "example_translation": "Cửa sổ đang mở."
+      },
+      {
+        "english": "wall",
+        "vietnamese": "bức tường",
+        "part_of_speech": "noun",
+        "example": "There is a picture on the wall.",
+        "example_translation": "Có một bức tranh trên tường."
+      },
+      {
+        "english": "floor",
+        "vietnamese": "sàn nhà",
+        "part_of_speech": "noun",
+        "example": "The floor is clean.",
+        "example_translation": "Sàn nhà sạch sẽ."
+      },
+      {
+        "english": "roof",
+        "vietnamese": "mái nhà",
+        "part_of_speech": "noun",
+        "example": "The roof is red.",
+        "example_translation": "Mái nhà màu đỏ."
+      },
+      {
+        "english": "kitchen",
+        "vietnamese": "nhà bếp",
+        "part_of_speech": "noun",
+        "example": "My father is in the kitchen.",
+        "example_translation": "Bố tôi đang ở trong bếp."
+      },
+      {
+        "english": "bedroom",
+        "vietnamese": "phòng ngủ",
+        "part_of_speech": "noun",
+        "example": "My bedroom is small.",
+        "example_translation": "Phòng ngủ của tôi nhỏ."
+      },
+      {
+        "english": "bathroom",
+        "vietnamese": "phòng tắm",
+        "part_of_speech": "noun",
+        "example": "The bathroom is upstairs.",
+        "example_translation": "Phòng tắm ở trên lầu."
+      },
+      {
+        "english": "garden",
+        "vietnamese": "khu vườn",
+        "part_of_speech": "noun",
+        "example": "There are flowers in the garden.",
+        "example_translation": "Có hoa trong vườn."
+      },
+      {
+        "english": "bed",
+        "vietnamese": "giường",
+        "part_of_speech": "noun",
+        "example": "The cat is on the bed.",
+        "example_translation": "Con mèo ở trên giường."
+      },
+      {
+        "english": "table",
+        "vietnamese": "cái bàn",
+        "part_of_speech": "noun",
+        "example": "The food is on the table.",
+        "example_translation": "Thức ăn ở trên bàn."
+      },
+      {
+        "english": "sofa",
+        "vietnamese": "ghế sofa",
+        "part_of_speech": "noun",
+        "example": "We sit on the sofa.",
+        "example_translation": "Chúng tôi ngồi trên ghế sofa."
+      },
+      {
+        "english": "lamp",
+        "vietnamese": "đèn",
+        "part_of_speech": "noun",
+        "example": "I turn on the lamp.",
+        "example_translation": "Tôi bật đèn."
+      },
+      {
+        "english": "clock",
+        "vietnamese": "đồng hồ",
+        "part_of_speech": "noun",
+        "example": "The clock shows seven.",
+        "example_translation": "Đồng hồ chỉ bảy giờ."
+      },
+      {
+        "english": "mirror",
+        "vietnamese": "gương",
+        "part_of_speech": "noun",
+        "example": "There is a mirror in the bedroom.",
+        "example_translation": "Có một chiếc gương trong phòng ngủ."
+      },
+      {
+        "english": "key",
+        "vietnamese": "chìa khóa",
+        "part_of_speech": "noun",
+        "example": "I cannot find my key.",
+        "example_translation": "Tôi không tìm thấy chìa khóa."
+      },
+      {
+        "english": "fridge",
+        "vietnamese": "tủ lạnh",
+        "part_of_speech": "noun",
+        "example": "The milk is in the fridge.",
+        "example_translation": "Sữa ở trong tủ lạnh."
+      },
+      {
+        "english": "fan",
+        "vietnamese": "quạt",
+        "part_of_speech": "noun",
+        "example": "Please turn on the fan.",
+        "example_translation": "Hãy bật quạt."
+      }
+    ]
+  },
+  {
+    "key": "daily-actions",
+    "name": "Hoạt động hằng ngày",
+    "level": "A1–A2",
+    "words": [
+      {
+        "english": "eat",
+        "vietnamese": "ăn",
+        "part_of_speech": "verb",
+        "example": "We eat breakfast at home.",
+        "example_translation": "Chúng tôi ăn sáng ở nhà."
+      },
+      {
+        "english": "sleep",
+        "vietnamese": "ngủ",
+        "part_of_speech": "verb",
+        "example": "I sleep for eight hours.",
+        "example_translation": "Tôi ngủ tám tiếng."
+      },
+      {
+        "english": "wake up",
+        "vietnamese": "thức dậy",
+        "part_of_speech": "phrase",
+        "example": "I wake up at six.",
+        "example_translation": "Tôi thức dậy lúc sáu giờ."
+      },
+      {
+        "english": "walk",
+        "vietnamese": "đi bộ",
+        "part_of_speech": "verb",
+        "example": "They walk to the park.",
+        "example_translation": "Họ đi bộ đến công viên."
+      },
+      {
+        "english": "run",
+        "vietnamese": "chạy",
+        "part_of_speech": "verb",
+        "example": "I run every morning.",
+        "example_translation": "Tôi chạy bộ mỗi sáng."
+      },
+      {
+        "english": "sit",
+        "vietnamese": "ngồi",
+        "part_of_speech": "verb",
+        "example": "Please sit next to me.",
+        "example_translation": "Hãy ngồi cạnh tôi."
+      },
+      {
+        "english": "stand",
+        "vietnamese": "đứng",
+        "part_of_speech": "verb",
+        "example": "We stand near the door.",
+        "example_translation": "Chúng tôi đứng gần cửa."
+      },
+      {
+        "english": "read",
+        "vietnamese": "đọc",
+        "part_of_speech": "verb",
+        "example": "I read before bed.",
+        "example_translation": "Tôi đọc sách trước khi ngủ."
+      },
+      {
+        "english": "write",
+        "vietnamese": "viết",
+        "part_of_speech": "verb",
+        "example": "Please write your name.",
+        "example_translation": "Hãy viết tên của bạn."
+      },
+      {
+        "english": "listen",
+        "vietnamese": "lắng nghe",
+        "part_of_speech": "verb",
+        "example": "We listen to the teacher.",
+        "example_translation": "Chúng tôi lắng nghe giáo viên."
+      },
+      {
+        "english": "speak",
+        "vietnamese": "nói",
+        "part_of_speech": "verb",
+        "example": "She can speak English.",
+        "example_translation": "Cô ấy có thể nói tiếng Anh."
+      },
+      {
+        "english": "learn",
+        "vietnamese": "học",
+        "part_of_speech": "verb",
+        "example": "I learn five new words every day.",
+        "example_translation": "Tôi học năm từ mới mỗi ngày."
+      },
+      {
+        "english": "study",
+        "vietnamese": "học tập",
+        "part_of_speech": "verb",
+        "example": "We study in the library.",
+        "example_translation": "Chúng tôi học tập trong thư viện."
+      },
+      {
+        "english": "work",
+        "vietnamese": "làm việc",
+        "part_of_speech": "verb",
+        "example": "My parents work in the city.",
+        "example_translation": "Bố mẹ tôi làm việc trong thành phố."
+      },
+      {
+        "english": "play",
+        "vietnamese": "chơi",
+        "part_of_speech": "verb",
+        "example": "The children play outside.",
+        "example_translation": "Bọn trẻ chơi ở bên ngoài."
+      },
+      {
+        "english": "cook",
+        "vietnamese": "nấu ăn",
+        "part_of_speech": "verb",
+        "example": "I cook dinner with my mother.",
+        "example_translation": "Tôi nấu bữa tối cùng mẹ."
+      },
+      {
+        "english": "clean",
+        "vietnamese": "dọn dẹp",
+        "part_of_speech": "verb",
+        "example": "We clean our room on Sunday.",
+        "example_translation": "Chúng tôi dọn phòng vào Chủ nhật."
+      },
+      {
+        "english": "wash",
+        "vietnamese": "rửa",
+        "part_of_speech": "verb",
+        "example": "Please wash your hands.",
+        "example_translation": "Hãy rửa tay."
+      },
+      {
+        "english": "buy",
+        "vietnamese": "mua",
+        "part_of_speech": "verb",
+        "example": "I buy fruit at the market.",
+        "example_translation": "Tôi mua trái cây ở chợ."
+      },
+      {
+        "english": "help",
+        "vietnamese": "giúp đỡ",
+        "part_of_speech": "verb",
+        "example": "Can you help me?",
+        "example_translation": "Bạn có thể giúp tôi không?"
+      }
+    ]
+  },
+  {
+    "key": "weather",
+    "name": "Thời tiết và thiên nhiên",
+    "level": "A1–A2",
+    "words": [
+      {
+        "english": "weather",
+        "vietnamese": "thời tiết",
+        "part_of_speech": "noun",
+        "example": "The weather is nice today.",
+        "example_translation": "Thời tiết hôm nay đẹp."
+      },
+      {
+        "english": "sun",
+        "vietnamese": "mặt trời",
+        "part_of_speech": "noun",
+        "example": "The sun rises in the east.",
+        "example_translation": "Mặt trời mọc ở hướng đông."
+      },
+      {
+        "english": "rain",
+        "vietnamese": "mưa",
+        "part_of_speech": "noun",
+        "example": "The rain stops in the afternoon.",
+        "example_translation": "Mưa tạnh vào buổi chiều."
+      },
+      {
+        "english": "wind",
+        "vietnamese": "gió",
+        "part_of_speech": "noun",
+        "example": "The wind is strong today.",
+        "example_translation": "Gió hôm nay mạnh."
+      },
+      {
+        "english": "cloud",
+        "vietnamese": "đám mây",
+        "part_of_speech": "noun",
+        "example": "A white cloud is in the sky.",
+        "example_translation": "Một đám mây trắng ở trên bầu trời."
+      },
+      {
+        "english": "sky",
+        "vietnamese": "bầu trời",
+        "part_of_speech": "noun",
+        "example": "The sky is blue.",
+        "example_translation": "Bầu trời màu xanh."
+      },
+      {
+        "english": "snow",
+        "vietnamese": "tuyết",
+        "part_of_speech": "noun",
+        "example": "The children play in the snow.",
+        "example_translation": "Bọn trẻ chơi trong tuyết."
+      },
+      {
+        "english": "storm",
+        "vietnamese": "cơn bão",
+        "part_of_speech": "noun",
+        "example": "We stay inside during the storm.",
+        "example_translation": "Chúng tôi ở trong nhà khi có bão."
+      },
+      {
+        "english": "sunny",
+        "vietnamese": "có nắng",
+        "part_of_speech": "adjective",
+        "example": "It is sunny today.",
+        "example_translation": "Hôm nay trời có nắng."
+      },
+      {
+        "english": "rainy",
+        "vietnamese": "có mưa",
+        "part_of_speech": "adjective",
+        "example": "It is a rainy day.",
+        "example_translation": "Đó là một ngày có mưa."
+      },
+      {
+        "english": "windy",
+        "vietnamese": "nhiều gió",
+        "part_of_speech": "adjective",
+        "example": "It is windy near the beach.",
+        "example_translation": "Trời nhiều gió ở gần bãi biển."
+      },
+      {
+        "english": "cloudy",
+        "vietnamese": "nhiều mây",
+        "part_of_speech": "adjective",
+        "example": "The sky is cloudy this morning.",
+        "example_translation": "Bầu trời sáng nay nhiều mây."
+      },
+      {
+        "english": "warm",
+        "vietnamese": "ấm áp",
+        "part_of_speech": "adjective",
+        "example": "The water is warm.",
+        "example_translation": "Nước ấm."
+      },
+      {
+        "english": "cool",
+        "vietnamese": "mát mẻ",
+        "part_of_speech": "adjective",
+        "example": "The evening air is cool.",
+        "example_translation": "Không khí buổi tối mát mẻ."
+      },
+      {
+        "english": "spring",
+        "vietnamese": "mùa xuân",
+        "part_of_speech": "noun",
+        "example": "Flowers grow in spring.",
+        "example_translation": "Hoa mọc vào mùa xuân."
+      },
+      {
+        "english": "summer",
+        "vietnamese": "mùa hè",
+        "part_of_speech": "noun",
+        "example": "We go swimming in summer.",
+        "example_translation": "Chúng tôi đi bơi vào mùa hè."
+      },
+      {
+        "english": "autumn",
+        "vietnamese": "mùa thu",
+        "part_of_speech": "noun",
+        "example": "Leaves fall in autumn.",
+        "example_translation": "Lá rụng vào mùa thu."
+      },
+      {
+        "english": "winter",
+        "vietnamese": "mùa đông",
+        "part_of_speech": "noun",
+        "example": "Winter is cold here.",
+        "example_translation": "Mùa đông ở đây lạnh."
+      },
+      {
+        "english": "river",
+        "vietnamese": "dòng sông",
+        "part_of_speech": "noun",
+        "example": "The river flows through the town.",
+        "example_translation": "Dòng sông chảy qua thị trấn."
+      },
+      {
+        "english": "forest",
+        "vietnamese": "khu rừng",
+        "part_of_speech": "noun",
+        "example": "Many animals live in the forest.",
+        "example_translation": "Nhiều loài động vật sống trong rừng."
+      }
+    ]
+  },
+  {
+    "key": "technology",
+    "name": "Công nghệ cơ bản",
+    "level": "A1–A2",
+    "words": [
+      {
+        "english": "computer",
+        "vietnamese": "máy tính",
+        "part_of_speech": "noun",
+        "example": "I use a computer to study.",
+        "example_translation": "Tôi dùng máy tính để học."
+      },
+      {
+        "english": "laptop",
+        "vietnamese": "máy tính xách tay",
+        "part_of_speech": "noun",
+        "example": "My laptop is on the desk.",
+        "example_translation": "Máy tính xách tay của tôi ở trên bàn."
+      },
+      {
+        "english": "phone",
+        "vietnamese": "điện thoại",
+        "part_of_speech": "noun",
+        "example": "My phone is in my bag.",
+        "example_translation": "Điện thoại của tôi ở trong túi."
+      },
+      {
+        "english": "screen",
+        "vietnamese": "màn hình",
+        "part_of_speech": "noun",
+        "example": "The screen is bright.",
+        "example_translation": "Màn hình sáng."
+      },
+      {
+        "english": "keyboard",
+        "vietnamese": "bàn phím",
+        "part_of_speech": "noun",
+        "example": "This keyboard is new.",
+        "example_translation": "Bàn phím này mới."
+      },
+      {
+        "english": "mouse",
+        "vietnamese": "chuột máy tính",
+        "part_of_speech": "noun",
+        "example": "Click with your mouse.",
+        "example_translation": "Hãy nhấp bằng chuột máy tính."
+      },
+      {
+        "english": "printer",
+        "vietnamese": "máy in",
+        "part_of_speech": "noun",
+        "example": "The printer is near the door.",
+        "example_translation": "Máy in ở gần cửa."
+      },
+      {
+        "english": "internet",
+        "vietnamese": "mạng internet",
+        "part_of_speech": "noun",
+        "example": "We use the internet to learn.",
+        "example_translation": "Chúng tôi dùng mạng internet để học."
+      },
+      {
+        "english": "website",
+        "vietnamese": "trang web",
+        "part_of_speech": "noun",
+        "example": "This website teaches English.",
+        "example_translation": "Trang web này dạy tiếng Anh."
+      },
+      {
+        "english": "email",
+        "vietnamese": "thư điện tử",
+        "part_of_speech": "noun",
+        "example": "I send an email to my teacher.",
+        "example_translation": "Tôi gửi thư điện tử cho giáo viên."
+      },
+      {
+        "english": "password",
+        "vietnamese": "mật khẩu",
+        "part_of_speech": "noun",
+        "example": "Do not share your password.",
+        "example_translation": "Đừng chia sẻ mật khẩu của bạn."
+      },
+      {
+        "english": "file",
+        "vietnamese": "tệp tin",
+        "part_of_speech": "noun",
+        "example": "Please save this file.",
+        "example_translation": "Hãy lưu tệp tin này."
+      },
+      {
+        "english": "folder",
+        "vietnamese": "thư mục",
+        "part_of_speech": "noun",
+        "example": "The file is in this folder.",
+        "example_translation": "Tệp tin ở trong thư mục này."
+      },
+      {
+        "english": "program",
+        "vietnamese": "chương trình",
+        "part_of_speech": "noun",
+        "example": "This program helps us learn words.",
+        "example_translation": "Chương trình này giúp chúng tôi học từ."
+      },
+      {
+        "english": "software",
+        "vietnamese": "phần mềm",
+        "part_of_speech": "noun",
+        "example": "The software is easy to use.",
+        "example_translation": "Phần mềm dễ sử dụng."
+      },
+      {
+        "english": "data",
+        "vietnamese": "dữ liệu",
+        "part_of_speech": "noun",
+        "example": "We save the data every day.",
+        "example_translation": "Chúng tôi lưu dữ liệu mỗi ngày."
+      },
+      {
+        "english": "network",
+        "vietnamese": "mạng máy tính",
+        "part_of_speech": "noun",
+        "example": "Our network connects ten computers.",
+        "example_translation": "Mạng của chúng tôi kết nối mười máy tính."
+      },
+      {
+        "english": "click",
+        "vietnamese": "nhấp chuột",
+        "part_of_speech": "verb",
+        "example": "Click the green button.",
+        "example_translation": "Hãy nhấp vào nút màu xanh lá."
+      },
+      {
+        "english": "download",
+        "vietnamese": "tải xuống",
+        "part_of_speech": "verb",
+        "example": "I download the lesson.",
+        "example_translation": "Tôi tải bài học xuống."
+      },
+      {
+        "english": "upload",
+        "vietnamese": "tải lên",
+        "part_of_speech": "verb",
+        "example": "Please upload your homework.",
+        "example_translation": "Hãy tải bài tập của bạn lên."
+      }
+    ]
+  }
+]

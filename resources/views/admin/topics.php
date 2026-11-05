@@ -23,7 +23,7 @@ $pageLink = static fn (int $page): string => $appBase . '/admin/topics?' . http_
 <main>
     <h1>Quản lý chủ đề</h1>
     <nav>
-        <a href="<?= $escape($appBase . '/admin/dictionary') ?>">Tra và thêm từ</a>
+        <a href="<?= $escape($appBase . '/admin/words') ?>">Kệ sách từ vựng</a>
         <a href="<?= $escape($appBase . '/admin/topics') ?>">Tạo chủ đề mới</a>
     </nav>
     <?php if ($notice !== ''): ?><p class="success" role="status"><?= $escape($notice) ?></p><?php endif; ?>
