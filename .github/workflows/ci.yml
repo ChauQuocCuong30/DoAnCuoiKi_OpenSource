@@ -55,6 +55,26 @@ jobs:
           mysql --skip-ssl -h 127.0.0.1 -u root -pintegration-only doulingo_learning_test < database/migrations/001_create_tables.sql
           mysql --skip-ssl -h 127.0.0.1 -u root -pintegration-only doulingo_learning_test < database/seeds/001_demo_data.sql
       - run: php tests/integration/learning.php
+      - name: Reviews unit tests
+        run: |
+          php tests/unit/Sm2SchedulerTest.php
+          php tests/unit/ReviewSupportTest.php
+          php tests/unit/ReviewRequestTest.php
+      - name: Initialize separate Reviews test database
+        run: |
+          mysql --skip-ssl -h 127.0.0.1 -u root -pintegration-only -e "CREATE DATABASE doulingo_ci_sm2_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+          mysql --skip-ssl -h 127.0.0.1 -u root -pintegration-only doulingo_ci_sm2_test < database/migrations/001_create_tables.sql
+          mysql --skip-ssl -h 127.0.0.1 -u root -pintegration-only doulingo_ci_sm2_test < database/seeds/001_demo_data.sql
+      - name: Reviews and Notifications database regression tests
+        env:
+          SM2_TEST_DB_HOST: 127.0.0.1
+          SM2_TEST_DB_PORT: 3306
+          SM2_TEST_DB_NAME: doulingo_ci_sm2_test
+          SM2_TEST_DB_USER: root
+          SM2_TEST_DB_PASSWORD: integration-only
+        run: |
+          php tests/integration/ReviewDatabaseTest.php
+          php tests/integration/NotificationDatabaseTest.php
       - name: Install browser test runner
         run: |
           npm install --prefix /tmp/learning-playwright --no-audit --no-fund playwright@1.62.1
