@@ -5,6 +5,7 @@ use App\Core\Router;
 use App\Modules\Learning\Controllers\LearningController;
 
 return static function (Router $router): void {
+    \App\Modules\Admin\Controllers\ContentController::register($router);
     $router->get('/login', [\App\Modules\Auth\Controllers\AuthPageController::class, 'login']);
     $router->get('/register', [\App\Modules\Auth\Controllers\AuthPageController::class, 'register']);
     $router->get('/profile', [\App\Modules\Auth\Controllers\AuthPageController::class, 'profile']);
@@ -16,8 +17,6 @@ return static function (Router $router): void {
 
     $router->get('/learning', [LearningController::class, 'index']);
     $router->get('/learning/lesson/{id}', [LearningController::class, 'lesson']);
-    // Existing content module routes (Cuong).
-    \App\Modules\Admin\Controllers\ContentController::register($router);
     $router->get('/reviews', [
         \App\Modules\Reviews\Controllers\ReviewHttpController::class, 'index',
     ]);

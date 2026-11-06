@@ -8,6 +8,7 @@ use App\Modules\Users\Controllers\UsersController;
 use App\Modules\Learning\Controllers\LearningController;
 
 return static function (Router $router): void {
+    \App\Modules\Admin\Controllers\ContentApiController::register($router);
     $router->get('/api/v1/health', static function (array $params): void {
         Response::data(['status' => 'ok', 'database' => 'not_configured']);
     });
@@ -26,8 +27,6 @@ return static function (Router $router): void {
     $router->patch('/api/v1/users/me', [UsersController::class, 'updateMe']);
     $router->patch('/api/v1/users/{id}/status', [UsersController::class, 'updateStatus']);
 
-    // Content module registers dictionary and content routes together.
-    \App\Modules\Admin\Controllers\ContentApiController::register($router);
     // API on tap va nhac hoc.
     $reviewRoutes = [
         'GET' => [
