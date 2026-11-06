@@ -6,7 +6,7 @@ namespace App\Modules\Auth\Controllers;
 
 /**
  * Luồng làm quen: chào mừng -> chọn trình độ / test nhanh -> học từ vựng.
- * Chỉ trả về trang HTML; dữ liệu từ vựng tạm thời nằm ở public/assets/js/vocab-data.js.
+ * Kiểm tra trình độ demo dùng dữ liệu minh họa; học thật chuyển sang PR #26.
  */
 final class OnboardingController
 {
@@ -27,7 +27,8 @@ final class OnboardingController
 
     public function lesson(array $params): void
     {
-        $this->render('lesson', 'Học từ vựng');
+        $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
+        header('Location: ' . $base . '/learning', true, 303);
     }
 
     private function render(string $view, string $title): void

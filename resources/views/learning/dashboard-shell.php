@@ -40,10 +40,27 @@ $navItems = [
     ['home', '/', 'home', 'Trang chủ'],
     ['path', '/learning', 'map', 'Lộ trình học'],
     ['progress', '/learning/progress', 'chart', 'Tiến độ'],
+    ['placement', '/placement', 'chart', 'Kiểm tra trình độ demo'],
+    ...($isGuest ? [] : [['hearts', '/learning/hearts', 'heart', 'Ôn từ sai · Hồi tim']]),
 ];
+
+// Render admin navigation only for the current server-verified administrator.
+header('Cache-Control: no-store');
+if (Session::userId() !== null) {
+    try {
+        $account = \App\Middleware\Auth::user();
+        if ($account['role'] === 'admin') {
+            $navItems[] = ['admin', '/admin/words', 'book', 'Trang quản trị'];
+        }
+    } catch (\App\Core\ApiException $error) {
+        if (!in_array($error->status, [401, 403], true)) { throw $error; }
+        $isGuest = true;
+    }
+}
 
 $icon = static function (string $name): string {
     $paths = [
+        'heart' => 'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z',
         'home' =>
             'M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z',
         'map' =>
@@ -136,7 +153,7 @@ $icon = static function (string $name): string {
     </style>
 
     <script
-        src="<?= $e($b) ?>/assets/js/learning-ui.js?v=13"
+        src="<?= $e($b) ?>/assets/js/learning-ui.js?v=14"
         defer
     ></script>
 </head>

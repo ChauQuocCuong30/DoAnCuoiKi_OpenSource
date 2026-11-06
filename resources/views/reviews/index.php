@@ -30,6 +30,7 @@ $reviewApiBase = $reviewApiBase ?? rtrim(
     </script>
 </head>
 <body>
+<?php require dirname(__DIR__) . '/layouts/account-nav.php'; ?>
     <main class="review-shell">
         <nav aria-label="Điều hướng học tập" style="display:flex;gap:20px;margin-bottom:24px;flex-wrap:wrap">
             <a href="<?= htmlspecialchars($reviewApiBase . '/learning', ENT_QUOTES, 'UTF-8') ?>">← Bài học</a>

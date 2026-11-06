@@ -6,12 +6,9 @@ $navActive = 'home';
 
 require __DIR__ . '/learning/dashboard-shell.php';
 
-$topicsHome = [
-    ['Đồ uống và giao tiếp', 'milk', 'mint', 'drinks'],
-    ['Giao thông', 'bus', 'blue', 'transport'],
-    ['Quốc gia', 'vietnam', 'lilac', 'countries'],
-    ['Động vật', 'cat', 'peach', 'animals'],
-];
+$topicsHome = $topicsHome ?? [];
+$heroWords = $heroWords ?? [];
+$tones = ['mint', 'blue', 'lilac', 'peach'];
 ?>
 
 <section class="ld-hero ld-home-hero"
@@ -78,13 +75,13 @@ $topicsHome = [
                     <?= $icon('headphones') ?>
                 </span>
 
-                <strong>hello</strong>
-                <small>xin chào</small>
+                <strong><?= $e($heroWords[0]['english'] ?? 'Học mỗi ngày') ?></strong>
+                <small><?= $e($heroWords[0]['vietnamese'] ?? 'Khám phá từ mới') ?></small>
             </div>
 
             <div class="ld-word-chip ld-word-two">
-                <strong>milk</strong>
-                <small>sữa</small>
+                <strong><?= $e($heroWords[1]['english'] ?? 'Từng bước') ?></strong>
+                <small><?= $e($heroWords[1]['vietnamese'] ?? 'Ghi nhớ lâu hơn') ?></small>
                 <i></i>
             </div>
 
@@ -144,7 +141,7 @@ $topicsHome = [
             >
 
             <h3>Thử sức mỗi ngày</h3>
-            <p>Bốn dạng bài, nhiều cách nhớ.</p>
+            <p>Câu hỏi theo chủ đề, nhiều cách nhớ.</p>
 
             <span class="ld-shortcut-bottom">
                 Vào luyện tập
@@ -173,16 +170,18 @@ $topicsHome = [
     </div>
 
     <div class="ld-topics-grid">
-        <?php foreach (
-            $topicsHome as $i => [$name, $slug, $tone, $category]
-        ): ?>
+        <?php foreach ($topicsHome as $i => $topic): ?>
+            <?php
+            $cover = $topic['cover'] ?? '/assets/images/learning-ui/notebook.png';
+            $cover = str_starts_with($cover, '/') ? $b . $cover : $cover;
+            ?>
             <a
-                class="ld-topic-card ld-tone-<?= $e($tone) ?>"
-                href="<?= $e($b) ?>/learning/explore?category=<?= $e($category) ?>"
+                class="ld-topic-card ld-tone-<?= $e($tones[$i % count($tones)]) ?>"
+                href="<?= $e($b) ?>/learning/explore?topic=<?= (int) $topic['id'] ?>"
             >
                 <div class="ld-topic-image">
                     <img
-                        src="<?= $e($b) ?>/assets/media/images/<?= $e($slug) ?>.png"
+                        src="<?= $e($cover) ?>"
                         alt=""
                         width="90"
                         height="90"
@@ -199,14 +198,17 @@ $topicsHome = [
                     ) ?>
                 </span>
 
-                <h3><?= $e($name) ?></h3>
+                <h3><?= $e($topic['name']) ?></h3>
 
                 <div class="ld-topic-bottom">
-                    <small>4 ải học</small>
+                    <small><?= (int) $topic['word_count'] ?> từ · <?= (int) $topic['lesson_count'] ?> mức</small>
                     <?= $icon('arrow') ?>
                 </div>
             </a>
         <?php endforeach; ?>
+        <?php if ($topicsHome === []): ?>
+            <p>Chưa có chủ đề đang mở.</p>
+        <?php endif; ?>
     </div>
 </section>
 

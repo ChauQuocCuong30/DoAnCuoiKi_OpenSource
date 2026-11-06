@@ -11,10 +11,8 @@ $activeAdminPage = 'topics';
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#eee7d8">
     <title>Quản lý chủ đề · Doulingo Admin</title>
-    <link rel="stylesheet" href="<?= $escape($appBase . '/assets/css/admin-books.css') ?>">
-    <link rel="stylesheet" href="<?= $escape($appBase . '/assets/css/admin-topics.css') ?>">
+    <?php require __DIR__ . '/_styles.php'; ?>
 </head>
 <body class="topics-page">
 <?php require __DIR__ . '/_header.php'; ?>

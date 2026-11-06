@@ -50,6 +50,7 @@ $boot = [
         ? (int) $activeSession['id']
         : null,
     'ready' => !empty($ready),
+    'heartRecovery' => !$guest && \App\Shared\Cefr::installed(\App\Core\Database::connection()),
     'initialFocus' => $initialFocus,
 ];
 ?>
@@ -71,7 +72,7 @@ $boot = [
     <link rel="stylesheet"
           href="<?= $e($b) ?>/assets/css/learning-bright.css?v=1">
 
-    <script src="<?= $e($b) ?>/assets/js/learning-ui.js?v=13"
+    <script src="<?= $e($b) ?>/assets/js/learning-ui.js?v=14"
             defer></script>
 </head>
 
@@ -88,6 +89,7 @@ $boot = [
             <a href="<?= $e($b) ?>/learning/progress">
                 Tiến độ
             </a>
+            <?php if (!$guest): ?><a href="<?= $e($b) ?>/learning/hearts">Ôn từ sai · Hồi tim</a><?php endif; ?>
         </nav>
     </header>
 
@@ -137,7 +139,7 @@ $boot = [
                 <?= $e($lesson['name'] ?? 'Bài học') ?>
             </h1>
 
-            <span class="hearts" id="lu-hearts"></span>
+            <a class="hearts" id="lu-hearts" <?= $guest ? 'aria-label="Tim học thử"' : 'href="' . $e($b) . '/learning/hearts" aria-label="Xem tim và ôn từ sai"' ?>></a>
         </header>
 
         <progress id="lu-progress"
@@ -289,6 +291,7 @@ $boot = [
                 <?php endif; ?>
 
                 <?php if (!$guest): ?>
+                    <a class="btn" href="<?= $e($b) ?>/learning/hearts">Ôn từ sai để hồi tim</a>
                     <a class="btn" href="<?= $e($b) ?>/reviews">
                         Ôn tập theo lịch
                     </a>

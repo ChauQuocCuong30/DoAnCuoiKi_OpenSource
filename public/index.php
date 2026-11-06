@@ -17,8 +17,7 @@ try {
     $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
     $relative = substr((string) $path, strlen($base));
     if ($relative === '' || $relative === '/') {
-        header('Content-Type: text/html; charset=utf-8');
-        require dirname(__DIR__) . '/resources/views/home.php';
+        (new \App\Modules\Learning\Controllers\GuestLearningController())->home();
     } else {
         $router = new Router();
         (require dirname(__DIR__) . '/routes/web.php')($router);

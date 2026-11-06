@@ -1,10 +1,10 @@
-// Doulingo learning UI — version 13
+// Doulingo learning UI — version 14
 (() => {
     'use strict';
 
     function bootPage() {
-        if (window.__doulingoLearningUiLoaded === '13') return;
-        window.__doulingoLearningUiLoaded = '13';
+        if (window.__doulingoLearningUiLoaded === '14') return;
+        window.__doulingoLearningUiLoaded = '14';
 
         const $ = id => document.getElementById(id);
         const nfc = value => String(value ?? '').normalize('NFC');
@@ -1378,6 +1378,24 @@
                 sync();
             }
         });
+
+        if (!boot.guest && boot.heartRecovery) {
+            let heartPollAt = 0;
+            const pollHearts = async () => {
+                if (busy || Date.now() - heartPollAt < 25000) return;
+                heartPollAt = Date.now();
+                try {
+                    const fresh = await api('hearts');
+                    if (state) {
+                        state.current_hp = fresh.current_hp;
+                        state.next_hp_at = fresh.next_hp_at;
+                        summary();
+                    }
+                } catch { /* Normal question requests still refresh hearts on the server. */ }
+            };
+            setInterval(pollHearts, 30000);
+            document.addEventListener('visibilitychange', () => { if (!document.hidden) pollHearts(); });
+        }
 
         async function init() {
             if (entryMode === 'practice') {

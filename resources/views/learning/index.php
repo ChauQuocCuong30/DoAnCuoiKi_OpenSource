@@ -128,6 +128,13 @@ foreach (($topics ?? []) as $topic) {
     ];
 }
 
+if (!$isGuest && !empty($resumeSession)) {
+    foreach ($stages as $stage) {
+        foreach ($stage['lessons'] as $lesson) {
+            if ((int)$lesson['id']===(int)$resumeSession['lesson_id']) { $next=['topic'=>$stage['topic']['name'],'lesson'=>$lesson];break 2; }
+        }
+    }
+}
 $percent = $total > 0
     ? (int) round(100 * $done / $total)
     : 0;
@@ -144,6 +151,9 @@ $allDone = $total > 0 && $done === $total;
 
 require __DIR__ . '/dashboard-shell.php';
 ?>
+<?php if (!$isGuest && !empty($hearts)): ?>
+<div class="ld-stage" style="padding:16px;margin:12px 0 24px" data-account-hearts><strong>♥ <?= (int)$hearts['current_hp'] ?>/3 tim</strong> · Tự hồi 1 tim mỗi 30 phút. <a class="ld-btn ld-btn-small ld-btn-outline" href="<?= $e($b) ?>/learning/hearts">Ôn từ sai để hồi tim</a></div>
+<?php endif; ?>
 
 <?php if (!empty($loadError)): ?>
 
@@ -604,6 +614,7 @@ require __DIR__ . '/dashboard-shell.php';
                                     <div class="ld-lesson-copy">
                                         <h4>
                                             <?= $e($lesson['name']) ?>
+                                            <?php if (!empty($lesson['active_session'])): ?><small class="ld-muted"> · Đang học <?= (int)$lesson['active_session']['answered_main'] ?>/<?= (int)$lesson['active_session']['total_questions'] ?> câu</small><?php endif; ?>
 
                                             <?php if ($current): ?>
                                                 <span
@@ -837,6 +848,7 @@ require __DIR__ . '/dashboard-shell.php';
 <?php endif; ?>
 
 <?php
+require __DIR__ . '/history.php';
 // Chỉ kết quả học thử thật mới được đi vào luồng nhận kết quả.
 $guestCompleted = $hasGuestResult;
 require __DIR__ . '/dashboard-end.php';

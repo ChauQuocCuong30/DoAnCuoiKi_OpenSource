@@ -11,6 +11,9 @@ use App\Modules\Learning\Controllers\GuestLearningController;
 
 return static function (Router $router): void {
     ContentApiController::register($router);
+    $router->get('/api/v1/learning/hearts', [\App\Modules\Learning\Controllers\HeartPracticeController::class, 'summary']);
+    $router->post('/api/v1/learning/hearts/start', [\App\Modules\Learning\Controllers\HeartPracticeController::class, 'start']);
+    $router->post('/api/v1/learning/hearts/{id}/answers', [\App\Modules\Learning\Controllers\HeartPracticeController::class, 'answer']);
 
     $router->get(
         '/api/v1/health',

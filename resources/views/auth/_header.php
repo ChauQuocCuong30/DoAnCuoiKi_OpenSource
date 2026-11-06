@@ -30,6 +30,7 @@ $e = static fn (string $v): string => htmlspecialchars(
 </head>
 
 <body data-base="<?= $e($base) ?>">
+<?php require dirname(__DIR__) . '/layouts/account-nav.php'; ?>
 <div class="auth-layout">
     <aside class="brand-panel">
         <div class="logo">

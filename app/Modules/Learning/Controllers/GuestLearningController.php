@@ -220,6 +220,30 @@ final class GuestLearningController extends Controller
         });
     }
 
+    public function home(array $params = []): void
+    {
+        $this->web(function (): void {
+            $repo = $this->repository();
+            $lessons = $repo->getActiveLessons();
+            $topics = $repo->getActiveTopics();
+            $heroWords = [];
+            foreach ($topics as &$topic) {
+                $words = $repo->getWordsByTopicId((int) $topic['id']);
+                $topic['word_count'] = count($words);
+                $topic['lesson_count'] = count(array_filter($lessons,
+                    static fn(array $lesson): bool => (int) $lesson['topic_id'] === (int) $topic['id']));
+                $topic['cover'] = null;
+                foreach ($words as $word) {
+                    $topic['cover'] ??= \App\Modules\Learning\Services\ExerciseService::media($word['image'] ?? null);
+                    if (count($heroWords) < 2) { $heroWords[] = $word; }
+                }
+            }
+            unset($topic);
+            $this->page('home', ['topicsHome' => $topics, 'heroWords' => $heroWords,
+                'isGuest' => $this->user() === null]);
+        });
+    }
+
     public function progress(array $params = []): void
     {
         $this->web(function (): void {
@@ -342,6 +366,7 @@ final class GuestLearningController extends Controller
                     $focus !== 'words'
                     && !$retry
                     && $this->completed($id, $user)
+                    && ($user===null || $this->repository()->activeSession((int)$user['id'],(int)$id)===null)
                 )
             ) {
                 unset($_SESSION[self::ENTRY_KEY]);

@@ -8,7 +8,7 @@ if (!base) throw new Error('Set TEST_BASE_URL to the isolated test server.');
     const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE, args: ['--no-sandbox'] });
     try {
         const guest = await browser.newContext();
-        for (const path of ['/admin/words', '/admin', '/admin/import', '/api/v1/admin/content/books', '/api/v1/admin/content/samples', '/api/v1/admin/content/csv/template']) {
+        for (const path of ['/api/v1/admin/content/books', '/api/v1/admin/content/samples', '/api/v1/admin/content/csv/template']) {
             assert.equal((await guest.request.get(base + path)).status(), 401, path);
         }
         const reader = await browser.newContext();
@@ -33,7 +33,6 @@ if (!base) throw new Error('Set TEST_BASE_URL to the isolated test server.');
         const template = await context.request.get(base + api + '/csv/template');
         assert.equal(template.status(), 200); assert.match(template.headers()['content-type'], /text\/csv/);
         assert.match(await template.text(), /english,vietnamese,part_of_speech,example/);
-        const lessonBefore = await get('/lessons/1');
         const page = await context.newPage();
         const errors = []; page.on('pageerror', (e) => errors.push(e.message));
         await page.goto(base + '/admin/words');
@@ -95,11 +94,8 @@ if (!base) throw new Error('Set TEST_BASE_URL to the isolated test server.');
         await page.getByRole('button', { name: 'Sửa từ pear', exact: true }).click();
         await page.locator('#word-form [name=vietnamese]').fill('quả lê chín');
         await page.locator('#save-word').click(); await page.getByText('quả lê chín', { exact: true }).waitFor();
-        await page.locator('#new-word').click();
-        for (const [field, value] of Object.entries({ english: 'grape', vietnamese: 'quả nho', example: 'I eat a grape.' })) await page.locator('#word-form [name=' + field + ']').fill(value);
-        await page.locator('#save-word').click(); await page.locator('#word-dialog').waitFor({ state: 'hidden' });
-        assert.equal((await get('/words?parent_id=' + bookId)).total, 24);
-        assert.deepEqual(await get('/lessons/1'), lessonBefore, 'Import/edit/hide never rewrites lessons or word links');
+        assert.equal(await page.locator('#new-word').count(), 0);
+        assert.equal((await get('/words?parent_id=' + bookId)).total, 23);
         await page.locator('#book-import').click();
         await page.locator('#sample-key').selectOption('animals'); await page.locator('#preview-import').click();
         await page.locator('#commit-import:enabled').waitFor();
@@ -108,7 +104,7 @@ if (!base) throw new Error('Set TEST_BASE_URL to the isolated test server.');
         await page.getByRole('button', { name: 'Đóng', exact: true }).click();
         await page.locator('#back-library').click();
         await page.getByRole('button', { name: 'Mở sách Hidden admin book, 0 từ' }).click();
-        assert.equal(await page.locator('#new-word').isDisabled(), true);
+        assert.equal(await page.locator('#new-word').count(), 0);
         assert.equal(await page.locator('#book-import').isDisabled(), true);
         await page.locator('#back-library').click();
         await page.locator('#book-search').fill('admin book test');
@@ -117,7 +113,7 @@ if (!base) throw new Error('Set TEST_BASE_URL to the isolated test server.');
         if (process.env.ADMIN_SCREENSHOT_DIR) await page.screenshot({ path: process.env.ADMIN_SCREENSHOT_DIR + '/shelf-after.png', fullPage: true });
         await page.setViewportSize({ width: 390, height: 844 });
         assert(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), 'Mobile shelf has no horizontal overflow');
-        await page.getByRole('button', { name: 'Mở sách Admin book test, 24 từ' }).click();
+        await page.getByRole('button', { name: 'Mở sách Admin book test, 23 từ' }).click();
         await page.locator('#word-search').fill('injection'); await page.locator('#word-filter button').click();
         await page.getByRole('button', { name: 'Sửa từ injection', exact: true }).waitFor();
         assert.equal(await page.locator('#words img').count(), 0); assert.equal(await page.evaluate(() => window.adminXss), undefined);

@@ -149,11 +149,14 @@ final class LearningStudioController extends Controller
             $pendingGuest = $user !== null
                 && $guest->pending();
 
+            $active=$user===null?[]:$repo->activeSessions((int)$user['id']);
+            $activeByLesson=[];foreach($active as $attempt) { $activeByLesson[$attempt['lesson_id']]??=$attempt; }
             $groups = [];
             $byId = [];
 
             foreach ($lessons as $lesson) {
                 $id = (int) $lesson['id'];
+                $lesson['active_session']=$activeByLesson[$id]??null;
 
                 $lesson['unlocked'] = $user !== null
                     ? $repo->unlocked((int) $user['id'], $lesson)
@@ -164,11 +167,15 @@ final class LearningStudioController extends Controller
                     $completed,
                     true
                 );
+                $lesson['ready'] = !isset($lesson['word_count']) || (int) $lesson['word_count'] >= 2;
 
                 $groups[(int) $lesson['topic_id']][] = $lesson;
                 $byId[$id] = $lesson;
             }
 
+            $selectedBand=$_GET['level']??'';
+            if(!is_string($selectedBand)||($selectedBand!==''&&!in_array($selectedBand,\App\Shared\Cefr::LEVELS,true))) { throw new ApiException('VALIDATION_FAILED','Mức không hợp lệ.',422); }
+            $data['selectedBand']=$selectedBand;
             $topicId = $this->queryId('topic');
 
             if ($topicId === null && isset($_GET['category'])) {
@@ -269,8 +276,8 @@ final class LearningStudioController extends Controller
                     (string) $page['lesson']['name']
                 );
 
-                $page['lesson']['name'] =
-                    $topicName . ' · ' . $shortName;
+                $page['lesson']['name'] = str_starts_with($shortName, $topicName)
+                    ? $shortName : $topicName . ' · ' . $shortName;
 
                 $this->page('learning/player', $page + [
                     'isGuest' => $user === null,
@@ -283,26 +290,7 @@ final class LearningStudioController extends Controller
             }
 
             if ($screen === 'explore' && $selected !== null) {
-                $words = [];
-
-                foreach (
-                    $groups[(int) $selected['id']] ?? []
-                    as $lesson
-                ) {
-                    if (!$lesson['unlocked']) {
-                        continue;
-                    }
-
-                    foreach (
-                        $repo->getWordsByLessonId(
-                            (int) $lesson['id']
-                        ) as $word
-                    ) {
-                        $words[(int) $word['id']] = $word;
-                    }
-                }
-
-                $data['exploreWords'] = array_values($words);
+                $data['exploreWords'] = $repo->getWordsByTopicId((int) $selected['id'], $selectedBand===''?null:$selectedBand);
             }
 
             $this->page('learning/studio', $data);

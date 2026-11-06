@@ -79,7 +79,7 @@ final class LearningResultController extends Controller
 
             $data['questions'] = $this->prepareQuestions(
                 $data['questions'],
-                $this->visibleExercises($repo, $id)
+                $this->historyWords($repo, $data['lesson'])
             );
 
             $data['topicName'] = '';
@@ -263,26 +263,21 @@ final class LearningResultController extends Controller
         ];
     }
 
-    private function visibleExercises(
-        LearningRepository $repo,
-        int $lessonId
-    ): array {
-        $words = $repo->getWordsByLessonId($lessonId);
-        $grader = new ExerciseService();
-        $visible = [];
-
-        foreach ($repo->exercises($lessonId) as $row) {
-            if ($grader->snapshot($row, $words) !== null) {
-                $visible[(int) $row['id']] = true;
-            }
+    private function historyWords(LearningRepository $repo, array $lesson): array
+    {
+        // Completed results keep the vocabulary that was studied, including a later CEFR move.
+        // Hidden words/topics stay unavailable; retiring a generated bank must not hide history.
+        $words=[];
+        foreach (array_merge($repo->getWordsByLessonId((int)$lesson['id']),
+            $repo->getWordsByTopicId((int)$lesson['topic_id'])) as $word) {
+            $words[(int)$word['id']]=$word;
         }
-
-        return $visible;
+        return array_values($words);
     }
 
     private function prepareQuestions(
         array $rows,
-        array $visible
+        array $words
     ): array {
         $questions = [];
 
@@ -294,11 +289,6 @@ final class LearningResultController extends Controller
                     ? null
                     : (bool) $row['first_is_correct'],
             ];
-
-            if (!isset($visible[(int) $row['exercise_id']])) {
-                $questions[] = $item;
-                continue;
-            }
 
             try {
                 $snapshot = json_decode(
@@ -326,6 +316,13 @@ final class LearningResultController extends Controller
                     continue;
                 }
 
+                $validated=(new ExerciseService())->snapshot([
+                    'word_id'=>null, 'type'=>$snapshot['type'] ?? '',
+                    'content_json'=>json_encode($snapshot['content']+['target_word_ids'=>$snapshot['target_word_ids']??[]],JSON_THROW_ON_ERROR),
+                    'answer_json'=>json_encode($snapshot['answer'],JSON_THROW_ON_ERROR),
+                ],$words);
+                if($validated===null) { $questions[]=$item;continue; }
+                $snapshot=$validated;
                 $content = $snapshot['content'];
 
                 $item += [

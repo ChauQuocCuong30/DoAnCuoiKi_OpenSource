@@ -19,6 +19,7 @@ $e = static fn (string $v): string => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
     <script src="<?= $e($base) ?>/assets/js/transition.js"></script>
 </head>
 <body>
+<?php require dirname(__DIR__) . '/layouts/account-nav.php'; ?>
 <div class="grain" aria-hidden="true"></div>
 
 <!-- 1 · HERO -->

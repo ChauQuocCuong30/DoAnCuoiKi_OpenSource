@@ -18,3 +18,4 @@ $e = static fn (string $v): string => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
     <script src="<?= $e($base) ?>/assets/js/transition.js"></script>
 </head>
 <body data-page="<?= $e($page) ?>" data-base="<?= $e($base) ?>">
+<?php require dirname(__DIR__) . '/layouts/account-nav.php'; ?>

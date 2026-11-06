@@ -163,7 +163,11 @@ final class ExerciseService
             };
             return in_array($norm($input['text']), array_map($norm, $answer['accepted_answers']), true);
         }
-        if ($type === 'token_order') { return in_array($input['token_ids'], $answer['accepted_sequences'], true); }
+        if ($type === 'token_order') {
+            $tokens=array_column($snapshot['content']['tokens'],'text','id');
+            $text=static fn($sequence)=>array_map(static fn($id)=>$tokens[$id],$sequence);
+            return in_array($text($input['token_ids']),array_map($text,$answer['accepted_sequences']),true);
+        }
         $expected = array_map(static fn ($pair) => ['left_id' => $pair['left_id'], 'right_id' => $pair['right_id']], $answer['pairs']);
         usort($expected, static fn ($a, $b) => strcmp($a['left_id'], $b['left_id']));
         return $input['pairs'] === $expected;
