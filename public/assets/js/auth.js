@@ -75,7 +75,7 @@
   if (login) {
     submit(login, function (data) {
       return request('POST', '/auth/login', data).then(function (r) {
-        if (r.ok) { window.location.href = base + '/profile'; return null; }
+        if (r.ok) { (window.DLNav ? DLNav.go(base + '/') : (window.location.href = base + '/')); return null; }
         return r;
       });
     });
@@ -87,8 +87,8 @@
       return request('POST', '/auth/register', data).then(function (r) {
         if (!r.ok) { return r; }
         return request('POST', '/auth/login', { email: data.email, password: data.password }).then(function (l) {
-          if (l.ok) { window.location.href = base + (hasLevel() ? '/lesson' : '/profile'); return null; }
-          window.location.href = base + '/login';
+          if (l.ok) { (window.DLNav ? DLNav.go(base + '/profile?new=1') : (window.location.href = base + '/profile?new=1')); return null; }
+          (window.DLNav ? DLNav.go(base + '/login', 'back') : (window.location.href = base + '/login'));
           return null;
         });
       });
@@ -99,21 +99,71 @@
   if (profile) {
     var logout = document.querySelector('[data-logout]');
 
+    var selfId = null;
     request('GET', '/users/me').then(function (r) {
-      if (!r.ok) { window.location.href = base + '/login'; return; }
+      if (!r.ok) { (window.DLNav ? DLNav.go(base + '/login', 'back') : (window.location.href = base + '/login')); return; }
       var user = r.json.data;
+      selfId = user.id !== undefined && user.id !== null ? String(user.id) : null;
       ['email', 'name', 'daily_goal_xp', 'streak_goal_days', 'timezone'].forEach(function (key) {
         var input = profile.elements[key];
         if (input) { input.value = user[key]; }
       });
+      var roleLine = document.querySelector('[data-role]');
+      var isAdmin = user.role === 'admin';
+      roleLine.textContent = 'Vai trò: ' + (isAdmin ? 'Quản trị viên' : 'Người dùng');
+      roleLine.hidden = false;
+      document.querySelector('[data-admin]').hidden = !isAdmin;
       profile.hidden = false;
       logout.hidden = false;
+      document.querySelector('[data-welcome]').hidden = !/[?&]new=1(&|$)/.test(window.location.search);
+    });
+
+    var adminBox = document.querySelector('[data-admin]');
+    document.querySelector('[data-admin-submit]').addEventListener('click', function (event) {
+      var button = event.currentTarget;
+      if (button.disabled) { return; }
+      var id = document.querySelector('[data-admin-id]').value.trim();
+      var statusSelect = document.querySelector('[data-admin-status]');
+      var status = statusSelect.value;
+      if (!/^[1-9][0-9]{0,9}$/.test(id)) { showAlert(adminBox, 'ID phải là số nguyên dương, chỉ gồm chữ số (ví dụ: 5).', false); return; }
+      if (selfId !== null && id === selfId) { showAlert(adminBox, 'Bạn không thể tự khóa chính mình.', false); return; }
+      var label = statusSelect.options[statusSelect.selectedIndex].text;
+      if (!window.confirm('Đổi trạng thái tài khoản ID ' + id + ' thành ' + label + '?')) { return; }
+      button.disabled = true;
+      showAlert(adminBox, '');
+      request('PATCH', '/users/' + id + '/status', { status: status }).then(function (r) {
+        if (r.ok) { showAlert(adminBox, 'Đã cập nhật trạng thái tài khoản.', true); return; }
+        var code = r.json && r.json.error ? r.json.error.code : '';
+        var msg = 'Có lỗi xảy ra, vui lòng thử lại.';
+        if (r.status === 403 || code === 'FORBIDDEN') { msg = 'Bạn không có quyền thực hiện thao tác này.'; }
+        else if (r.status === 422) { msg = 'Dữ liệu không hợp lệ (không thể tự khóa chính mình).'; }
+        else if (r.status === 404) { msg = 'Không tìm thấy người dùng.'; }
+        showAlert(adminBox, msg, false);
+      }).catch(function () {
+        showAlert(adminBox, 'Không kết nối được máy chủ.', false);
+      }).then(function () { button.disabled = false; });
     });
 
     submit(profile, function (data) {
       delete data.email;
-      data.daily_goal_xp = parseInt(data.daily_goal_xp, 10);
-      data.streak_goal_days = parseInt(data.streak_goal_days, 10);
+      var limits = { daily_goal_xp: [1, 1000], streak_goal_days: [1, 365] };
+      var invalid = false;
+      Object.keys(limits).forEach(function (key) {
+        var raw = String(data[key] === undefined ? '' : data[key]).trim();
+        var msg = '';
+        if (!/^[0-9]+$/.test(raw)) { msg = 'Chỉ nhập số nguyên (chữ số 0-9).'; }
+        else {
+          var n = Number(raw);
+          if (n < limits[key][0] || n > limits[key][1]) { msg = 'Giá trị phải từ ' + limits[key][0] + ' đến ' + limits[key][1] + '.'; }
+          else { data[key] = n; }
+        }
+        if (msg) {
+          invalid = true;
+          var el = profile.querySelector('[data-error="' + key + '"]');
+          if (el) { el.textContent = msg; }
+        }
+      });
+      if (invalid) { return Promise.resolve(null); }
       return request('PATCH', '/users/me', data).then(function (r) {
         if (r.ok) { showAlert(profile, 'Đã lưu thay đổi.', true); return null; }
         return r;
@@ -121,7 +171,7 @@
     });
 
     logout.addEventListener('click', function () {
-      request('POST', '/auth/logout').then(function () { window.location.href = base + '/login'; });
+      request('POST', '/auth/logout').then(function () { (window.DLNav ? DLNav.go(base + '/login', 'back') : (window.location.href = base + '/login')); });
     });
   }
 })();

@@ -1,4 +1,6 @@
 <?php require __DIR__ . '/_header.php'; ?>
+<div class="alert ok" data-welcome hidden>Chào mừng bạn! Hãy kiểm tra lại thông tin và điền mục tiêu học của bạn, sau đó bấm Lưu thay đổi.</div>
+<p class="role-line" data-role hidden></p>
 <form data-form="profile" novalidate hidden>
     <div class="alert" data-alert hidden></div>
     <label>Email
@@ -27,6 +29,21 @@
         <small data-error="timezone"></small>
     </label>
     <button type="submit">Lưu thay đổi</button>
+    <a class="home-btn" href="<?= $e($base) ?>/">Tới trang chủ</a>
 </form>
+<section class="admin-box" data-admin hidden>
+    <h2>Quản lý tài khoản</h2>
+    <div class="alert" data-alert hidden></div>
+    <label>ID người dùng
+        <input type="text" data-admin-id inputmode="numeric" pattern="[0-9]*" maxlength="10" autocomplete="off">
+    </label>
+    <label>Trạng thái
+        <select data-admin-status>
+            <option value="active">Hoạt động</option>
+            <option value="locked">Khóa</option>
+        </select>
+    </label>
+    <button type="button" data-admin-submit>Cập nhật trạng thái</button>
+</section>
 <button type="button" class="secondary" data-logout hidden>Đăng xuất</button>
 <?php require __DIR__ . '/_footer.php'; ?>
