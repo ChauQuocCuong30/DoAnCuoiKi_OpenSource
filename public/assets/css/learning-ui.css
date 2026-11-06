@@ -1,0 +1,1266 @@
+.lu {
+    --ink: #123e2a;
+    --muted: #69836b;
+    --paper: #eaf0dc;
+    --line: #d7e3cb;
+    --green: #3e8b52;
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif;
+}
+
+.lu * {
+    box-sizing: border-box;
+}
+
+.lu [hidden] {
+    display: none !important;
+}
+
+.lu h1,
+.lu h2,
+.lu h3,
+.lu p {
+    margin: 0;
+    letter-spacing: normal;
+}
+
+.lu a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.lu button,
+.lu input,
+.lu select {
+    font: inherit;
+}
+
+.lu button {
+    cursor: pointer;
+    color: inherit;
+}
+
+.lu :focus-visible {
+    outline: 3px solid #b68b36;
+    outline-offset: 4px;
+}
+
+.lu button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.lu .shell {
+    width: min(1200px, calc(100% - 64px));
+    margin: auto;
+}
+
+.lu .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 88px;
+    border-bottom: 1px solid #ceddbf80;
+}
+
+.lu .brand {
+    font-size: 26px;
+    font-weight: 750;
+    letter-spacing: -1px;
+}
+
+.lu .brand:before {
+    content: "D";
+    display: inline-grid;
+    place-items: center;
+    background: #43874f;
+    color: white;
+    width: 35px;
+    height: 39px;
+    border-radius: 12px;
+    margin-right: 10px;
+    font-size: 23px;
+}
+
+.lu nav {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.lu nav a {
+    padding: 9px 15px;
+    border-radius: 99px;
+    font-size: 13px;
+    color: #607e60;
+}
+
+.lu nav a[aria-current="page"] {
+    color: #2b693d;
+    background: #d5e7c5;
+}
+
+.lu .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border: 1px solid #ccddbf;
+    background: #fcfef6;
+    color: #456b42;
+    padding: 12px 20px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 650;
+    min-height: 46px;
+    transition: transform .2s, box-shadow .2s;
+}
+
+.lu .btn:hover {
+    transform: translateY(-2px);
+}
+
+.lu .primary {
+    background: linear-gradient(145deg, #549f60, #3b854c);
+    color: white;
+    border-color: #3f864c;
+    box-shadow: 0 4px 0 #2c683c;
+}
+
+.lu .quiet {
+    background: transparent;
+    border-color: transparent;
+}
+
+.lu .actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 24px;
+}
+
+.lu .kicker {
+    display: block;
+    color: #879e69;
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 1.7px;
+    text-transform: uppercase;
+}
+
+.lu .muted {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.lu main {
+    padding-bottom: 55px;
+}
+
+.lu .intro {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 250px;
+    margin: 25px 0 18px;
+    padding: 24px 36px;
+    background: linear-gradient(
+        115deg,
+        #d6eac1,
+        #e2f0d3 65%,
+        #d0e8bb
+    );
+    border: 1px solid #ccdfba;
+    border-radius: 28px;
+    overflow: hidden;
+}
+
+.lu h1 {
+    font-size: clamp(30px, 3.3vw, 44px);
+    font-weight: 750;
+    line-height: 1.25;
+    margin: 12px 0;
+}
+
+.lu .intro p {
+    max-width: 430px;
+    color: #648363;
+    font-size: 15px;
+}
+
+.lu .scene {
+    position: relative;
+    width: 230px;
+    height: 200px;
+    flex: none;
+    perspective: 800px;
+    --rx: 0deg;
+    --ry: 0deg;
+}
+
+.lu .scene-inner {
+    position: absolute;
+    inset: 0;
+    transform: rotateX(var(--rx)) rotateY(var(--ry));
+    transform-style: preserve-3d;
+    transition: transform .2s;
+}
+
+.lu .scene:after {
+    content: "";
+    position: absolute;
+    width: 150px;
+    height: 28px;
+    left: 40px;
+    bottom: 9px;
+    border-radius: 50%;
+    background: #789d4b26;
+    filter: blur(7px);
+}
+
+.lu .clay {
+    position: absolute;
+    width: 140px;
+    height: 160px;
+    top: 10px;
+    left: 45px;
+    filter: drop-shadow(12px 19px 12px #42683625);
+    animation: luFloat 5s ease-in-out infinite;
+}
+
+.lu .book {
+    background: linear-gradient(
+        130deg,
+        #faffec,
+        #f1f7d5 65%,
+        #d7e7ac
+    );
+    border-radius: 12px 23px 23px 12px;
+    border-left: 13px solid #6eac59;
+    border-bottom: 8px solid #c4d591;
+    transform: rotate(-14deg);
+}
+
+.lu .book:before {
+    content: "";
+    position: absolute;
+    inset: 12px 9px 13px 9px;
+    border: 1px solid #cddca6;
+    border-radius: 7px 13px 13px 7px;
+}
+
+.lu .book b {
+    position: absolute;
+    top: 34px;
+    left: 24px;
+    font-size: 56px;
+    color: #82b663;
+    font-weight: 750;
+    letter-spacing: -5px;
+    text-shadow: 1px 2px #ffffed;
+}
+
+.lu .book:after {
+    content: "";
+    position: absolute;
+    width: 49px;
+    height: 6px;
+    border-radius: 8px;
+    background: #d7bc63;
+    bottom: 25px;
+    left: 36px;
+}
+
+.lu .sound {
+    width: 144px;
+    height: 144px;
+    top: 18px;
+    border: 22px solid #8dbbc7;
+    border-bottom-color: transparent;
+    border-radius: 80px;
+    background: transparent;
+    box-shadow: inset 4px 3px 0 #c1e0e5;
+    transform: rotate(12deg);
+}
+
+.lu .sound:before,
+.lu .sound:after {
+    content: "";
+    position: absolute;
+    top: 53px;
+    width: 35px;
+    height: 60px;
+    background: linear-gradient(100deg, #c0dfe6, #78a6b4);
+    border-radius: 14px;
+    box-shadow: inset 5px 2px #d4eced;
+}
+
+.lu .sound:before {
+    left: -29px;
+}
+
+.lu .sound:after {
+    right: -29px;
+}
+
+.lu .sound i {
+    position: absolute;
+    top: 44px;
+    left: 35px;
+    width: 8px;
+    height: 34px;
+    border-radius: 6px;
+    background: #649f6b;
+    box-shadow: 16px -10px #8cb57a, 32px 2px #649f6b;
+}
+
+.lu .trophy {
+    width: 108px;
+    height: 106px;
+    top: 8px;
+    left: 62px;
+    background: linear-gradient(
+        120deg,
+        #fff0a5,
+        #edc44f 65%,
+        #d9a93a
+    );
+    border-radius: 15px 15px 55px 55px;
+    transform: rotate(-9deg);
+    box-shadow: inset 8px 3px #fff1ac;
+}
+
+.lu .trophy:before,
+.lu .trophy:after {
+    content: "";
+    position: absolute;
+    top: 15px;
+    width: 43px;
+    height: 60px;
+    border: 12px solid #eac457;
+    border-radius: 17px;
+    z-index: -1;
+}
+
+.lu .trophy:before {
+    left: -29px;
+}
+
+.lu .trophy:after {
+    right: -29px;
+}
+
+.lu .trophy b {
+    display: grid;
+    place-items: center;
+    font-size: 48px;
+    color: #fff8cd;
+    height: 90px;
+    text-shadow: 0 3px #d5aa39;
+}
+
+.lu .trophy i {
+    position: absolute;
+    left: 42px;
+    top: 96px;
+    width: 25px;
+    height: 35px;
+    background: linear-gradient(90deg, #f4d878, #dab14c);
+}
+
+.lu .trophy span {
+    position: absolute;
+    top: 124px;
+    left: 17px;
+    width: 78px;
+    height: 25px;
+    border-radius: 10px;
+    background: linear-gradient(#f3d980, #d5ad47);
+    border-bottom: 5px solid #bf963d;
+}
+
+.lu .spark {
+    position: absolute;
+    right: 11px;
+    top: 17px;
+    color: #d4aa42;
+    font-size: 30px;
+    animation: luTwinkle 4s ease-in-out infinite;
+}
+
+.lu .bubble {
+    position: absolute;
+    left: 12px;
+    top: 30px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #a1c97e;
+    box-shadow: 187px 107px #f0d77e;
+}
+
+.lu .body-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 270px;
+    gap: 25px;
+    align-items: start;
+}
+
+.lu .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0 15px;
+}
+
+.lu h2 {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.lu .section-head small {
+    color: #7c9472;
+}
+
+.lu .card {
+    background: #fcfef7;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 26px;
+}
+
+.lu .stage {
+    margin-bottom: 20px;
+}
+
+.lu .stage-head {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: 19px;
+    border-bottom: 1px solid #e1ead8;
+}
+
+.lu .stage-number {
+    display: grid;
+    place-items: center;
+    width: 43px;
+    height: 45px;
+    background: #dfedce;
+    border-radius: 14px;
+    color: #769953;
+    font-weight: 750;
+}
+
+.lu .stage-head h3 {
+    font-size: 19px;
+    line-height: 1.45;
+}
+
+.lu .stage-head small {
+    color: #8c9d7a;
+    font-size: 11px;
+}
+
+.lu .lessons {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.lu .lesson {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    gap: 17px;
+    align-items: center;
+    padding: 23px 0;
+    border-bottom: 1px solid #e8eedf;
+}
+
+.lu .lesson:last-child {
+    border: 0;
+    padding-bottom: 5px;
+}
+
+.lu .node {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    background: #ecf0e4;
+    color: #9baa8c;
+    box-shadow: 0 4px #dce4d0;
+    font-size: 17px;
+    font-weight: 750;
+}
+
+.lu .lesson.open .node {
+    background: linear-gradient(135deg, #a6d383, #80b661);
+    color: white;
+    box-shadow: 0 4px #65974a;
+}
+
+.lu .lesson.done .node {
+    background: #dceccc;
+    color: #518041;
+    box-shadow: 0 4px #c6dcaf;
+}
+
+.lu .lesson h3 {
+    font-size: 15px;
+    font-weight: 650;
+    overflow-wrap: anywhere;
+}
+
+.lu .meta {
+    color: #93a080;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.lu .mini {
+    padding: 9px 13px;
+    min-height: 39px;
+    font-size: 12px;
+}
+
+.lu .lock {
+    border: 1px solid #e0e8d4;
+    border-radius: 12px;
+    padding: 9px 12px;
+    background: #f7faef;
+    color: #9eaa90;
+    font-size: 12px;
+}
+
+.lu .rail {
+    display: grid;
+    gap: 18px;
+    margin-top: 20px;
+}
+
+.lu .rail h3 {
+    font-size: 18px;
+    margin: 7px 0 12px;
+}
+
+.lu .rail .btn {
+    width: 100%;
+}
+
+.lu .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin: 28px 0;
+}
+
+.lu .stat strong {
+    display: block;
+    font-size: 32px;
+    line-height: 1.2;
+    color: #5b8b43;
+}
+
+.lu .stat span {
+    display: block;
+    font-size: 12px;
+    color: #829675;
+    margin-top: 8px;
+}
+
+.lu progress {
+    display: block;
+    width: 100%;
+    height: 10px;
+    accent-color: #87bc65;
+    border: 0;
+    border-radius: 99px;
+    overflow: hidden;
+    background: #dce7cf;
+}
+
+.lu progress::-webkit-progress-bar {
+    background: #dce7cf;
+}
+
+.lu progress::-webkit-progress-value {
+    background: linear-gradient(90deg, #71ad58, #a4cf78);
+    border-radius: 99px;
+}
+
+.lu .progress-caption {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #829675;
+    margin: 12px 0 9px;
+}
+
+.lu .empty {
+    text-align: center;
+    padding: 35px 25px;
+}
+
+.lu .empty .scene {
+    margin: 0 auto;
+}
+
+.lu .empty p {
+    margin: 10px 0;
+    color: #819371;
+}
+
+.lu .player {
+    max-width: 1000px;
+    margin: 30px auto;
+}
+
+.lu .player-head {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 20px 0 14px;
+}
+
+.lu .player-head h1 {
+    font-size: 23px;
+    margin: 0;
+    flex: 1;
+}
+
+.lu .hearts {
+    color: #c78d79;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.lu .player-count {
+    font-size: 12px;
+    color: #849675;
+    margin: 10px 0 20px;
+}
+
+.lu .word-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    align-items: center;
+    gap: 35px;
+}
+
+.lu .word-art {
+    position: relative;
+    min-height: 290px;
+    background: linear-gradient(135deg, #e5f0d4, #d6eabd);
+    border-radius: 19px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+}
+
+.lu .word-art .scene {
+    scale: 1.1;
+}
+
+.lu .word-art img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 24px;
+    background: #e3efd4;
+}
+
+.lu .word-title {
+    font-size: 46px;
+    line-height: 1.2;
+    font-weight: 750;
+    color: #2b5734;
+}
+
+.lu .ipa {
+    font-size: 15px;
+    color: #8ba27b;
+    margin: 9px 0 !important;
+}
+
+.lu .meaning {
+    font-size: 23px;
+    margin: 12px 0 !important;
+}
+
+.lu .example {
+    padding: 15px 18px;
+    background: #f0f6e7;
+    border-radius: 13px;
+    margin: 18px 0;
+}
+
+.lu .example strong {
+    display: block;
+    color: #8a9d73;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 7px;
+}
+
+.lu .example p {
+    font-size: 14px;
+}
+
+.lu .example small {
+    display: block;
+    color: #8a9d78;
+    margin-top: 5px;
+}
+
+.lu .word-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.lu .question {
+    max-width: 760px;
+    margin: 22px auto;
+    min-height: 330px;
+}
+
+.lu .question h2 {
+    font-size: 25px;
+    margin: 10px 0 17px;
+}
+
+.lu .prompt {
+    font-size: 21px;
+    background: #eef5e3;
+    padding: 16px 20px;
+    border-radius: 14px;
+    margin-bottom: 23px !important;
+}
+
+.lu .prompt:empty {
+    display: none;
+}
+
+.lu audio {
+    max-width: 100%;
+    margin-bottom: 20px;
+}
+
+.lu .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 13px;
+}
+
+.lu .option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 17px;
+    background: white;
+    border: 2px solid #e1e9d7;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+.lu .option:has(input:checked) {
+    border-color: #9fc47d;
+    background: #eff8e4;
+}
+
+.lu .option input {
+    accent-color: #589248;
+}
+
+.lu .option img {
+    width: 100%;
+    height: 150px;
+    object-fit: contain;
+}
+
+.lu .option.picture {
+    flex-direction: column;
+}
+
+.lu .answer-input,
+.lu select {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #c8dbb5;
+    border-radius: 13px;
+    background: white;
+    color: #315b37;
+}
+
+.lu .token-bank {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin: 15px 0;
+}
+
+.lu .token-line {
+    padding: 15px;
+    border: 1px dashed #bfd3a7;
+    min-height: 63px;
+    border-radius: 13px;
+    background: #f6faee;
+}
+
+.lu .pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.lu .pair select {
+    min-width: 0;
+}
+
+.lu .result {
+    text-align: center;
+    max-width: 650px;
+    margin: 25px auto;
+}
+
+.lu .result .scene {
+    margin: 0 auto;
+}
+
+.lu .result h2 {
+    font-size: 29px;
+}
+
+.lu .result-score {
+    font-size: 18px;
+    color: #809966;
+    margin: 13px 0 !important;
+}
+
+.lu .result .actions {
+    justify-content: center;
+}
+
+.lu .feedback {
+    max-width: 760px;
+    margin: 15px auto;
+    color: #5d874b;
+    font-size: 14px;
+}
+
+.lu .feedback:empty {
+    display: none;
+}
+
+.lu .feedback.error {
+    color: #a6614a;
+}
+
+.lu dialog {
+    width: calc(100% - 36px);
+    max-width: 430px;
+    padding: 28px;
+    border: 1px solid #d6e4c3;
+    border-radius: 25px;
+    background: #faffef;
+    color: var(--ink);
+    box-shadow: 0 30px 100px #254b3329;
+    text-align: center;
+}
+
+.lu dialog::backdrop {
+    background: #234e385e;
+    backdrop-filter: blur(7px);
+}
+
+.lu dialog h2 {
+    font-size: 24px;
+}
+
+.lu dialog p {
+    color: #829671;
+    font-size: 14px;
+    margin: 12px 0 20px;
+}
+
+.lu dialog .btn {
+    width: 100%;
+    margin-top: 11px;
+}
+
+.lu dialog .scene {
+    height: 150px;
+    width: 180px;
+    margin: auto;
+    scale: .8;
+    transform-origin: center bottom;
+}
+
+.lu .toast {
+    position: fixed;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: calc(100% - 40px);
+    padding: 13px 20px;
+    border-radius: 14px;
+    background: #315e3d;
+    color: #f8fff0;
+    font-size: 14px;
+    box-shadow: 0 10px 25px #18442420;
+    z-index: 10;
+}
+
+.lu .home-hero {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 50px;
+    align-items: center;
+    min-height: 470px;
+    padding: 45px 0;
+}
+
+.lu .home-hero h1 {
+    font-size: clamp(39px, 5vw, 65px);
+    line-height: 1.18;
+    max-width: 610px;
+}
+
+.lu .home-hero em {
+    color: #7ea75e;
+    font-style: normal;
+}
+
+.lu .home-hero p {
+    max-width: 420px;
+    color: #79926b;
+    margin-top: 20px;
+}
+
+.lu .home-art {
+    min-height: 330px;
+    background: radial-gradient(
+        ellipse,
+        #d4e8bc 20%,
+        transparent 68%
+    );
+    display: grid;
+    place-items: center;
+}
+
+.lu .home-art .scene {
+    scale: 1.55;
+}
+
+.lu .features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    padding: 10px 0 40px;
+}
+
+.lu .feature {
+    overflow: hidden;
+    display: block;
+    transition: transform .25s, box-shadow .25s;
+    background: #fbfef3b8;
+    backdrop-filter: blur(10px);
+    border-color: #fafff1;
+}
+
+.lu .feature:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 35px #4266260c;
+}
+
+.lu .feature .scene {
+    height: 170px;
+    width: 230px;
+    margin: -10px auto -35px;
+    scale: .65;
+    transform-origin: top center;
+}
+
+.lu .feature h2 {
+    font-size: 20px;
+    margin: 12px 0 8px;
+}
+
+.lu .feature p {
+    color: #8a9d77;
+    font-size: 14px;
+}
+
+.lu .feature > span {
+    display: block;
+    color: #5b8948;
+    margin-top: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.lu footer {
+    padding: 20px 0 30px;
+    color: #93a17f;
+    font-size: 12px;
+}
+
+@keyframes luFloat {
+    0%, 100% {
+        translate: 0 0;
+    }
+
+    50% {
+        translate: 0 -9px;
+    }
+}
+
+@keyframes luTwinkle {
+    0%, 100% {
+        scale: 1;
+        rotate: 0deg;
+    }
+
+    50% {
+        scale: .85;
+        rotate: 20deg;
+    }
+}
+
+@media (max-width: 900px) {
+    .lu .shell {
+        width: calc(100% - 40px);
+    }
+
+    .lu .body-grid {
+        grid-template-columns: minmax(0, 1fr) 220px;
+    }
+
+    .lu .card {
+        padding: 21px;
+    }
+
+    .lu .intro {
+        padding: 23px;
+    }
+
+    .lu .home-hero {
+        gap: 20px;
+    }
+
+    .lu .home-art .scene {
+        scale: 1.2;
+    }
+
+    .lu .lesson {
+        grid-template-columns: 43px minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .lu .lesson > .btn,
+    .lu .lesson > .lock {
+        grid-column: 2;
+        justify-self: start;
+    }
+
+    .lu .node {
+        width: 41px;
+        height: 43px;
+    }
+}
+
+@media (max-width: 650px) {
+    .lu .shell {
+        width: calc(100% - 32px);
+    }
+
+    .lu .top {
+        min-height: 76px;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 12px 0;
+    }
+
+    .lu .brand {
+        font-size: 23px;
+    }
+
+    .lu nav a {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .lu .top > .btn {
+        padding: 8px 12px;
+        min-height: 37px;
+        font-size: 12px;
+    }
+
+    .lu .intro {
+        min-height: 190px;
+        border-radius: 22px;
+        margin-top: 18px;
+    }
+
+    .lu .intro .scene {
+        scale: .65;
+        width: 130px;
+        margin-right: -20px;
+        margin-left: -25px;
+    }
+
+    .lu h1 {
+        font-size: 29px;
+    }
+
+    .lu .intro p {
+        font-size: 13px;
+    }
+
+    .lu .body-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .lu .rail {
+        margin-top: 0;
+    }
+
+    .lu .rail .card {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .lu .rail .btn {
+        width: auto;
+        margin-left: auto;
+    }
+
+    .lu .word-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .lu .word-art {
+        min-height: 210px;
+    }
+
+    .lu .word-art .scene {
+        scale: .85;
+    }
+
+    .lu .player-head h1 {
+        font-size: 18px;
+    }
+
+    .lu .player-head {
+        gap: 12px;
+    }
+
+    .lu .word-title {
+        font-size: 38px;
+    }
+
+    .lu .options {
+        grid-template-columns: 1fr;
+    }
+
+    .lu .word-actions {
+        flex-wrap: wrap;
+    }
+
+    .lu .word-actions .primary {
+        width: 100%;
+    }
+
+    .lu .home-hero {
+        grid-template-columns: 1fr;
+        padding: 35px 0 20px;
+        gap: 5px;
+        min-height: 0;
+    }
+
+    .lu .home-hero h1 {
+        font-size: 43px;
+    }
+
+    .lu .home-art {
+        min-height: 260px;
+    }
+
+    .lu .home-art .scene {
+        scale: 1.2;
+    }
+
+    .lu .features {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .lu .feature .scene {
+        float: right;
+        width: 135px;
+        height: 120px;
+        margin: 0 -15px -20px 0;
+        scale: .6;
+        transform-origin: top right;
+    }
+
+    .lu .feature .clay {
+        left: 0;
+    }
+
+    .lu .feature h2 {
+        margin-top: 7px;
+    }
+
+    .lu .feature > span {
+        margin-top: 15px;
+    }
+
+    .lu .stat-grid {
+        gap: 10px;
+    }
+
+    .lu .stat {
+        padding: 20px 14px;
+    }
+
+    .lu .stat strong {
+        font-size: 26px;
+    }
+
+    .lu .section-head small {
+        font-size: 11px;
+    }
+
+    .lu .actions .btn {
+        flex: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lu * {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+
+    .lu .scene-inner {
+        transform: none;
+    }
+}
