@@ -179,6 +179,7 @@ final class LearningService
                 if ($this->current($this->repo->questions($id)) === null) {
                     $this->repo->finish($id, 'completed');
                     $this->repo->reward($user, $session, (int) $rules['xp_reward']);
+                    $this->repo->initializeReviews($userId, $id);
                 }
             }
             return ['is_correct' => $correct, 'replayed' => false,
@@ -216,7 +217,8 @@ final class LearningService
             'answered_main' => count(array_filter($questions, static fn ($q) => $q['phase'] === 'main' && $q['resolved_at'] !== null)),
             'current_hp' => (int) $user['current_hp'], 'max_hp' => HeartRules::MAX_HP, 'next_hp_at' => $user['next_hp_at'],
             'xp_earned' => $session['status'] === 'completed' ? (int) $rules['xp_reward'] : 0,
-            'stats' => $this->stats($user), 'question' => $public];
+            'stats' => $this->stats($user), 'question' => $public,
+            'review_initialization' => $rules['review_initialization'] ?? null];
     }
 
     private function stats(array $user): array

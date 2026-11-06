@@ -23,13 +23,8 @@ $boot = ['basePath' => $basePath, 'csrfToken' => $csrfToken, 'lessonId' => (int)
     <p id="progress" aria-live="polite"></p>
     <section id="flashcards" class="player-content">
         <?php if ($words === []): ?><p>Chưa có từ vựng để giới thiệu.</p><?php endif; ?>
-        <img id="fc-image" class="word-image" alt="" hidden>
-        <h2 id="fc-word"></h2>
-        <p id="fc-pronunciation"></p>
+        <div id="shared-word-card" aria-live="polite"></div>
         <button id="btn-listen" type="button">🔊 Nghe phát âm</button>
-        <h3 id="fc-translation"></h3>
-        <p id="fc-example" hidden><strong>Ví dụ: </strong><span id="fc-ex-en"></span></p>
-        <p id="fc-ex-translation"></p>
         <button id="btn-next-word" type="button">Tiếp tục</button>
         <button id="btn-start" type="button" <?= !$ready && $activeSession === null ? 'disabled' : '' ?>><?= $activeSession === null ? 'Làm bài tập' : 'Tiếp tục lượt học' ?></button>
         <?php if (!$ready): ?><p>Bài học chưa đủ câu hỏi hoặc tài nguyên. Chưa thể nhận kết quả hay XP từ phần giới thiệu từ.</p><?php endif; ?>
@@ -49,6 +44,7 @@ $boot = ['basePath' => $basePath, 'csrfToken' => $csrfToken, 'lessonId' => (int)
         <h2 id="result-title"></h2>
         <p id="result-score"></p>
         <a class="btn-continue" href="<?= $escape($basePath) ?>/learning">Về lộ trình</a>
+        <a class="btn-continue" href="<?= $escape($basePath) ?>/reviews">Xem lịch ôn của bạn</a>
     </section>
     <p id="feedback" role="status" aria-live="polite"></p>
     <noscript>Hãy bật JavaScript để xem thẻ từ và gửi câu trả lời.</noscript>

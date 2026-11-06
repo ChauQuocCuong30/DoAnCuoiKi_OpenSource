@@ -90,7 +90,9 @@ final class ExerciseService
                 if ($audio === null) { return null; }
                 $public['audio'] = $audio;
             }
-            return ['type' => $type, 'content' => $public, 'answer' => $answer];
+            // Private immutable targets for the lesson -> SM-2 bridge; not part of public content.
+            return ['type' => $type, 'content' => $public, 'answer' => $answer,
+                'target_word_ids' => array_values(array_unique($targets))];
         } catch (\JsonException | \TypeError $e) { return null; }
     }
 

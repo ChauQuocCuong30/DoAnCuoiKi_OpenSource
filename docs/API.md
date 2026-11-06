@@ -88,3 +88,39 @@ Answer theo dạng: chọn nghĩa/hình/nghe `{option_id:"a"}`; dịch/điền/n
 request_key là chuỗi ASCII `[A-Za-z0-9:_-]` 16–100 ký tự, tạo một lần cho mỗi lần nộp; retry phải giữ nguyên key, question_id và answer. Retry trả lại is_correct đã lưu, replayed=true, cùng trạng thái lượt hiện tại; không ghi submission, trừ tim, thay điểm hay thưởng lại. Cùng key nhưng thao tác khác: 409 REQUEST_KEY_CONFLICT. Câu đã xử lý gửi bằng key mới, nhảy thứ tự hoặc lượt đã kết thúc: 409 QUESTION_OUT_OF_ORDER.
 
 Lỗi khác: 404 LESSON_NOT_FOUND (gồm nội dung bị ẩn), SESSION_NOT_FOUND (gồm lượt thuộc người khác), QUESTION_NOT_FOUND; 403 LESSON_LOCKED; 409 LESSON_NOT_READY, NO_HEARTS; 422 VALIDATION_FAILED. Lỗi ngoài dự kiến ghi log và trả 500 INTERNAL_ERROR, không hiện file/trace.
+
+## Ôn tập SM-2 và nhắc học (Tuấn)
+
+Cookie phiên dùng chung với Learning. GET /reviews chuyển khách sang /login;
+API chưa đăng nhập trả 401. POST cần X-CSRF-Token từ GET /api/v1/reviews/bootstrap.
+Không nhận user_id từ client; backend lấy chủ sở hữu qua Auth.
+
+| Method | Path | Request/query | Kết quả trong data |
+|---|---|---|---|
+| GET | /api/v1/reviews/bootstrap | — | user, csrf_token, directions, server_now |
+| GET | /api/v1/reviews/due | limit 1–100, cursor?, direction? | items, meta: total_due/next_cursor/server_now |
+| GET | /api/v1/reviews/history | limit 1–100, before_id? | items, next_before_id |
+| POST | /api/v1/reviews/start | review_state_id, request_key (UUID) | session_id, session_question_id, card, direction, expires_at |
+| POST | /api/v1/reviews/submit | session_question_id, request_key (UUID), quality (integer 0–5) | state, review_event_id, next_review_at trong state, xp_awarded=0 |
+| GET | /api/v1/notifications | limit 1–100, before_id? | items, next_before_id |
+| POST | /api/v1/notifications/review-due | {} | created, due_count, notification_id |
+| POST | /api/v1/notifications/{id}/read | {} | id, read_at |
+
+start/submit dùng hai UUID riêng; retry cùng thao tác giữ nguyên key và body.
+Khác body với key cũ: 409 REQUEST_KEY_REUSED. Thẻ đã được phiên khác cập nhật:
+409 STALE_REVIEW. Chưa đến hạn: 409 NOT_DUE. Phiên quá 30 phút:
+410 REVIEW_EXPIRED. Thiếu/sai CSRF: 403 CSRF_INVALID. Không nhận diện tài nguyên:
+404 NOT_FOUND. Deadlock/lock timeout: 503 BUSY_RETRY; retry cùng key.
+
+Reviews là flashcard tự đánh giá, không dùng quality làm điểm trò chơi hoặc thưởng XP.
+Backend tính EF/khoảng/ngày ôn. EF tối thiểu 1.3; bài học đầu tạo lịch sau 24 giờ.
+Thẻ quá hạn vẫn được liệt kê trước; nội dung bị ẩn không xuất hiện.
+Nhắc học trong ứng dụng chỉ tạo khi mở tab Nhắc học, tối đa một thông báo/user/ngày
+theo timezone. Chưa có email hoặc tác vụ chạy nền.
+
+Learning hoàn thành gọi LessonReviewHook trong cùng transaction với câu cuối và XP.
+Session trả thêm review_initialization (null trước khi hoàn thành; sau đó gồm
+initialized, already_learned, skipped, legacy_questions).
+Các snapshot tạo trước đợt tích hợp thiếu target_word_ids không bị đoán/bù từ bài hiện tại:
+cần học lượt mới để ghi nhận lịch cho các từ đó.
+Chi tiết và lệnh kiểm tra: tests/integration/README_TUAN.md.

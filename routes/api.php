@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 use App\Core\Response;
 use App\Core\Router;
-use App\Modules\Vocabulary\Controllers\DictionaryController;
 use App\Modules\Auth\Controllers\AuthController;
 use App\Modules\Users\Controllers\UsersController;
 use App\Modules\Learning\Controllers\LearningController;
@@ -18,7 +17,7 @@ return static function (Router $router): void {
     $router->get('/api/v1/learning/sessions/{id}', [LearningController::class, 'session']);
     $router->post('/api/v1/learning/sessions/{id}/answers', [LearningController::class, 'answer']);
 
-    // Auth 
+    // Auth
     $router->post('/api/v1/auth/register', [AuthController::class, 'register']);
     $router->post('/api/v1/auth/login', [AuthController::class, 'login']);
     $router->post('/api/v1/auth/logout', [AuthController::class, 'logout']);
@@ -28,4 +27,41 @@ return static function (Router $router): void {
     $router->patch('/api/v1/users/me', [UsersController::class, 'updateMe']);
     $router->patch('/api/v1/users/{id}/status', [UsersController::class, 'updateStatus']);
 
+    // API on tap va nhac hoc.
+    $reviewRoutes = [
+        'GET' => [
+            '/api/v1/reviews/bootstrap',
+            '/api/v1/reviews/due',
+            '/api/v1/reviews/history',
+            '/api/v1/notifications',
+        ],
+        'POST' => [
+            '/api/v1/reviews/start',
+            '/api/v1/reviews/submit',
+            '/api/v1/notifications/review-due',
+            '/api/v1/notifications/{id}/read',
+        ],
+    ];
+
+    foreach ($reviewRoutes as $method => $paths) {
+        foreach ($paths as $path) {
+            $register = strtolower($method);
+
+            $router->$register(
+                $path,
+                static function (array $params) use ($path): void {
+                    $resolvedPath = str_replace(
+                        '{id}',
+                        $params['id'] ?? '',
+                        $path
+                    );
+
+                    $controller = new
+                        \App\Modules\Reviews\Controllers\ReviewHttpController();
+
+                    $controller->api($resolvedPath);
+                }
+            );
+        }
+    }
 };
