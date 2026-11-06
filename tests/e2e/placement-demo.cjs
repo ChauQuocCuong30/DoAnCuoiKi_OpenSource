@@ -30,12 +30,12 @@ if(!base)throw Error('Set TEST_BASE_URL to the test server.');
    assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('doulingo_progress'))),legacy);
    assert.equal(demoWrites,0,'Demo never posts learning scores or XP');
    await page.locator('#goOn').click();
-   assert.equal(new URL(await page.getByRole('link',{name:'Học tiếp với lộ trình mới'}).getAttribute('href'),base).pathname,new URL(base+'/learning').pathname);
-   await page.getByRole('link',{name:'Học tiếp với lộ trình mới'}).click();await page.waitForURL('**/learning');
-   assert(await page.locator('body.ld').count(),'Uses PR #26 learning shell');
+   await page.getByRole('link',{name:'Tạo hồ sơ'}).waitFor();
+   assert.equal(new URL(await page.getByRole('link',{name:'Tạo hồ sơ'}).getAttribute('href'),base).pathname,new URL(base+'/register').pathname);
+   assert.equal(new URL(await page.getByRole('link',{name:'Lúc khác'}).getAttribute('href'),base).pathname,new URL(base+'/').pathname);
   }
-  await page.goto(base+'/level');await page.locator('[data-level=a2]').click();await page.waitForURL('**/learning');
-  assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('doulingo_placement_demo_v1')).level),'a2');
+  await page.goto(base+'/level');await page.locator('[data-level=a2]').click();await page.waitForURL('**/placement?level=a2');
+  assert.equal(await page.locator('#count').textContent(),'1/6','Level pick runs a 6-question test first');
   const legacyRoute=await context.request.get(base+'/lesson',{maxRedirects:0});assert.equal(legacyRoute.status(),303);assert(legacyRoute.headers().location.endsWith('/learning'));
   for(const role of['admin','user']){
    const actor=await browser.newContext({reducedMotion:'reduce'});const p=await actor.newPage();p.on('pageerror',e=>errors.push(e.message));
