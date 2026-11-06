@@ -1,0 +1,46 @@
+const {chromium}=require('playwright');
+const assert=require('node:assert/strict'),path=require('node:path'),fs=require('node:fs');
+const base=process.env.TEST_BASE_URL?.replace(/\/$/,'');if(!base)throw Error('Set TEST_BASE_URL to an isolated migrated test server.');
+(async()=>{
+ const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,args:['--no-sandbox','--disable-dev-shm-usage']});
+ try{
+  const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
+  await context.addInitScript(()=>{window.__spoken=[];window.__cancelled=0;Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>[{lang:'en-US',name:'Test voice'}],cancel:()=>window.__cancelled++,resume(){},speak:u=>window.__spoken.push(u.text),addEventListener(){}}});window.SpeechSynthesisUtterance=class{constructor(text){this.text=text;}};});
+  const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto(base+'/welcome');
+  await page.evaluate(()=>{document.body.className='lu dq-lesson';document.body.innerHTML='<main class="shell"><section class="question card"><h2 id="lu-instruction"></h2><p id="lu-prompt"></p><button id="lu-question-sound">Nghe lại</button><p id="lu-audio-note"></p><audio id="lu-audio"></audio><div id="lu-controls"></div><div id="lu-answer-feedback" hidden></div></section></main>';});
+  for(const file of ['learning-media.js','learning-audio.js','learning-question-ui.js'])await page.addScriptTag({path:path.join(__dirname,'../../public/assets/js',file)});
+  const mount=async (question,words=[])=>page.evaluate(({question,words,base})=>{window.ui?.destroy();window.__spoken=[];document.getElementById('lu-prompt').textContent=question.content.prompt||'';document.getElementById('lu-answer-feedback').hidden=true;window.ui=window.DLQuestionUI.mount({question,host:document.getElementById('lu-controls'),base,words});},{question,words,base});
+  const tokens=['My','cat','is','smart.'].map((text,i)=>({id:'t'+i,text}));
+  await mount({type:'token_order',content:{instruction:'Viết lại bằng tiếng Việt',prompt:'My cat is smart.',prompt_lang:'en',answer_lang:'vi',tokens:['Con','mèo','thông','minh'].map((text,i)=>({id:'v'+i,text}))}});
+  assert.deepEqual(await page.evaluate(()=>window.__spoken),['My cat is smart.']);await page.locator('.token-bank button').nth(0).click();assert.equal((await page.evaluate(()=>window.__spoken)).length,1);await page.locator('#lu-question-sound').click();assert.equal((await page.evaluate(()=>window.__spoken)).length,2);
+  await mount({type:'token_order',content:{instruction:'Viết lại bằng tiếng Anh',prompt:'Con mèo thông minh.',prompt_lang:'vi',answer_lang:'en',tokens}});
+  assert.deepEqual(await page.evaluate(()=>window.__spoken),[]);
+  for(let i=0;i<4;i++)await page.locator('.token-bank button').nth(i).click();
+  await page.locator('.token-line button').nth(1).click();assert.deepEqual(await page.evaluate(()=>window.ui.read().token_ids),['t0','t2','t3']);await page.locator('.token-bank button').nth(1).click();assert.deepEqual(await page.evaluate(()=>window.ui.read().token_ids),['t0','t2','t3','t1']);
+  assert.deepEqual(await page.evaluate(()=>window.__spoken),['My','cat','is','smart.','cat']);
+  await page.evaluate(()=>window.ui.feedback(false,{correct_text:'My cat is smart.'}));assert.match(await page.locator('#lu-answer-feedback').textContent(),/Chưa đúng.*My cat is smart/s);
+  await mount({type:'choose_meaning',content:{prompt:'thông minh',prompt_lang:'vi',answer_lang:'en',options:['smart','small','large','young'].map((text,i)=>({id:'a'+i,text}))}});
+  assert.deepEqual(await page.evaluate(()=>window.__spoken),[]);await page.locator('input[value=a0]').check();assert.deepEqual(await page.evaluate(()=>window.__spoken),['smart']);
+  await page.evaluate(()=>window.ui.feedback(true,{option_results:[{id:'a0',is_correct:true}]}));assert.equal(await page.locator('label.is-correct').count(),1);
+  await mount({type:'choose_meaning',content:{prompt:'smart',prompt_lang:'en',answer_lang:'vi',options:['thông minh','nhỏ','lớn','trẻ'].map((text,i)=>({id:'a'+i,text}))}});await page.locator('input[value=a0]').check();assert.deepEqual(await page.evaluate(()=>window.__spoken),[]);
+  await mount({type:'choose_meaning',content:{prompt:'chọn một từ',options:['cat','dog','bird','fish'].map((text,i)=>({id:'legacy'+i,text}))}},[{english:'cat',vietnamese:'mèo'},{english:'dog',vietnamese:'chó'},{english:'bird',vietnamese:'chim'},{english:'fish',vietnamese:'cá'}]);await page.locator('input[value=legacy0]').check();assert.deepEqual(await page.evaluate(()=>window.__spoken),['cat']);
+  await mount({type:'translate_text',content:{prompt:'con mèo',prompt_lang:'vi',answer_lang:'en'}});await page.locator('input[type=text]').fill('cat');assert.deepEqual(await page.evaluate(()=>window.__spoken),[]);assert.equal(await page.evaluate(()=>window.ui.complete()),true);
+  await mount({type:'match_pairs',content:{left_lang:'vi',right_lang:'en',left:[{id:'v1',text:'mèo'},{id:'v2',text:'chó'}],right:[{id:'e1',text:'cat'},{id:'e2',text:'dog'}]}});await page.locator('button[data-left-id=v1]').click();await page.locator('button[data-right-id=e1]').click();await page.locator('button[data-left-id=v2]').click();await page.locator('button[data-right-id=e2]').click();assert.deepEqual(await page.evaluate(()=>window.__spoken),['cat','dog']);assert.equal(await page.evaluate(()=>window.ui.complete()),true);assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  console.log('PASS: English-only audio rules, replay, append/remove/reinsert tokens, real-feedback styling, matching and mobile fit');
+
+  const survey=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'}),sp=await survey.newPage();sp.on('pageerror',e=>errors.push(e.message));await sp.goto(base+'/start');await sp.locator('#ds-next:enabled').waitFor();const csrf=await sp.locator('body').getAttribute('data-csrf');
+  assert.equal((await survey.request.post(base+'/api/v1/onboarding',{data:{reason:'study'}})).status(),403);
+  assert.equal((await survey.request.post(base+'/api/v1/onboarding',{headers:{'X-CSRF-Token':csrf},data:{level:'C9'}})).status(),422);
+  assert.equal((await survey.request.post(base+'/api/v1/onboarding',{headers:{'X-CSRF-Token':csrf},data:{xp:100}})).status(),422);
+  await sp.locator('#ds-next').click();await sp.getByRole('button',{name:/Hỗ trợ việc học/}).click();await sp.locator('#ds-next').click();await sp.getByRole('button',{name:/B2/}).click();await sp.locator('#ds-next').click();await sp.getByRole('button',{name:/10 phút/}).click();await sp.locator('#ds-next').click();await sp.getByRole('button',{name:/Bắt đầu từ bài cơ bản/}).click();await sp.locator('#ds-next').click();await sp.getByRole('heading',{name:/Sẵn sàng/}).waitFor();await sp.reload();await sp.getByRole('heading',{name:/Sẵn sàng/}).waitFor();
+  await sp.goto(base+'/start?step=streak');await sp.getByRole('button',{name:/14 ngày/}).click();if(process.env.ADMIN_SCREENSHOT_DIR){fs.mkdirSync(process.env.ADMIN_SCREENSHOT_DIR,{recursive:true});await sp.screenshot({path:process.env.ADMIN_SCREENSHOT_DIR+'/survey-streak-mobile.png',fullPage:true});}await sp.locator('#ds-next').click();await sp.getByRole('link',{name:'Tạo hồ sơ',exact:true}).waitFor();assert(await sp.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  const email='survey-'+Date.now()+'@example.test',password='survey-test-password-123';assert.equal((await survey.request.post(base+'/api/v1/auth/register',{data:{name:'Survey learner',email,password}})).status(),201);assert.equal((await survey.request.post(base+'/api/v1/auth/login',{data:{email,password}})).status(),200);
+  const profile=(await (await survey.request.get(base+'/api/v1/users/me')).json()).data;assert.equal(profile.daily_goal_xp,20);assert.equal(profile.streak_goal_days,14);
+  const stored=(await (await survey.request.get(base+'/api/v1/onboarding')).json()).data.answers;assert.equal(stored.reason,'study');assert.equal(stored.level,'B2');assert.equal(stored.minutes,10);assert.equal(stored.streak,14);assert.equal(stored.finished,true);
+  await survey.request.post(base+'/api/v1/auth/logout');await survey.request.post(base+'/api/v1/auth/login',{data:{email,password}});assert.deepEqual((await (await survey.request.get(base+'/api/v1/onboarding')).json()).data.answers,stored);
+  const outsider=await browser.newContext();assert.deepEqual((await (await outsider.request.get(base+'/api/v1/onboarding')).json()).data.answers,[]);
+  const mediaAdmin=await browser.newContext();await mediaAdmin.request.post(base+'/api/v1/auth/login',{data:{email:'books-admin@example.test',password:'books-test-password-123'}});const mediaPage=await mediaAdmin.newPage();await mediaPage.goto(base+'/admin/words');assert.equal(await mediaPage.locator('input[name=audio]').getAttribute('type'),'text');assert.equal(await mediaPage.locator('input[name=image_source]').getAttribute('type'),'text');
+  assert.equal(errors.length,0,errors.join('\n'));console.log('PASS: sequential survey, draft resume, CSRF, validation, guest-to-account preferences and logout/login persistence');
+ }finally{await browser.close();}
+})().catch(e=>{console.error(e);process.exit(1)});

@@ -70,19 +70,19 @@ $renderAnswer = static function (
 
     <link
         rel="stylesheet"
-        href="<?= $e($b) ?>/assets/css/learning-ui.css?v=10"
+        href="<?= $e($b) ?>/assets/css/learning-ui.css?v=12"
     >
 
     <link
         rel="stylesheet"
-        href="<?= $e($b) ?>/assets/css/learning-bright.css?v=12"
+        href="<?= $e($b) ?>/assets/css/learning-bright.css?v=13"
     >
 
     <link
         rel="stylesheet"
-        href="<?= $e($b) ?>/assets/css/learning-result.css?v=1"
+        href="<?= $e($b) ?>/assets/css/learning-result.css?v=2"
     >
-</head>
+<?php require dirname(__DIR__) . '/layouts/theme-head.php'; ?></head>
 
 <body class="lu result-page">
 <div class="shell">
@@ -102,6 +102,7 @@ $renderAnswer = static function (
                 Tiến độ
             </a>
 
+            <?php require dirname(__DIR__) . "/layouts/theme-toggle.php"; ?>
             <a href="<?= $e($b) ?>/<?= $isGuest ? 'login' : 'profile' ?>">
                 <?= $isGuest ? 'Đăng nhập' : 'Tài khoản' ?>
             </a>

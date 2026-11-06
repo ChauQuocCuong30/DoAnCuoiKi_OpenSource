@@ -11,8 +11,9 @@ if (\App\Core\Session::userId() !== null) {
 }
 $navEscape = static fn ($value): string => htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 ?>
-<link rel="stylesheet" href="<?= $navEscape($navBase) ?>/assets/css/account-nav.css?v=2">
+<link rel="stylesheet" href="<?= $navEscape($navBase) ?>/assets/css/account-nav.css?v=3">
 <nav class="account-navigation" aria-label="Tài khoản">
+    <?php require __DIR__ . "/theme-toggle.php"; ?>
     <details>
         <summary><?= $navUser === null ? 'Tài khoản' : $navEscape($navUser['name']) ?></summary>
         <div class="account-navigation-menu">

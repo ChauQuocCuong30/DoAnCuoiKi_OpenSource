@@ -19,16 +19,16 @@
 }
 
 .lu .review-eyebrow {
-    color: #718679;
+    color: var(--theme-muted);
     font-size: 14px;
     margin-bottom: 5px;
 }
 
 .lu .review-card {
     padding: 32px;
-    border: 1px solid #dcece2;
+    border: 1px solid var(--theme-line);
     border-radius: 28px;
-    background: #fff;
+    background: var(--theme-surface);
     text-align: center;
     box-shadow: 0 12px 32px #14532d08;
 }
@@ -44,7 +44,7 @@
 }
 
 .lu .review-muted {
-    color: #718679;
+    color: var(--theme-muted);
 }
 
 .lu .review-card > .review-muted {
@@ -67,8 +67,8 @@
     gap: 3px;
     padding: 20px 10px;
     border-radius: 18px;
-    background: #f1f7ff;
-    color: #337bb5;
+    background: var(--theme-soft);
+    color: var(--dq-blue);
 }
 
 .lu .review-metric strong {
@@ -81,18 +81,18 @@
 }
 
 .lu .review-metric.correct {
-    background: #ecfbf1;
-    color: #168744;
+    background: var(--theme-good-bg);
+    color: var(--theme-good);
 }
 
 .lu .review-metric.wrong {
-    background: #fff1f1;
-    color: #cf5757;
+    background: var(--theme-bad-bg);
+    color: var(--theme-bad);
 }
 
 .lu .review-metric.xp {
-    background: #fff8dd;
-    color: #956b0b;
+    background: var(--theme-soft);
+    color: var(--theme-gold);
 }
 
 .lu .review-actions {
@@ -117,9 +117,9 @@
 
 .lu .review-question {
     margin-bottom: 14px;
-    border: 1px solid #dcece2;
+    border: 1px solid var(--theme-line);
     border-radius: 20px;
-    background: #fff;
+    background: var(--theme-surface);
     overflow: hidden;
 }
 
@@ -146,8 +146,8 @@
     flex: 0 0 34px;
     height: 34px;
     border-radius: 11px;
-    background: #eff8f2;
-    color: #168744;
+    background: var(--theme-soft);
+    color: var(--theme-good);
     font-weight: 700;
 }
 
@@ -161,20 +161,20 @@
 .lu .review-badge {
     padding: 4px 12px;
     border-radius: 99px;
-    background: #e8f8ed;
-    color: #168744;
+    background: var(--theme-good-bg);
+    color: var(--theme-good);
     font-size: 13px;
     white-space: nowrap;
 }
 
 .lu .review-badge.wrong {
-    background: #fff0f0;
-    color: #c84e4e;
+    background: var(--theme-bad-bg);
+    color: var(--theme-bad);
 }
 
 .lu .review-question-body {
     padding: 0 20px 20px;
-    border-top: 1px solid #edf3ef;
+    border-top: 1px solid var(--theme-line);
 }
 
 .lu .review-question-body > p {
@@ -197,20 +197,20 @@
 .lu .review-answer {
     min-width: 0;
     padding: 18px;
-    border: 1px solid #e4ebe6;
+    border: 1px solid var(--theme-line);
     border-radius: 16px;
-    background: #fafcfb;
+    background: var(--theme-surface);
     overflow-wrap: anywhere;
 }
 
 .lu .review-answer.expected {
-    border-color: #d2eadb;
-    background: #effaf3;
+    border-color: var(--theme-line);
+    background: var(--theme-good-bg);
 }
 
 .lu .review-answer h3 {
     margin-bottom: 10px;
-    color: #718679;
+    color: var(--theme-muted);
     font-size: 13px;
     font-weight: 600;
 }
@@ -230,7 +230,7 @@
 
 .lu .review-question.unavailable {
     padding: 18px 20px;
-    color: #718679;
+    color: var(--theme-muted);
     font-size: 14px;
 }
 

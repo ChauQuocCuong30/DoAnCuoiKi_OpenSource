@@ -122,7 +122,7 @@ $icon = static function (string $name): string {
 
     <link
         rel="stylesheet"
-        href="<?= $e($b) ?>/assets/css/learning-dashboard.css?v=1"
+        href="<?= $e($b) ?>/assets/css/learning-dashboard.css?v=2"
     >
 
     <style>
@@ -156,7 +156,7 @@ $icon = static function (string $name): string {
         src="<?= $e($b) ?>/assets/js/learning-ui.js?v=14"
         defer
     ></script>
-</head>
+<?php require dirname(__DIR__) . '/layouts/theme-head.php'; ?></head>
 
 <body class="ld">
 <a class="ld-skip" href="#main-content">
@@ -229,6 +229,8 @@ $icon = static function (string $name): string {
                 </strong>
             </div>
 
+            <div class="theme-account-actions">
+            <?php require dirname(__DIR__) . "/layouts/theme-toggle.php"; ?>
             <a
                 class="ld-account"
                 href="<?= $e($b) ?><?= $isGuest ? '/login' : '/profile' ?>"
@@ -237,6 +239,7 @@ $icon = static function (string $name): string {
 
                 <?= $isGuest ? 'Đăng nhập' : 'Tài khoản' ?>
             </a>
+            </div>
         </header>
 
         <main class="ld-content" id="main-content">

@@ -353,6 +353,7 @@ final class GuestLearningService
             return [
                 'is_correct' => $old['correct'],
                 'replayed' => true,
+                'feedback' => $this->grader->feedback($snapshot,$answer),
                 'session' => $this->publicState($state),
             ];
         }
@@ -456,6 +457,7 @@ final class GuestLearningService
         return [
             'is_correct' => $correct,
             'replayed' => false,
+            'feedback' => $this->grader->feedback($snapshot,$answer),
             'session' => $this->publicState($state),
         ];
     }
@@ -487,7 +489,9 @@ final class GuestLearningService
                 'id' => $question['id'],
                 'phase' => $question['phase'],
                 'type' => $question['snapshot']['type'],
-                'content' => $question['snapshot']['content'],
+                'content' => $this->grader->publicContent($question['snapshot'],
+                    in_array($question['snapshot']['type'], ['listen_type', 'listen_select'], true)
+                        ? $this->repo->getWordsByLessonId((int) $state['lesson']['id']) : []),
             ],
         ];
     }

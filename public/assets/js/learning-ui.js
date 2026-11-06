@@ -1,10 +1,10 @@
-// Doulingo learning UI — version 14
+// Doulingo learning UI — version 15
 (() => {
     'use strict';
 
     function bootPage() {
-        if (window.__doulingoLearningUiLoaded === '14') return;
-        window.__doulingoLearningUiLoaded = '14';
+        if (window.__doulingoLearningUiLoaded === '15') return;
+        window.__doulingoLearningUiLoaded = '15';
 
         const $ = id => document.getElementById(id);
         const nfc = value => String(value ?? '').normalize('NFC');
@@ -327,8 +327,10 @@
 
         let pending = null;
         let chosenTokens = [];
+        let questionUI = null;
         let mediaFault = false;
         let generation = 0;
+        let transitioning = false;
 
         let sound = null;
         let speechVersion = 0;
@@ -411,6 +413,7 @@
         );
 
         function stopSound() {
+            window.DLAudio?.stop();
             speechVersion++;
 
             if (sound) {
@@ -720,7 +723,7 @@
 
             text(
                 'lu-hearts',
-                state.status === 'in_progress'
+                Number.isInteger(state.current_hp)
                     ? '♥ ' + state.current_hp + '/' + state.max_hp
                     : ''
             );
@@ -781,6 +784,7 @@
         }
 
         function inputAnswer() {
+            if (questionUI) return questionUI.read();
             const question = state.question;
             const host = $('lu-controls');
 
@@ -816,6 +820,7 @@
 
         function complete() {
             if (!state?.question) return false;
+            if (questionUI) return questionUI.complete();
 
             const answer = inputAnswer();
             const question = state.question;
@@ -847,9 +852,31 @@
                 || (!pending && !complete());
         }
 
-        function brokenMedia(version) {
-            if (version !== generation) return;
+        function useTextQuestion(version) {
+            const question = state?.question, fallback = question?.content?.media_fallback;
+            if (version !== generation || !fallback || pending) return false;
+            const audio = $('lu-audio');
+            audio.onerror = null;
+            audio.pause(); audio.removeAttribute('src'); audio.load();
+            questionUI?.destroy();
+            const equivalent = {...question, type:fallback.type,
+                content:{...question.content, ...fallback, audio:null, prompt_audio:null}};
+            text('lu-prompt', fallback.prompt);
+            questionUI = window.DLQuestionUI.mount({question:equivalent, host:$('lu-controls'), words,
+                base:boot.base, autoReadDelay:180, onChange:sync});
+            mediaFault = false;
+            $('lu-use-text').hidden = true;
+            $('lu-media-retry').hidden = false;
+            text('lu-media-retry', 'Thử nghe lại');
+            note('Âm thanh chưa sẵn sàng. Bạn có thể làm câu tương đương bằng chữ.');
+            sync();
+            return true;
+        }
 
+        function brokenMedia(version) {
+            if (version !== generation || pending || $('lu-submit').hidden) return;
+
+            if (useTextQuestion(version)) return;
             mediaFault = true;
             $('lu-media-retry').hidden = false;
 
@@ -865,6 +892,12 @@
             if (!state) return;
 
             stopSound();
+            questionUI?.destroy(); questionUI = null;
+            if ($('lu-answer-feedback')) {
+                $('lu-answer-feedback').hidden = true;
+                $('lu-answer-feedback').closest('.dq-next-actions')?.classList.remove('is-correct', 'is-wrong');
+            }
+            $('lu-submit').hidden = false;
             note();
             summary();
 
@@ -918,6 +951,9 @@
                     passed ? 'Tiếp tục →' : 'Thử lại'
                 );
 
+                text('lu-result-accuracy', Math.round(100 * state.correct_count / Math.max(1, state.total_questions)) + '%');
+                text('lu-result-xp', boot.guest ? 'Chờ lưu hồ sơ' : '+' + (state.xp_earned || 0) + ' XP');
+                text('lu-result-streak', boot.guest ? 'Tạo hồ sơ để lưu chuỗi ngày học' : (state.stats?.streak || 0) + ' ngày streak');
                 return;
             }
 
@@ -964,6 +1000,8 @@
 
             const audio = $('lu-audio');
             const src = media(question.content.audio);
+            $('lu-use-text').hidden = !question.content.media_fallback;
+            $('lu-use-text').onclick = () => useTextQuestion(version);
 
             audio.hidden = !src;
 
@@ -976,7 +1014,7 @@
             if (src) {
                 audio.src = src;
                 audio.load();
-                audio.play().catch(() => {});
+                if (!window.DLQuestionUI) audio.play().catch(() => {});
             } else {
                 audio.removeAttribute('src');
             }
@@ -984,140 +1022,13 @@
             $('lu-form').hidden = false;
             text('lu-submit', 'Kiểm tra');
 
-            if (question.content.options) {
-                host.className = 'options';
-
-                question.content.options.forEach((option, index) => {
-                    const label = document.createElement('label');
-                    label.className = 'option';
-
-                    const radio = document.createElement('input');
-
-                    radio.type = 'radio';
-                    radio.name = 'answer';
-                    radio.value = option.id;
-
-                    label.append(radio);
-
-                    if (question.type === 'choose_image') {
-                        label.classList.add('picture');
-
-                        const optionImage =
-                            document.createElement('img');
-
-                        optionImage.alt = 'Hình ' + (index + 1);
-
-                        optionImage.addEventListener(
-                            'error',
-                            () => brokenMedia(version)
-                        );
-
-                        const url = media(option.image);
-
-                        if (url) {
-                            optionImage.src = url;
-                        } else {
-                            brokenMedia(version);
-                        }
-
-                        label.append(optionImage);
-                    } else {
-                        const span =
-                            document.createElement('span');
-
-                        span.textContent = nfc(option.text);
-                        label.append(span);
-                    }
-
-                    host.append(label);
-                });
-            } else if (question.type === 'token_order') {
-                const line = document.createElement('div');
-                line.className = 'token-line';
-
-                const bank = document.createElement('div');
-                bank.className = 'token-bank';
-
-                question.content.tokens.forEach(token => {
-                    const button =
-                        document.createElement('button');
-
-                    button.type = 'button';
-                    button.className = 'btn mini';
-                    button.textContent = nfc(token.text);
-
-                    button.addEventListener('click', () => {
-                        chosenTokens.push(token.id);
-                        button.disabled = true;
-
-                        line.textContent = nfc(
-                            chosenTokens.map(id =>
-                                question.content.tokens.find(
-                                    item => item.id === id
-                                ).text
-                            ).join(' ')
-                        );
-
-                        sync();
-                    });
-
-                    bank.append(button);
-                });
-
-                const reset = document.createElement('button');
-
-                reset.type = 'button';
-                reset.className = 'btn mini';
-                reset.textContent = 'Xếp lại';
-
-                reset.addEventListener('click', render);
-
-                bank.append(reset);
-                host.append(line, bank);
-            } else if (question.type === 'match_pairs') {
-                question.content.left.forEach(left => {
-                    const label =
-                        document.createElement('label');
-
-                    label.className = 'pair';
-
-                    const span =
-                        document.createElement('span');
-
-                    span.textContent = nfc(left.text);
-
-                    const select =
-                        document.createElement('select');
-
-                    select.dataset.leftId = left.id;
-                    select.add(new Option('Chọn từ', ''));
-
-                    question.content.right.forEach(right => {
-                        select.add(
-                            new Option(
-                                nfc(right.text),
-                                right.id
-                            )
-                        );
-                    });
-
-                    label.append(span, select);
-                    host.append(label);
-                });
-            } else {
-                const input = document.createElement('input');
-
-                input.type = 'text';
-                input.className = 'answer-input';
-                input.maxLength = 1000;
-                input.autocomplete = 'off';
-
-                input.setAttribute(
-                    'aria-label',
-                    'Câu trả lời'
-                );
-
-                host.append(input);
+            questionUI = window.DLQuestionUI.mount({question, host, words, base:boot.base, autoReadDelay:180, onChange:sync, onBrokenMedia:()=>brokenMedia(version)});
+            const stage = $('lu-question');
+            stage.dataset.questionId = String(question.id);
+            stage.getAnimations?.().forEach(animation => animation.cancel());
+            if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                stage.animate?.([{opacity:0,transform:'translateX(14px)'},{opacity:1,transform:'translateX(0)'}],
+                    {duration:180,easing:'cubic-bezier(.2,.7,.2,1)'});
             }
 
             sync();
@@ -1231,14 +1142,34 @@
             }
         });
 
-        $('lu-next-question').addEventListener(
-            'click',
-            render
-        );
+        $('lu-next-question').addEventListener('click', async () => {
+            if (transitioning || busy || !state) return;
+            transitioning = true;
+            $('lu-next-question').disabled = true;
+            stopSound();
+            const stage = $('lu-question');
+            stage.setAttribute('aria-busy', 'true');
+            try {
+                if (!matchMedia('(prefers-reduced-motion: reduce)').matches && stage.animate) {
+                    await stage.animate([{opacity:1,transform:'translateX(0)'},{opacity:0,transform:'translateX(-14px)'}],
+                        {duration:120,easing:'ease-in'}).finished.catch(() => {});
+                }
+                render();
+                const heading = state.status === 'in_progress' ? $('lu-instruction') : $('lu-result-title');
+                heading.tabIndex = -1;
+                heading.focus({preventScroll:true});
+            } finally {
+                transitioning = false;
+                stage.removeAttribute('aria-busy');
+                $('lu-next-question').disabled = false;
+            }
+        });
 
         $('lu-result-next').addEventListener('click', () => {
             if (state?.status === 'completed') {
-                if (boot.guest) {
+                if (boot.onboarding) {
+                    location.assign(boot.base + '/start?step=streak');
+                } else if (boot.guest) {
                     gate();
                 } else {
                     location.assign(
@@ -1266,7 +1197,10 @@
             }
 
             busy = true;
+            window.DLFeedbackSound?.unlock();
+            $('lu-form').setAttribute('aria-busy', 'true');
             $('lu-submit').disabled = true;
+            text('lu-submit', 'Đang kiểm tra…');
 
             pending ??= {
                 question_id: state.question.id,
@@ -1296,6 +1230,7 @@
 
             try {
                 const answeredId = pending.question_id;
+                const submittedKey = pending.request_key;
 
                 const result = await api(
                     boot.guest
@@ -1311,34 +1246,16 @@
 
                 summary();
 
-                if (state.status !== 'in_progress') {
-                    render();
-                } else {
-                    $('lu-audio').pause();
+                stopSound();
+                questionUI?.feedback(result.is_correct, result.feedback || {});
+                window.DLFeedbackSound?.play(result.is_correct, {key: state.id + ':' + submittedKey});
+                $('lu-form').hidden = false;
+                $('lu-submit').hidden = true;
+                $('lu-next-question').hidden = false;
+                const repeat = state.question?.id === answeredId;
+                text('lu-next-question', state.status !== 'in_progress' ? 'Xem kết quả →' : repeat ? 'Thử lại câu này' : 'Tiếp tục →');
+                note();
 
-                    $('lu-form').hidden = true;
-                    $('lu-next-question').hidden = false;
-
-                    const repeat =
-                        state.question?.id === answeredId;
-
-                    text(
-                        'lu-next-question',
-                        repeat
-                            ? 'Thử lại câu này'
-                            : 'Tiếp tục →'
-                    );
-
-                    note(
-                        result.is_correct
-                            ? 'Chính xác!'
-                            : (
-                                repeat
-                                    ? 'Chưa đúng. Bạn thử lại câu này nhé.'
-                                    : 'Chưa đúng. Tiếp tục nhé.'
-                            )
-                    );
-                }
             } catch (error) {
                 if (error.status) {
                     pending = null;
@@ -1375,6 +1292,7 @@
                 note(error.message, true);
             } finally {
                 busy = false;
+                $('lu-form').removeAttribute('aria-busy');
                 sync();
             }
         });

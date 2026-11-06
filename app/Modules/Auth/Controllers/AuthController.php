@@ -36,6 +36,12 @@ final class AuthController
 
         Session::login($user['id']);
 
+        if ($user['role'] === 'user') {
+            (new \App\Modules\Auth\Services\OnboardingService(Database::connection()))->attachDraft((int)$user['id']);
+            $fresh=(new UserRepository(Database::connection()))->findById((int)$user['id']);
+            if($fresh!==null)$user=array_replace($user,\App\Modules\Users\Services\UserService::present($fresh));
+        }
+
         Response::data($user);
     }
 

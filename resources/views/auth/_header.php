@@ -18,7 +18,7 @@ $e = static fn (string $v): string => htmlspecialchars(
 
     <link
         rel="stylesheet"
-        href="<?= $e($base) ?>/assets/css/auth.css"
+        href="<?= $e($base) ?>/assets/css/auth.css?v=2"
     >
 
     <link
@@ -27,7 +27,7 @@ $e = static fn (string $v): string => htmlspecialchars(
     >
 
     <script src="<?= $e($base) ?>/assets/js/transition.js"></script>
-</head>
+<?php require dirname(__DIR__) . '/layouts/theme-head.php'; ?></head>
 
 <body data-base="<?= $e($base) ?>">
 <?php require dirname(__DIR__) . '/layouts/account-nav.php'; ?>

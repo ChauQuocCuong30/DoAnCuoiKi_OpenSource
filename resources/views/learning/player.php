@@ -52,6 +52,7 @@ $boot = [
     'ready' => !empty($ready),
     'heartRecovery' => !$guest && \App\Shared\Cefr::installed(\App\Core\Database::connection()),
     'initialFocus' => $initialFocus,
+    'onboarding' => ($_GET['onboarding'] ?? '') === '1',
 ];
 ?>
 <!doctype html>
@@ -67,16 +68,17 @@ $boot = [
     </title>
 
     <link rel="stylesheet"
-          href="<?= $e($b) ?>/assets/css/learning-ui.css?v=10">
+          href="<?= $e($b) ?>/assets/css/learning-ui.css?v=12">
 
-    <link rel="stylesheet"
-          href="<?= $e($b) ?>/assets/css/learning-bright.css?v=1">
+    <link rel="stylesheet" href="<?= $e($b) ?>/assets/css/learning-interactions.css?v=3">
+    <script defer src="<?= $e($b) ?>/assets/js/learning-media.js?v=1"></script>
+    <script defer src="<?= $e($b) ?>/assets/js/learning-audio.js?v=2"></script>
+    <script defer src="<?= $e($b) ?>/assets/js/learning-question-ui.js?v=2"></script>
+    <script defer src="<?= $e($b) ?>/assets/js/learning-feedback-sound.js?v=1"></script>
+    <script defer src="<?= $e($b) ?>/assets/js/learning-ui.js?v=17"></script>
+<?php require dirname(__DIR__) . '/layouts/theme-head.php'; ?></head>
 
-    <script src="<?= $e($b) ?>/assets/js/learning-ui.js?v=14"
-            defer></script>
-</head>
-
-<body class="lu">
+<body class="lu dq-lesson">
 <div class="shell">
     <header class="top">
         <a class="brand" href="<?= $e($b) ?>/">
@@ -91,6 +93,10 @@ $boot = [
             </a>
             <?php if (!$guest): ?><a href="<?= $e($b) ?>/learning/hearts">Ôn từ sai · Hồi tim</a><?php endif; ?>
         </nav>
+        <div class="theme-account-actions">
+            <?php require dirname(__DIR__) . "/layouts/theme-toggle.php"; ?>
+            <a class="theme-account-link" href="<?= $e($b) ?>/profile">Tài khoản</a>
+        </div>
     </header>
 
     <main class="player">
@@ -211,11 +217,13 @@ $boot = [
                 ? 'Luyện tập'
                 : '' ?></span>
 
-            <h2 id="lu-instruction"><?= $practiceFirst
+            <h2 tabindex="-1" id="lu-instruction"><?= $practiceFirst
                 ? 'Đang mở bài tập…'
                 : '' ?></h2>
 
-            <p class="prompt" id="lu-prompt"></p>
+            <div class="dq-prompt-row"><img src="<?= $e($b) ?>/assets/images/learning-ui/notebook.png" width="88" height="88" alt="">
+                <div class="dq-speech-bubble"><button type="button" id="lu-question-sound" class="dq-speaker" aria-label="Nghe lại tiếng Anh" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg></button><button type="button" id="lu-question-slow" class="dq-speaker dq-speaker-slow" aria-label="Nghe chậm tiếng Anh" hidden>0.75×</button><p class="prompt" id="lu-prompt"></p></div>
+            </div><p id="lu-audio-note" class="dq-audio-note" role="status"></p>
 
             <audio id="lu-audio"
                    controls
@@ -228,6 +236,13 @@ $boot = [
                 <div id="lu-controls"></div>
 
                 <div class="actions">
+                <button class="btn" type="button" id="lu-use-text" hidden>Làm bằng chữ</button>
+                <button class="btn"
+                        type="button"
+                        id="lu-media-retry"
+                        hidden>
+                    Tải lại tài nguyên
+                </button>
                     <button class="btn primary"
                             type="submit"
                             id="lu-submit"
@@ -237,7 +252,8 @@ $boot = [
                 </div>
             </form>
 
-            <div class="actions">
+            <div class="actions dq-next-actions">
+                <div id="lu-answer-feedback" class="dq-feedback" role="status" aria-live="polite" hidden></div>
                 <button class="btn primary"
                         type="button"
                         id="lu-next-question"
@@ -245,12 +261,7 @@ $boot = [
                     Tiếp tục →
                 </button>
 
-                <button class="btn"
-                        type="button"
-                        id="lu-media-retry"
-                        hidden>
-                    Tải lại tài nguyên
-                </button>
+
             </div>
         </section>
 
@@ -271,6 +282,8 @@ $boot = [
             <h2 id="lu-result-title"></h2>
 
             <p class="result-score" id="lu-score"></p>
+            <div class="dq-result-stats"><div><span>ĐIỂM KINH NGHIỆM</span><strong id="lu-result-xp"></strong></div><div><span>TỶ LỆ ĐÚNG</span><strong id="lu-result-accuracy"></strong></div></div>
+            <p id="lu-result-streak"></p>
 
             <div class="actions">
                 <button class="btn primary"
