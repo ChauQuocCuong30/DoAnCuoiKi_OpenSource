@@ -8,14 +8,24 @@
   var resumeGuest = nextPage === 'guest';
   var returnToLearning = nextPage === 'learning';
 
-  function navigate(path, direction) {
-    var target = base + path;
+  (function () {
+    var back = document.querySelector('.back-welcome');
+    if (!back || !document.referrer) { return; }
+    try {
+      var from = new URL(document.referrer);
+      if (from.origin === window.location.origin && /\/(profile|admin)(\/|$)/.test(from.pathname)) {
+        back.href = base + '/';      // vừa đăng xuất -> quay về trang chủ
+      } else if (from.origin === window.location.origin && !/\/(login|register)\/?$/.test(from.pathname)) {
+        back.href = from.href;
+      }
+    } catch (e) {}
+  })();
 
-    if (window.DLNav) {
-      window.DLNav.go(target, direction);
-    } else {
-      window.location.href = target;
-    }
+  function navigate(path, direction, replace) {
+    var target = base + path;
+    if (window.DLNav) { window.DLNav.go(target, direction, replace); }
+    else if (replace) { window.location.replace(target); }
+    else { window.location.href = target; }
   }
 
   if (resumeGuest || returnToLearning) {
@@ -337,7 +347,7 @@
 
     request('GET', '/users/me').then(function (r) {
       if (!r.ok) {
-        navigate('/login', 'back');
+        navigate('/login', 'back', true);
         return;
       }
 
@@ -458,7 +468,7 @@
           return;
         }
 
-        navigate('/login?next=learning', 'back');
+        navigate('/login?next=learning', 'back', true);
       }).catch(function () {
         showAlert(
           profile,
