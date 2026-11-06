@@ -186,9 +186,9 @@
       ).then(function (r) {
         if (r.ok) {
           navigate(
-            resumeGuest
-              ? '/learning/continue?focus=practice'
-              : (returnToLearning ? '/learning' : '/')
+            r.json.data.role === 'admin'
+              ? '/admin/words'
+              : (resumeGuest ? '/learning/continue?focus=practice' : '/learning')
           );
 
           return null;
@@ -368,113 +368,13 @@
         + (isAdmin ? 'Quản trị viên' : 'Người dùng');
 
       roleLine.hidden = false;
-      document.querySelector('[data-admin]').hidden = !isAdmin;
+
       profile.hidden = false;
       logout.hidden = false;
 
       document.querySelector('[data-welcome]').hidden =
         !/[?&]new=1(&|$)/.test(window.location.search);
     });
-
-    var adminBox = document.querySelector('[data-admin]');
-
-    document.querySelector('[data-admin-submit]').addEventListener(
-      'click',
-      function (event) {
-        var button = event.currentTarget;
-
-        if (button.disabled) {
-          return;
-        }
-
-        var id = document.querySelector(
-          '[data-admin-id]'
-        ).value.trim();
-
-        var statusSelect = document.querySelector(
-          '[data-admin-status]'
-        );
-
-        var status = statusSelect.value;
-
-        if (!/^[1-9][0-9]{0,9}$/.test(id)) {
-          showAlert(
-            adminBox,
-            'ID phải là số nguyên dương, chỉ gồm chữ số (ví dụ: 5).',
-            false
-          );
-
-          return;
-        }
-
-        if (selfId !== null && id === selfId) {
-          showAlert(
-            adminBox,
-            'Bạn không thể tự khóa chính mình.',
-            false
-          );
-
-          return;
-        }
-
-        var label = statusSelect.options[
-          statusSelect.selectedIndex
-        ].text;
-
-        if (!window.confirm(
-          'Đổi trạng thái tài khoản ID '
-            + id
-            + ' thành '
-            + label
-            + '?'
-        )) {
-          return;
-        }
-
-        button.disabled = true;
-        showAlert(adminBox, '');
-
-        request(
-          'PATCH',
-          '/users/' + id + '/status',
-          { status: status }
-        ).then(function (r) {
-          if (r.ok) {
-            showAlert(
-              adminBox,
-              'Đã cập nhật trạng thái tài khoản.',
-              true
-            );
-
-            return;
-          }
-
-          var code = r.json && r.json.error
-            ? r.json.error.code
-            : '';
-
-          var msg = 'Có lỗi xảy ra, vui lòng thử lại.';
-
-          if (r.status === 403 || code === 'FORBIDDEN') {
-            msg = 'Bạn không có quyền thực hiện thao tác này.';
-          } else if (r.status === 422) {
-            msg = 'Dữ liệu không hợp lệ (không thể tự khóa chính mình).';
-          } else if (r.status === 404) {
-            msg = 'Không tìm thấy người dùng.';
-          }
-
-          showAlert(adminBox, msg, false);
-        }).catch(function () {
-          showAlert(
-            adminBox,
-            'Không kết nối được máy chủ.',
-            false
-          );
-        }).then(function () {
-          button.disabled = false;
-        });
-      }
-    );
 
     submit(profile, function (data) {
       delete data.email;

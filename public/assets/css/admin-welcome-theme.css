@@ -1,0 +1,68 @@
+/* Admin shares the palette and typography of /welcome; no welcome animations. */
+:root {
+  --paper: #eaf0dc;
+  --paper2: #e0e8cf;
+  --ink: #123524;
+  --muted: #53644f;
+  --line: rgba(18, 53, 36, .16);
+  --cream: #f6fbe9;
+  --gold: #b8862b;
+  --rust: #8b641f;
+  --olive: #3f7d4f;
+  --error: #9b352b;
+  --serif: "Playfair Display", "Bodoni Moda", Georgia, "Times New Roman", serif;
+  --sans: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+body { font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { font-weight: 500; }
+h1 { letter-spacing: -.035em; line-height: 1.16; }
+h2 { line-height: 1.35; }
+.eyebrow { color: var(--rust); letter-spacing: .18em; line-height: 1.6; }
+.site-header { flex-wrap: wrap; row-gap: 14px; }
+.brand { font-weight: 600; }
+.brand-mark { line-height: 1.15; flex-shrink: 0; }
+.site-header nav { flex-wrap: wrap; gap: 22px; }
+.site-header nav a { line-height: 1.6; }
+.site-header nav a:hover { color: var(--rust); }
+.nav-current { font-weight: 600; border-color: var(--olive); }
+.more-nav[open] summary, .more-nav.is-current summary { color: var(--rust); }
+.more-nav.is-current summary { font-weight: 600; }
+.more-nav > div { top: calc(100% + 10px); border-radius: 12px; box-shadow: 0 12px 36px #12352414; }
+.more-nav a { border-radius: 7px; }
+.more-nav a.nav-current { background: var(--paper2); border: 0; }
+.button-primary, .button-secondary { border-radius: 999px; font-weight: 500; }
+.button-primary { background: var(--ink); color: var(--cream); }
+.button-primary:hover:enabled { background: #254e35; }
+.button-secondary { background: var(--cream); }
+.button-secondary:hover:enabled { background: var(--paper2); }
+.text-link { color: var(--ink); }
+input, select, textarea { border-radius: 10px; }
+input::placeholder, textarea::placeholder { color: var(--muted); opacity: .85; }
+input[type="search"] { background: var(--cream); }
+button:focus-visible, a:focus-visible, summary:focus-visible { outline-color: var(--olive); }
+.paper-panel, dialog { border-radius: 16px; }
+.notice { background: var(--paper2); border-radius: 0 10px 10px 0; line-height: 1.7; }
+.notice.is-error { background: #fae9e3; border-color: var(--error); color: var(--error); }
+.errors, .is-error { color: var(--error); }
+.hero-stamp, .hero-stamp:before, .topics-count { border-color: #9aaa85; }
+.hero-stamp { color: var(--olive); }
+.shelf-toolbar h2 span { font-family: var(--sans); }
+.book-cover { color: var(--cream); box-shadow: 4px 5px 0 #bdc9aa, 8px 10px 18px #12352418; }
+.book-cover:hover { box-shadow: 4px 7px 0 #bdc9aa, 10px 18px 22px #12352425; }
+.badge.active { color: var(--ink); background: var(--paper2); border-color: #9aaa85; }
+.topic-identity { background: var(--paper2); border-radius: 10px; }
+.topic-book-preview { background: var(--ink); box-shadow: 5px 6px 0 #bdc9aa, 10px 12px 20px #1235241a; }
+dialog { box-shadow: 0 20px 100px #12352440; }
+dialog::backdrop { background: #12352499; }
+th { letter-spacing: .06em; }
+tbody tr:hover { background: #12352405; }
+.site-footer { line-height: 1.8; }
+@media (max-width: 760px) {
+  .site-header { align-items: flex-start; gap: 14px; }
+  .site-header nav { position: relative; width: 100%; gap: 12px 20px; font-size: 12px; }
+  .brand-mark { display: block; }
+  .more-nav { position: static; }
+  .more-nav > div { left: auto; right: 0; }
+  h1 { letter-spacing: -.025em; }
+  .dialog-actions { flex-wrap: wrap; }
+}

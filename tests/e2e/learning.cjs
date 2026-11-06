@@ -611,7 +611,7 @@ function silentWav() {
         await page.goto(base + '/reviews');
         await page.waitForFunction(() => document.getElementById('review-profile').textContent.includes('Learner A'));
         assert.equal(await page.evaluate(() => typeof window.DoulingoReviewCard), 'function');
-        assert.equal(await page.locator('a[href$="/learning"]').count(), 1);
+        assert.equal(await page.locator('.review-shell > nav a[href$="/learning"]').count(), 1);
         await page.waitForFunction(() => !document.getElementById('review-app').textContent.includes('Đang tải'));
         await page.locator('[data-tab="history"]').click();
         await page.waitForFunction(() => document.getElementById('review-app').textContent.includes('Chưa có lịch sử ôn'));

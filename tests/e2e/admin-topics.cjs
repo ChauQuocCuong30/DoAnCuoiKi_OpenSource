@@ -8,7 +8,7 @@ if (!base) throw new Error('Set TEST_BASE_URL to the isolated test server.');
     const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE, args: ['--no-sandbox'] });
     try {
         const guest = await browser.newContext();
-        assert.equal((await guest.request.get(base + '/admin/topics')).status(), 401);
+        assert.equal((await guest.request.get(base + '/admin/topics', { maxRedirects: 0 })).status(), 303);
         const reader = await browser.newContext();
         await reader.request.post(base + '/api/v1/auth/login', { data: { email: 'books-user@example.test', password: 'books-test-password-123' } });
         assert.equal((await reader.request.get(base + '/admin/topics')).status(), 403);
@@ -30,7 +30,7 @@ if (!base) throw new Error('Set TEST_BASE_URL to the isolated test server.');
         assert.equal(await page.locator('#topic-form [name=id]').inputValue(), '');
         assert.equal(await page.locator('#topic-code').textContent(), 'Tự động khi lưu');
         assert.equal(await page.locator('#topic-position').textContent(), 'Tự xếp cuối kệ');
-        assert.equal(await page.locator('body').evaluate((el) => getComputedStyle(el).backgroundColor), 'rgb(238, 231, 216)');
+        assert.equal(await page.locator('body').evaluate((el) => getComputedStyle(el).backgroundColor), 'rgb(234, 240, 220)');
         const title = 'Thế giới hoang dã';
         await page.getByLabel('Tên chủ đề', { exact: true }).fill(title);
         await page.getByLabel(/Mô tả/).fill('Khám phá từ vựng về thiên nhiên và động vật.');

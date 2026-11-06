@@ -12,37 +12,28 @@ final class ContentController
     public static function register(Router $router): void
     {
         $router->get('/admin', [self::class, 'words']);
-        $router->get('/admin/dictionary', [
-            DictionaryPageController::class,
-            'index',
-        ]);
         $router->get('/admin/topics', [TopicController::class, 'index']);
         $router->post('/admin/topics', [TopicController::class, 'store']);
-        foreach (['words', 'lessons', 'exercises', 'import'] as $section) {
-            $router->get('/admin/' . $section, [
-                self::class,
-                $section === 'import' ? 'importPage' : $section,
-            ]);
+        $router->get('/admin/words', [self::class, 'words']);
+        $router->get('/admin/learners', [LearnerController::class, 'index']);
+        $router->post('/admin/learners/{id}/status', [LearnerController::class, 'status']);
+        foreach (['dictionary', 'lessons', 'exercises', 'import'] as $legacy) {
+            $router->get('/admin/' . $legacy, [self::class, 'legacy']);
         }
     }
+    public function legacy(array $params): void
+    {
+        $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/index.php')), '/');
+        header('Location: ' . $base . (Session::userId() === null ? '/login' : '/admin/words'), true, 303);
+    }
+
     public function words(array $params): void
     {
         $this->page('words');
     }
-    public function lessons(array $params): void
-    {
-        $this->page('lessons');
-    }
-    public function exercises(array $params): void
-    {
-        $this->page('exercises');
-    }
-    public function importPage(array $params): void
-    {
-        $this->page('import');
-    }
     private function page(string $section): void
     {
+        if (Session::userId() === null) { $this->legacy([]); return; }
         Auth::admin();
         Session::start();
         $appBase = rtrim(
@@ -55,7 +46,7 @@ final class ContentController
         );
         header('Content-Type: text/html; charset=utf-8');
         header('Cache-Control: no-store');
-        $view = in_array($section, ['words', 'import'], true) ? 'books' : 'content';
+        $view = 'books';
         require dirname(__DIR__, 4) . '/resources/views/admin/' . $view . '.php';
     }
 }

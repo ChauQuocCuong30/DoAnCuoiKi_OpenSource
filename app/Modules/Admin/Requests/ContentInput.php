@@ -105,6 +105,13 @@ final class ContentInput
         sort($ids, SORT_NUMERIC);
         return $ids;
     }
+    public static function cefr(mixed $value = 'A1'): string
+    {
+        if (!is_string($value)) { self::fail('Mức phải là A1, A2, B1, B2, C1 hoặc C2.'); }
+        $value = strtoupper(trim($value));
+        if (!in_array($value, \App\Shared\Cefr::LEVELS, true)) { self::fail('Mức phải là A1, A2, B1, B2, C1 hoặc C2.'); }
+        return $value;
+    }
     public static function word(array $b): array
     {
         $pos = self::text($b, 'part_of_speech', 30);
@@ -119,6 +126,7 @@ final class ContentInput
         }
         $word = [
             'topic_id' => self::id($b['topic_id'] ?? null),
+            'cefr_level' => self::cefr($b['cefr_level'] ?? 'A1'),
             'english' => mb_strtolower($english, 'UTF-8'),
             'vietnamese' => self::text($b, 'vietnamese', 255),
             'part_of_speech' => $pos,
@@ -164,7 +172,7 @@ final class ContentInput
         return [
             'topic_id' => self::id($b['topic_id'] ?? null),
             'name' => self::text($b, 'name', 150),
-            'level' => self::number($b['level'] ?? 1, 1, 5),
+            'level' => self::number($b['level'] ?? 1, 1, 6),
             'position' => self::number($b['position'] ?? null),
             'question_count' => self::number(
                 $b['question_count'] ?? 10,
@@ -490,7 +498,7 @@ final class ContentInput
             'lesson_id' => self::id($b['lesson_id'] ?? null),
             'word_id' => $wordId,
             'type' => $type,
-            'difficulty' => self::number($b['difficulty'] ?? 1, 1, 5),
+            'difficulty' => self::number($b['difficulty'] ?? 1, 1, 6),
             'is_active' => self::number($b['is_active'] ?? 0, 0, 1),
             'content_json' => json_encode(
                 $c,

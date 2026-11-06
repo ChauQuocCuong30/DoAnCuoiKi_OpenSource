@@ -91,6 +91,7 @@ final class AuthService
             throw new ApiException('ACCOUNT_DEACTIVATED', 'Account is deactivated', 403);
         }
 
+        $user=$this->users->refreshHearts((int)$user['id']);
         return $this->publicUser($user);
     }
 
@@ -104,6 +105,7 @@ final class AuthService
             'role' => $user['role'],
             'status' => $user['status'],
             'current_hp' => (int) $user['current_hp'],
+            'next_hp_at' => $user['next_hp_at'] ?? null,
             'daily_goal_xp' => (int) $user['daily_goal_xp'],
             'streak_goal_days' => (int) $user['streak_goal_days'],
             'timezone' => $user['timezone'],

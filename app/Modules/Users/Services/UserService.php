@@ -86,10 +86,11 @@ final class UserService
         }
 
         $id = (int) $rawId;
-        if ($this->users->findById($id) === null) {
+        $target = $this->users->findById($id);
+        if ($target === null) {
             throw new ApiException('USER_NOT_FOUND', 'User not found', 404);
         }
-        if ($id === (int) $admin['id']) {
+        if ($target['role'] !== 'user' || $id === (int) $admin['id']) {
             throw new ApiException('VALIDATION_FAILED', 'Validation failed', 422, ['id' => 'Admin cannot change own status']);
         }
 

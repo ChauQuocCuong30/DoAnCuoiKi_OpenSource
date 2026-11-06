@@ -15,12 +15,12 @@
     phrase: "Cụm từ",
   };
   const colors = [
-    "#65694e",
-    "#a75b3e",
-    "#4d6267",
-    "#8a6656",
-    "#73705a",
-    "#76505b",
+    "#123524",
+    "#3f6846",
+    "#315e53",
+    "#6c6436",
+    "#476244",
+    "#486b61",
   ];
   let csrf = "",
     books = [],
@@ -189,7 +189,7 @@
     $("#edit-topic").href =
       base + "/admin/topics?edit=" + encodeURIComponent(selected.id);
     $("#topic-hidden").hidden = Number(selected.is_active) === 1;
-    $("#book-import").disabled = $("#new-word").disabled =
+    $("#book-import").disabled =
       Number(selected.is_active) !== 1;
   }
   async function openBook(id, push = true) {
@@ -199,6 +199,7 @@
     selected = book;
     page = 1;
     $("#word-search").value = "";
+    $("#word-level").value = "";
     $("#library-view").hidden = true;
     $("#book-view").hidden = false;
     renderBookHeading();
@@ -227,6 +228,7 @@
       parent_id: selected.id,
       q: $("#word-search").value.trim(),
       page,
+      cefr_level: $("#word-level").value,
     });
     $("#words").replaceChildren();
     $("#words").setAttribute("aria-busy", "true");
@@ -245,6 +247,7 @@
       row.append(
         node("td", word.english),
         node("td", word.vietnamese),
+        node("td", word.cefr_level || "A1"),
         node("td", posLabels[word.part_of_speech] || word.part_of_speech),
       );
       const status = node("td");
@@ -303,7 +306,7 @@
           "td",
           "Chưa có từ phù hợp. Nhập bộ mẫu hoặc CSV để thêm từ vào sách.",
         );
-      cell.colSpan = 5;
+      cell.colSpan = 6;
       row.append(cell);
       $("#words").append(row);
     }
@@ -429,6 +432,7 @@
     page = 1;
     guard(loadWords);
   });
+  $("#word-level").addEventListener("change", () => {page=1;guard(loadWords);});
   $("#prev-page").addEventListener("click", () => {
     if (page > 1) {
       page--;
@@ -443,7 +447,6 @@
   });
   $("#open-import").addEventListener("click", openImport);
   $("#book-import").addEventListener("click", openImport);
-  $("#new-word").addEventListener("click", () => guard(() => editWord()));
   $("#import-form").addEventListener("input", invalidatePreview);
   $("#import-form").addEventListener("change", () => {
     invalidatePreview();
@@ -474,6 +477,7 @@
           topic_id: topic,
           sample_key: $("#sample-key").value,
           duplicate_mode: mode,
+          cefr_level: $("#import-level").value,
         }
       : new FormData(form);
     if (!isSample) data.set("duplicate_mode", mode);

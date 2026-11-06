@@ -19,6 +19,7 @@ final class UsersController
 
     public function me(array $params): void
     {
+        header('Cache-Control: no-store');
         Response::data(UserService::present(Auth::user()));
     }
 
@@ -32,6 +33,7 @@ final class UsersController
     {
 
         $admin = Auth::admin();
+        \App\Core\Session::verifyCsrf();
         Response::data($this->service()->setStatus($admin, (string) ($params['id'] ?? ''), Request::json()));
     }
 }

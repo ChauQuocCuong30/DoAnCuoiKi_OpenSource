@@ -148,6 +148,7 @@ final class ContentRepository
         string $q,
         int $page,
         ?int $parent = null,
+        ?string $cefr = null,
     ): array {
         $table = $this->table($kind);
         $conditions = [];
@@ -169,6 +170,9 @@ final class ContentRepository
                 ($kind === 'exercises' ? 'lesson_id' : 'topic_id') . '=?';
             $args[] = $parent;
         }
+        if ($kind === 'words' && $cefr !== null && \App\Shared\Cefr::installed($this->db)) {
+            $conditions[]='cefr_level=?';$args[]=$cefr;
+        }
         $where = $conditions ? ' WHERE ' . implode(' AND ', $conditions) : '';
         $total = (int) $this->rows(
             'SELECT COUNT(*) n FROM ' . $table . $where,
@@ -184,6 +188,7 @@ final class ContentRepository
                 => 'id,topic_id,name,level,position,question_count,is_active',
             default => 'id,lesson_id,word_id,type,difficulty,is_active',
         };
+        if ($kind === 'words') { $columns .= \App\Shared\Cefr::installed($this->db) ? ',cefr_level' : ", 'A1' AS cefr_level"; }
         return [
             'items' => $this->rows(
                 'SELECT ' .
@@ -231,6 +236,7 @@ final class ContentRepository
             $sql .= ' AND id<>?';
             $args[] = $except;
         }
+        if (\App\Shared\Cefr::installed($this->db)) { $sql.=' AND cefr_level=?';$args[]=$w['cefr_level']??'A1'; }
         return $this->rows(
             $sql . ' LIMIT 1' . ($lock ? ' FOR UPDATE' : ''),
             $args,
@@ -326,6 +332,7 @@ final class ContentRepository
                 'audio',
                 'is_active',
             ];
+            if (\App\Shared\Cefr::installed($this->db)) { $columns[]='cefr_level';$word['cefr_level']??=$old['cefr_level']??'A1'; }
             $id = $this->persist('words', $id, $word, $columns);
             $oldSource = $this->rows(
                 'SELECT metadata_json FROM word_sources WHERE word_id=?',

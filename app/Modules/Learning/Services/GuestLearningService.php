@@ -20,13 +20,20 @@ final class GuestLearningService
 
     public function firstLesson(): ?array
     {
+        $lessons = $this->repo->getActiveLessons();
+        if (isset($lessons[0]['word_count'])) {
+            foreach ($lessons as $lesson) {
+                if ((int) $lesson['word_count'] >= 2) { return $lesson; }
+            }
+            return null;
+        }
         $topic = $this->repo->getActiveTopics()[0] ?? null;
 
         if ($topic === null) {
             return null;
         }
 
-        foreach ($this->repo->getActiveLessons() as $lesson) {
+        foreach ($lessons as $lesson) {
             if ((int) $lesson['topic_id'] === (int) $topic['id']) {
                 return $lesson;
             }
@@ -57,7 +64,7 @@ final class GuestLearningService
         if ($first === null || (int) $first['id'] !== $id) {
             throw new ApiException(
                 'GUEST_LIMIT',
-                'Khách chỉ được học ải đầu tiên của chặng đầu tiên.',
+                'Khách được học thử bài mở đầu khả dụng. Đăng nhập để học các bài còn lại.',
                 403
             );
         }
@@ -227,7 +234,7 @@ final class GuestLearningService
             ];
         };
 
-        foreach (array_slice($main, 0, $total) as $i => $item) {
+        foreach (QuestionSelection::main($main, $total) as $i => $item) {
             $add($item, 'main', $i + 1);
         }
 
@@ -248,6 +255,7 @@ final class GuestLearningService
             'claimed_user_id' => null,
             'updated_at' => time(),
             'rules' => [
+                'question_bank_version' => 'mixed-cefr-v4',
                 'pass_percent' => (float) $lesson['pass_percent'],
                 'xp_reward' => (int) $lesson['xp_reward'],
                 'max_hp' => HeartRules::MAX_HP,

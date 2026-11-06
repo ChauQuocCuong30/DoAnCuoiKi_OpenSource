@@ -1,0 +1,9 @@
+.admin-page-heading { padding: 38px 0 30px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.admin-page-heading h1 { font-size: clamp(38px, 4.5vw, 60px); }
+.admin-page-heading .hero-copy { max-width: 660px; }
+.learner-filter { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.learner-filter label { flex: 1; min-width: 180px; font-size: 13px; }
+.learner-filter button { margin-top: 12px; }
+.admin-tools-page td form { margin: 0; }
+.admin-tools-page td button { white-space: normal; }
+@media(max-width: 600px) { .learner-filter label { flex-basis: 100%; } }

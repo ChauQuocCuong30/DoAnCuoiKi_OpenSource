@@ -13,17 +13,22 @@ final class LearningService
 
     public function getLearningPathData(array $user): array
     {
+        $hearts=$this->repo->transaction(fn()=> $this->userWithHearts((int)$user['id']));
+        $active=$this->repo->activeSessions((int)$user['id']);
+        $byLesson=[];foreach($active as $session) { $byLesson[$session['lesson_id']]??=$session; }
         $completed = $this->repo->completedLessons((int) $user['id']);
         $lessonsByTopic = [];
         foreach ($this->repo->getActiveLessons() as $lesson) {
             [$main] = $this->bank($lesson);
-            $lesson['ready'] = count($main) >= (int) $lesson['question_count'];
+            $lesson['active_session']=$byLesson[$lesson['id']]??null;
+            $lesson['cefr_level']=\App\Shared\Cefr::LEVELS[(int)$lesson['level']-1]??'';
+            $lesson['ready'] = !empty($lesson['active_session']) || count($main) >= (int) $lesson['question_count'];
             $lesson['completed'] = in_array((int) $lesson['id'], $completed, true);
-            $lesson['unlocked'] = $this->repo->unlocked((int) $user['id'], $lesson);
+            $lesson['unlocked'] = !empty($lesson['active_session']) || $this->repo->unlocked((int) $user['id'], $lesson);
             $lessonsByTopic[$lesson['topic_id']][] = $lesson;
         }
         return ['topics' => $this->repo->getActiveTopics(), 'lessonsByTopic' => $lessonsByTopic,
-            'stats' => $this->stats($user)];
+            'stats' => $this->stats($user), 'hearts'=>$hearts, 'history'=>$this->repo->history((int)$user['id']), 'resumeSession'=>$active[0]??null];
     }
 
     public function getLessonFlashcards(int $lessonId, int $userId): array
@@ -44,7 +49,7 @@ final class LearningService
     {
         $lesson = $this->repo->lesson($id);
         if ($lesson === null) { throw new ApiException('LESSON_NOT_FOUND', 'Không tìm thấy bài học.', 404); }
-        if (!$this->repo->unlocked($userId, $lesson)) {
+        if ($this->repo->activeSession($userId,$id)===null && !$this->repo->unlocked($userId, $lesson)) {
             throw new ApiException('LESSON_LOCKED', 'Hãy hoàn thành bài trước trong chủ đề.', 403);
         }
         return $lesson;
@@ -65,10 +70,12 @@ final class LearningService
 
     public function start(int $userId, int $lessonId): array
     {
+        $this->repo->syncForLesson($lessonId);
         return $this->repo->transaction(function () use ($userId, $lessonId): array {
             $user = $this->userWithHearts($userId);
             $lesson = $this->requireLesson($lessonId, $userId);
             $existing = $this->repo->activeSession($userId, $lessonId);
+            if($existing!==null) { $this->repo->touchSession((int)$existing['id']); }
             if ($existing !== null) { return $this->state($user, $existing); }
             if ((int) $user['current_hp'] === 0) { throw new ApiException('NO_HEARTS', 'Bạn đã hết tim. Hãy chờ hồi tim.', 409); }
             [$main, $matching] = $this->bank($lesson);
@@ -77,10 +84,11 @@ final class LearningService
                 throw new ApiException('LESSON_NOT_READY', 'Bài học chưa đủ câu hỏi hoặc tài nguyên để bắt đầu.', 409);
             }
             shuffle($main); shuffle($matching);
-            $rules = ['pass_percent' => (float) $lesson['pass_percent'], 'xp_reward' => (int) $lesson['xp_reward'],
+            $rules = ['question_bank_version'=>'mixed-cefr-v4','pass_percent' => (float) $lesson['pass_percent'], 'xp_reward' => (int) $lesson['xp_reward'],
                 'max_hp' => HeartRules::MAX_HP, 'mistake_review' => true, 'matching_required' => $matching !== []];
             $id = $this->repo->createSession($userId, $lessonId, $total, $rules);
-            foreach (array_slice($main, 0, $total) as $position => $item) {
+            $this->repo->touchSession($id);
+            foreach (QuestionSelection::main($main, $total) as $position => $item) {
                 // Shuffle display order once and keep it stable on refresh/retry.
                 foreach (['options', 'tokens'] as $key) {
                     if (isset($item['snapshot']['content'][$key])) { shuffle($item['snapshot']['content'][$key]); }
@@ -101,7 +109,9 @@ final class LearningService
     {
         return $this->repo->transaction(function () use ($userId, $id): array {
             $user = $this->userWithHearts($userId);
-            return $this->state($user, $this->requireSession($userId, $id));
+            $session=$this->requireSession($userId, $id);
+            $this->repo->touchSession($id);
+            return $this->state($user,$session);
         });
     }
 
@@ -157,6 +167,8 @@ final class LearningService
             }
             $correct = $this->grader->grade($snapshot, $answer);
             $this->repo->recordAnswer($questionId, $key, $answer, $correct);
+            $this->repo->touchSession($id);
+            if(!$correct && $selected['phase']!=='mistake_review') { $this->repo->recordMistakes($userId,$questionId,$snapshot['target_word_ids']); }
             if ($correct || $selected['phase'] === 'main') { $this->repo->resolveQuestion($questionId); }
             if ($selected['phase'] === 'main' && $correct) { $this->repo->addCorrect($id); }
             if (!$correct && $selected['phase'] !== 'mistake_review') {

@@ -9,6 +9,7 @@ final class ContentCsvImporter
 {
     public const HEADERS = [
         'topic_id',
+        'cefr_level',
         'english',
         'vietnamese',
         'part_of_speech',
@@ -23,9 +24,10 @@ final class ContentCsvImporter
         'audio_license',
     ];
     public function __construct(private ContentRepository $repo) {}
-    public function preview(string $csv, string $duplicateMode = 'error', ?int $topicId = null): array
+    public function preview(string $csv, string $duplicateMode = 'error', ?int $topicId = null, string $defaultLevel = 'A1'): array
     {
         self::duplicateMode($duplicateMode);
+        $defaultLevel = ContentInput::cefr($defaultLevel);
         if (strlen($csv) > 1048576) {
             throw new ApiException(
                 'CSV_TOO_LARGE',
@@ -79,6 +81,7 @@ final class ContentCsvImporter
                         }
                         $b['topic_id'] = $topicId;
                     }
+                    $b['cefr_level'] = ($b['cefr_level'] ?? '') !== '' ? $b['cefr_level'] : $defaultLevel;
                     $b['is_active'] = 1;
                     $data = ContentInput::word($b);
                     $w = $data['word'];
@@ -96,6 +99,7 @@ final class ContentCsvImporter
                     $identity = json_encode(
                         [
                             $rowTopic,
+                            $w['cefr_level'],
                             mb_strtolower($w['english'], 'UTF-8'),
                             $w['part_of_speech'],
                             mb_strtolower($w['vietnamese'], 'UTF-8'),

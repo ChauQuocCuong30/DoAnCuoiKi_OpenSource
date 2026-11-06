@@ -504,7 +504,11 @@ input[type="search"] {
 }
 .word-filter input {
   max-width: 430px;
+  flex: 1;
+  min-width: 120px;
 }
+.word-filter select { width: 160px; flex: 0 0 160px; }
+.word-filter button { flex-shrink: 0; white-space: nowrap; }
 .word-filter .muted {
   margin-left: auto;
   white-space: nowrap;

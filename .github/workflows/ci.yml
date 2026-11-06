@@ -26,6 +26,8 @@ jobs:
       - name: Check tracked PHP syntax
         run: git ls-files -z -- '*.php' | xargs -0 -r -n 1 php -l
       - run: php tests/unit/learning.php
+      - run: php tests/unit/VocabularyQuestionFactoryTest.php
+      - run: php tests/unit/LearningResultHistoryTest.php
       - run: node --check public/assets/js/learning.js
       - run: node --check public/assets/js/admin-books.js
   learning-integration:
@@ -56,6 +58,7 @@ jobs:
           mysql --skip-ssl -h 127.0.0.1 -u root -pintegration-only doulingo_learning_test < database/migrations/001_create_tables.sql
           mysql --skip-ssl -h 127.0.0.1 -u root -pintegration-only doulingo_learning_test < database/seeds/001_demo_data.sql
           mysql --skip-ssl -h 127.0.0.1 -u root -pintegration-only doulingo_learning_test < database/migrations/002_ensure_word_sources.sql
+          mysql --skip-ssl -h 127.0.0.1 -u root -pintegration-only doulingo_learning_test < database/migrations/003_learning_guest_claims.sql
       - run: php tests/integration/learning.php
       - name: Reviews unit tests
         run: |
@@ -97,3 +100,18 @@ jobs:
         run: |
           php tests/integration/admin-topics.php
           TEST_BASE_URL=http://127.0.0.1:8085 NODE_PATH=/tmp/learning-playwright/node_modules node tests/e2e/admin-topics.cjs
+
+      - name: Restored placement demo and PR learning entry
+        run: TEST_BASE_URL=http://127.0.0.1:8085 NODE_PATH=/tmp/learning-playwright/node_modules node tests/e2e/placement-demo.cjs
+      - name: Vocabulary catalogue and generated question bank
+        run: |
+          mysql --skip-ssl -h 127.0.0.1 -u root -pintegration-only doulingo_learning_test < database/migrations/005_share_vocabulary_lessons.sql
+          php tests/integration/shared-vocabulary.php
+          TEST_BASE_URL=http://127.0.0.1:8085 NODE_PATH=/tmp/learning-playwright/node_modules node tests/e2e/shared-vocabulary.cjs
+
+      - name: CEFR A1-C2, resume and mistake heart recovery
+        run: |
+          mysql --skip-ssl -h 127.0.0.1 -u root -pintegration-only doulingo_learning_test < database/migrations/006_cefr_resume_hearts.sql
+          mysql --skip-ssl -h 127.0.0.1 -u root -pintegration-only doulingo_learning_test < database/migrations/006_cefr_resume_hearts.sql
+          php tests/integration/cefr-hearts.php
+          TEST_BASE_URL=http://127.0.0.1:8085 NODE_PATH=/tmp/learning-playwright/node_modules node tests/e2e/cefr-hearts.cjs

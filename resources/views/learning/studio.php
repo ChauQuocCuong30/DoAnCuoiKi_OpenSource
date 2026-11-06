@@ -16,6 +16,7 @@ $topics = $topics ?? [];
 $groups = $groups ?? [];
 $selectedTopic = $selectedTopic ?? null;
 $exploreWords = $exploreWords ?? [];
+$selectedBand = $selectedBand ?? '';
 
 require __DIR__ . '/dashboard-shell.php';
 
@@ -376,6 +377,13 @@ $previews = [
         <?php endforeach; ?>
     </nav>
 
+    <?php if (!$practice && $selectedTopic!==null): ?>
+        <nav class="ls-tabs" aria-label="Chọn mức từ vựng">
+            <a href="<?= $e($studioUrl) ?>?topic=<?= (int)$selectedTopic['id'] ?>" <?= $selectedBand===''?'aria-current="page"':'' ?>>Tất cả mức</a>
+            <?php foreach (\App\Shared\Cefr::LEVELS as $band): ?><a href="<?= $e($studioUrl) ?>?topic=<?= (int)$selectedTopic['id'] ?>&amp;level=<?= $band ?>" <?= $selectedBand===$band?'aria-current="page"':'' ?>><?= $band ?></a><?php endforeach; ?>
+        </nav>
+    <?php endif; ?>
+
     <?php if ($selectedTopic === null): ?>
 
         <div class="ld-topics-grid">
@@ -443,6 +451,7 @@ $previews = [
 
                     <p>
                         <?= (int) $lesson['question_count'] ?> câu hỏi
+                        <?php if (!empty($lesson['active_session'])): ?> · Đang học <?= (int)$lesson['active_session']['answered_main'] ?>/<?= (int)$lesson['active_session']['total_questions'] ?> câu<?php endif; ?>
                         <?= !empty($lesson['completed'])
                             ? ' · Đã hoàn thành'
                             : '' ?>
@@ -453,6 +462,10 @@ $previews = [
                         <button class="ld-btn ld-btn-muted" disabled>
                             Lưu kết quả học thử trước
                         </button>
+
+                    <?php elseif (empty($lesson['ready'])): ?>
+
+                        <p>Chủ đề cần ít nhất 2 từ đang hiện để tạo câu hỏi.</p>
 
                     <?php elseif (!empty($lesson['unlocked'])): ?>
 
@@ -517,7 +530,7 @@ $previews = [
                 <?php foreach ($exploreWords as $i => $word): ?>
                     <button type="button"
                             data-word-index="<?= $i ?>">
-                        <?= $e($word['english']) ?>
+                        <?= $e($word['english']) ?> · <?= $e($word['cefr_level']??'A1') ?>
                     </button>
                 <?php endforeach; ?>
             </nav>

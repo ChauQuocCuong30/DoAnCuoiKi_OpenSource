@@ -13,6 +13,9 @@ final class TopicController
 {
     public function index(array $params): void
     {
+        if (\App\Core\Session::userId() === null) {
+            header('Location: ' . $this->base() . '/login', true, 303); return;
+        }
         Auth::admin();
         $id = $_GET['edit'] ?? '';
         $form = $id === '' ? null : (new TopicRepository())->find($this->positive($id));

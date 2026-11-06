@@ -7,7 +7,7 @@ use PDO;
 
 final class UserRepository
 {
-    private const COLUMNS = 'id, name, email, password_hash, role, status, current_hp, daily_goal_xp, streak_goal_days, timezone';
+    private const COLUMNS = 'id, name, email, password_hash, role, status, current_hp, next_hp_at, daily_goal_xp, streak_goal_days, timezone';
     private const PROFILE_COLUMNS = ['name', 'daily_goal_xp', 'streak_goal_days', 'timezone'];
 
     public function __construct(private PDO $pdo)
@@ -41,6 +41,19 @@ final class UserRepository
         $stmt->execute(['name' => $name, 'email' => $email, 'password_hash' => $passwordHash]);
 
         return (int) $this->pdo->lastInsertId();
+    }
+
+
+    public function refreshHearts(int $id): array
+    {
+        $this->pdo->beginTransaction();
+        try {
+            $q=$this->pdo->prepare('SELECT * FROM users WHERE id=? FOR UPDATE');$q->execute([$id]);$user=$q->fetch(PDO::FETCH_ASSOC);
+            if(!$user) { throw new \RuntimeException('Account not found'); }
+            $hp=\App\Shared\HeartRules::refresh($user,new \DateTimeImmutable('now',new \DateTimeZone('UTC')));
+            $this->pdo->prepare('UPDATE users SET current_hp=?,next_hp_at=? WHERE id=?')->execute([$hp['current_hp'],$hp['next_hp_at'],$id]);
+            $this->pdo->commit();return array_replace($user,$hp);
+        } catch(\Throwable $error) { if($this->pdo->inTransaction()) { $this->pdo->rollBack(); }throw $error; }
     }
 
     public function updateProfile(int $id, array $fields): void

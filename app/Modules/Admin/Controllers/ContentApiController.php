@@ -11,21 +11,12 @@ use App\Modules\Admin\Requests\ContentInput as Input;
 use App\Modules\Admin\Services\ContentCsvImporter;
 use App\Modules\Admin\Services\VocabularySamples;
 use App\Modules\Vocabulary\Repositories\ContentRepository;
-use App\Modules\Vocabulary\Controllers\DictionaryController;
 
 // LIÊN QUAN CƯỜNG: dùng Auth/Session/Response chung; Admin ghi phải có CSRF.
 final class ContentApiController
 {
     public static function register(Router $router): void
     {
-        $router->get('/api/v1/admin/dictionary', [
-            DictionaryController::class,
-            'lookup',
-        ]);
-        $router->post('/api/v1/admin/dictionary/words', [
-            DictionaryWordController::class,
-            'store',
-        ]);
         $router->get('/api/v1/admin/content/bootstrap', [
             self::class,
             'bootstrap',
@@ -42,12 +33,12 @@ final class ContentApiController
         $router->get('/api/v1/admin/content/samples', [self::class, 'samples']);
         $router->get('/api/v1/admin/content/csv/template', [self::class, 'template']);
         $router->post('/api/v1/admin/content/samples/preview', [self::class, 'samplePreview']);
-        $router->get('/api/v1/admin/content/{kind}', [self::class, 'listing']);
-        $router->get('/api/v1/admin/content/{kind}/{id}', [
+        $router->get('/api/v1/admin/content/words', [self::class, 'listing']);
+        $router->get('/api/v1/admin/content/words/{id}', [
             self::class,
             'show',
         ]);
-        $router->post('/api/v1/admin/content/{kind}', [self::class, 'store']);
+        $router->post('/api/v1/admin/content/words', [self::class, 'store']);
     }
     private function admin(): void
     {
@@ -79,6 +70,7 @@ final class ContentApiController
             'part_of_speech' => Input::POS,
             'exercise_types' => Input::TYPES,
             'csv_headers' => ContentCsvImporter::HEADERS,
+            'cefr_levels' => \App\Shared\Cefr::LEVELS,
         ]);
     }
     public function listing(array $params): void
@@ -92,10 +84,11 @@ final class ContentApiController
                 : Input::id($_GET['parent_id']);
         Response::data(
             (new ContentRepository())->listing(
-                $params['kind'],
+                'words',
                 $q,
                 $page,
                 $parent,
+                ($_GET['cefr_level'] ?? '') === '' ? null : Input::cefr($_GET['cefr_level']),
             ),
         );
     }
@@ -127,7 +120,7 @@ final class ContentApiController
         $topic = Input::id($b['topic_id'] ?? null);
         $mode = ContentCsvImporter::duplicateMode(Input::text($b, 'duplicate_mode', 10));
         $preview = (new ContentCsvImporter(new ContentRepository()))->preview(
-            (new VocabularySamples())->csv($key, $topic), $mode, $topic,
+            (new VocabularySamples())->csv($key, $topic), $mode, $topic, Input::cefr($b['cefr_level'] ?? 'A1'),
         );
         foreach ($preview['rows'] as &$row) {
             $row['source']['provider'] = 'sample_bundle';
@@ -142,7 +135,7 @@ final class ContentApiController
         $this->admin();
         Response::data(
             (new ContentRepository())->get(
-                $params['kind'],
+                'words',
                 Input::id($params['id']),
             ),
         );
@@ -154,24 +147,8 @@ final class ContentApiController
         $b = $this->body();
         $id = ($b['id'] ?? '') === '' ? null : Input::id($b['id']);
         $repo = new ContentRepository();
-        switch ($params['kind']) {
-            case 'words':
-                $data = Input::word($b);
-                $saved = $repo->saveWord($id, $data['word'], $data['source']);
-                break;
-            case 'lessons':
-                $saved = $repo->saveLesson($id, Input::lesson($b));
-                break;
-            case 'exercises':
-                $saved = $repo->saveExercise($id, Input::exercise($b));
-                break;
-            default:
-                throw new ApiException(
-                    'NOT_FOUND',
-                    'Loại nội dung không tồn tại.',
-                    404,
-                );
-        }
+        $data = Input::word($b);
+        $saved = $repo->saveWord($id, $data['word'], $data['source']);
         Response::data(['id' => $saved], $id === null ? 201 : 200);
     }
     public function preview(array $params): void
@@ -196,7 +173,7 @@ final class ContentApiController
         $mode = ContentCsvImporter::duplicateMode(Input::text($_POST + ['duplicate_mode' => 'error'], 'duplicate_mode', 10));
         $topic = ($_POST['topic_id'] ?? '') === '' ? null : Input::id($_POST['topic_id']);
         $preview = (new ContentCsvImporter(new ContentRepository()))->preview(
-            (string) file_get_contents($file['tmp_name']), $mode, $topic,
+            (string) file_get_contents($file['tmp_name']), $mode, $topic, Input::cefr($_POST['cefr_level'] ?? 'A1'),
         );
         $this->respondPreview($preview, $mode);
     }
