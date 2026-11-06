@@ -131,7 +131,7 @@
 .ld-topic-image img{width:75px;height:75px;transition:transform .25s}
 .ld-topic-card:hover img{transform:scale(1.08) rotate(-3deg)}
 .ld-topic-card>span{color:#65796b;font-size:9px;font-weight:750;letter-spacing:1.1px}
-.ld-topic-card h3{min-height:41px;margin-top:5px;font-size:15px}
+.ld-topic-card h3{min-height:41px;margin-top:5px;font-size:15px;overflow-wrap:anywhere}
 .ld-topic-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:13px;color:#65796b}
 .ld-topic-bottom small{font-size:11px}
 .ld-topic-bottom .ld-icon{width:16px;height:16px}
