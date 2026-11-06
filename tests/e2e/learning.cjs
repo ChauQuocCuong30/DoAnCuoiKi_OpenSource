@@ -11,11 +11,25 @@ if (!base) {
 }
 
 async function status(response, expected) {
-    assert.equal(
-        response.status(),
-        expected,
-        `${response.request().method()} ${response.url()}: ${await response.text()}`
-    );
+    assert.ok(response, 'No HTTP response received.');
+
+    const actual = response.status();
+
+    if (actual !== expected) {
+        let body;
+
+        try {
+            body = await response.text();
+        } catch {
+            body = '[Could not read response body]';
+        }
+
+        assert.equal(
+            actual,
+            expected,
+            `${response.url()}: ${body}`
+        );
+    }
 
     return response;
 }
