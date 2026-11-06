@@ -99,9 +99,11 @@
   if (profile) {
     var logout = document.querySelector('[data-logout]');
 
+    var selfId = null;
     request('GET', '/users/me').then(function (r) {
       if (!r.ok) { (window.DLNav ? DLNav.go(base + '/login', 'back') : (window.location.href = base + '/login')); return; }
       var user = r.json.data;
+      selfId = user.id !== undefined && user.id !== null ? String(user.id) : null;
       ['email', 'name', 'daily_goal_xp', 'streak_goal_days', 'timezone'].forEach(function (key) {
         var input = profile.elements[key];
         if (input) { input.value = user[key]; }
@@ -119,9 +121,14 @@
     var adminBox = document.querySelector('[data-admin]');
     document.querySelector('[data-admin-submit]').addEventListener('click', function (event) {
       var button = event.currentTarget;
-      var id = parseInt(document.querySelector('[data-admin-id]').value, 10);
-      var status = document.querySelector('[data-admin-status]').value;
-      if (!id || id < 1) { showAlert(adminBox, 'Vui lòng nhập ID người dùng hợp lệ.', false); return; }
+      if (button.disabled) { return; }
+      var id = document.querySelector('[data-admin-id]').value.trim();
+      var statusSelect = document.querySelector('[data-admin-status]');
+      var status = statusSelect.value;
+      if (!/^[1-9][0-9]{0,9}$/.test(id)) { showAlert(adminBox, 'ID phải là số nguyên dương, chỉ gồm chữ số (ví dụ: 5).', false); return; }
+      if (selfId !== null && id === selfId) { showAlert(adminBox, 'Bạn không thể tự khóa chính mình.', false); return; }
+      var label = statusSelect.options[statusSelect.selectedIndex].text;
+      if (!window.confirm('Đổi trạng thái tài khoản ID ' + id + ' thành ' + label + '?')) { return; }
       button.disabled = true;
       showAlert(adminBox, '');
       request('PATCH', '/users/' + id + '/status', { status: status }).then(function (r) {
@@ -139,8 +146,24 @@
 
     submit(profile, function (data) {
       delete data.email;
-      data.daily_goal_xp = parseInt(data.daily_goal_xp, 10);
-      data.streak_goal_days = parseInt(data.streak_goal_days, 10);
+      var limits = { daily_goal_xp: [1, 1000], streak_goal_days: [1, 365] };
+      var invalid = false;
+      Object.keys(limits).forEach(function (key) {
+        var raw = String(data[key] === undefined ? '' : data[key]).trim();
+        var msg = '';
+        if (!/^[0-9]+$/.test(raw)) { msg = 'Chỉ nhập số nguyên (chữ số 0-9).'; }
+        else {
+          var n = Number(raw);
+          if (n < limits[key][0] || n > limits[key][1]) { msg = 'Giá trị phải từ ' + limits[key][0] + ' đến ' + limits[key][1] + '.'; }
+          else { data[key] = n; }
+        }
+        if (msg) {
+          invalid = true;
+          var el = profile.querySelector('[data-error="' + key + '"]');
+          if (el) { el.textContent = msg; }
+        }
+      });
+      if (invalid) { return Promise.resolve(null); }
       return request('PATCH', '/users/me', data).then(function (r) {
         if (r.ok) { showAlert(profile, 'Đã lưu thay đổi.', true); return null; }
         return r;

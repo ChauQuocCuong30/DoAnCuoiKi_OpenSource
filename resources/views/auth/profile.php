@@ -35,7 +35,7 @@
     <h2>Quản lý tài khoản</h2>
     <div class="alert" data-alert hidden></div>
     <label>ID người dùng
-        <input type="number" data-admin-id min="1" step="1" inputmode="numeric">
+        <input type="text" data-admin-id inputmode="numeric" pattern="[0-9]*" maxlength="10" autocomplete="off">
     </label>
     <label>Trạng thái
         <select data-admin-status>
