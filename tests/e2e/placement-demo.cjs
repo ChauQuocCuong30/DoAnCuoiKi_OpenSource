@@ -30,7 +30,7 @@ if(!base)throw Error('Set TEST_BASE_URL to the test server.');
    assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('doulingo_progress'))),legacy);
    assert.equal(demoWrites,0,'Demo never posts learning scores or XP');
    await page.locator('#goOn').click();
-   assert.equal(new URL(await page.getByRole('link',{name:'Học tiếp với lộ trình mới'}).getAttribute('href'),base).pathname,new URL(base).pathname+'/learning');
+   assert.equal(new URL(await page.getByRole('link',{name:'Học tiếp với lộ trình mới'}).getAttribute('href'),base).pathname,new URL(base+'/learning').pathname);
    await page.getByRole('link',{name:'Học tiếp với lộ trình mới'}).click();await page.waitForURL('**/learning');
    assert(await page.locator('body.ld').count(),'Uses PR #26 learning shell');
   }
