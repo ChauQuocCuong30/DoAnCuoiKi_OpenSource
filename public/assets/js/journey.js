@@ -40,7 +40,7 @@
       if (b.dataset.level === cur) { b.classList.add('cur'); }
       b.addEventListener('click', function () {
         var d = load(); d.level = b.dataset.level; save(d);
-        window.location.href = base + '/lesson';
+        (window.DLNav ? DLNav.go(base + '/lesson') : (window.location.href = base + '/lesson'));
       });
     });
   }
@@ -119,7 +119,7 @@
   /* ---------- Bài học theo trình độ ---------- */
   if (page === 'lesson') {
     var data = load(), level = data.level;
-    if (!level || !VOCAB[level]) { window.location.href = base + '/level'; return; }
+    if (!level || !VOCAB[level]) { (window.DLNav ? DLNav.go(base + '/level', 'back') : (window.location.href = base + '/level')); return; }
 
     var stageL = $('stage'), barL = $('bar'), heartsEl = $('hearts'), foot = $('foot'), fb = $('fb'), act = $('act');
     var learned = (data.learned && data.learned[level]) || [];
@@ -138,7 +138,7 @@
       });
       shuffle(qs).forEach(function (q) { steps.push(q); });
     }
-    var total = steps.length, done = 0, hearts = 5, right = 0, wrongCount = 0, selected = null, checked = false, current = null;
+    var total = steps.length, done = 0, hearts = 5, right = 0, wrongCount = 0, firstRight = 0, firstWrong = 0, selected = null, checked = false, current = null;
 
     var setProgress = function () { barL.style.width = (done / total * 100) + '%'; };
     var setFoot = function (state, title, text, label, enabled) {
@@ -184,9 +184,9 @@
           var t = b.querySelector('span:last-child').textContent;
           if (t === current.ans) { b.classList.add('right'); } else if (b.classList.contains('sel')) { b.classList.add('wrong'); } else { b.classList.add('dim'); }
         });
-        if (ok) { right++; setFoot('ok', 'Chính xác!', current.word.en + ' = ' + current.word.vi, 'Tiếp tục', true); }
+        if (ok) { right++; if (!current.retry) { firstRight++; } setFoot('ok', 'Chính xác!', current.word.en + ' = ' + current.word.vi, 'Tiếp tục', true); }
         else {
-          hearts--; wrongCount++; heartsEl.textContent = hearts;
+          hearts--; wrongCount++; if (!current.retry) { firstWrong++; } heartsEl.textContent = hearts;
           if (!current.retry) { var again = { type: current.type, word: current.word, retry: true }; steps.push(again); total++; }
           setFoot('bad', 'Chưa đúng', 'Đáp án: ' + current.ans, 'Tiếp tục', true);
         }
@@ -219,17 +219,36 @@
         }
         save(d);
       }
-      var learnedN = (d.learned && d.learned[level] ? d.learned[level].length : 0);
-      stageL.innerHTML = '<div class="result"><div class="badge">' + (win ? '✓' : '♥') + '</div>' +
-        '<h2>' + (win ? 'Hoàn thành bài học!' : 'Hết tim rồi') + '</h2>' +
-        '<p>' + (win ? 'Bạn vừa học ' + pick.length + ' từ vựng trình độ ' + LEVELS[level].tag + '.' : 'Đừng lo, hãy xem lại các từ rồi thử lại nhé.') + '</p>' +
-        '<div class="stats"><div class="stat"><b>+' + (win ? xp : 0) + '</b><span>XP</span></div><div class="stat"><b>' + right + '</b><span>Câu đúng</span></div>' +
-        '<div class="stat"><b>' + learnedN + '/' + VOCAB[level].length + '</b><span>Từ đã học</span></div><div class="stat"><b>' + (d.streak || 0) + '</b><span>Chuỗi ngày</span></div></div>' +
-        '<div class="row"><a class="btn solid" href="' + base + '/lesson">' + (win ? 'Học tiếp' : 'Thử lại') + '</a><a class="btn line" href="' + base + '/level">Đổi trình độ</a><a class="btn line" href="' + base + '/">Về trang chủ</a></div>' +
-        '<p class="note" id="note"></p></div>';
-      fetch(base + '/api/v1/users/me', { credentials: 'same-origin' }).then(function (r) {
-        if (!r.ok) { $('note').innerHTML = 'Chưa đăng nhập, tiến độ chỉ lưu trên trình duyệt này. <a href="' + base + '/register">Đăng ký</a> hoặc <a href="' + base + '/login">đăng nhập</a> để lưu lâu dài.'; }
-      }).catch(function () { /* bỏ qua */ });
+      var totalQ = firstRight + firstWrong;
+      var resultHtml = '<div class="result"><div class="badge">' + LEVELS[level].tag + '</div>' +
+        '<h2>' + (win ? 'Kết quả kiểm tra' : 'Hết tim rồi') + '</h2>' +
+        '<p>Bạn trả lời đúng ' + firstRight + '/' + totalQ + ' câu ở trình độ ' + LEVELS[level].name + ' (' + LEVELS[level].tag + ').</p>' +
+        '<div class="stats"><div class="stat"><b>' + firstRight + '</b><span>Câu đúng</span></div><div class="stat"><b>' + firstWrong + '</b><span>Câu sai</span></div>' +
+        '<div class="stat"><b>' + LEVELS[level].tag + '</b><span>Trình độ</span></div></div>' +
+        '<div class="row"><button class="btn solid" id="goOn" type="button">Tiếp tục</button><a class="btn line" href="' + base + '/level">Chọn lại trình độ</a></div></div>';
+      var promptHtml = '<div class="prompt">' +
+        '<svg class="art" viewBox="0 0 190 190" aria-hidden="true"><circle cx="95" cy="95" r="90" fill="#d8efc4"/><rect x="55" y="38" width="80" height="114" rx="14" fill="#f6fbe9" stroke="#123524" stroke-width="3"/>' +
+        '<circle cx="95" cy="82" r="18" fill="#3f7d4f"/><path d="M95 92V72M95 80c-6 0-9-3-10-8 6 0 9 3 10 8zM95 77c5 0 8-3 9-7-5 0-8 2-9 7z" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<rect x="70" y="118" width="50" height="8" rx="4" fill="#b8862b"/><rect x="76" y="134" width="38" height="6" rx="3" fill="#cfe0bd"/>' +
+        '<circle cx="46" cy="52" r="6" fill="#f0c24a"/><circle cx="148" cy="66" r="5" fill="#8cc572"/><circle cx="142" cy="140" r="7" fill="#f0c24a"/></svg>' +
+        '<h2>Đã đến lúc tạo hồ sơ!</h2><p>Tạo hồ sơ để lưu trình độ ' + LEVELS[level].tag + ' và tiến độ học của bạn.</p>' +
+        '<a class="big go" href="' + base + '/register">Tạo hồ sơ</a><a class="big later" href="' + base + '/">Lúc khác</a>' +
+        '<a class="back-link" href="#" id="backRes">← Xem lại kết quả</a></div>';
+      var showResult = function () {
+        stageL.innerHTML = resultHtml;
+        $('goOn').onclick = function () {
+          // Đã đăng nhập thì vào thẳng trang chủ, chưa đăng nhập thì mời tạo hồ sơ
+          fetch(base + '/api/v1/users/me', { credentials: 'same-origin' }).then(function (r) {
+            if (r.ok) { (window.DLNav ? DLNav.go(base + '/') : (window.location.href = base + '/')); return; }
+            stageL.innerHTML = promptHtml;
+            $('backRes').onclick = function (e) { e.preventDefault(); showResult(); };
+          }).catch(function () {
+            stageL.innerHTML = promptHtml;
+            $('backRes').onclick = function (e) { e.preventDefault(); showResult(); };
+          });
+        };
+      };
+      showResult();
     };
     renderStep();
   }

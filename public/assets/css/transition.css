@@ -1,0 +1,14 @@
+/* Hiệu ứng chuyển trang 2 chiều: tiến = trượt từ phải, lùi = trượt từ trái */
+@keyframes dl-in-fwd  { from { opacity: 0; transform: translateX(36px); } to { opacity: 1; transform: none; } }
+@keyframes dl-in-back { from { opacity: 0; transform: translateX(-36px); } to { opacity: 1; transform: none; } }
+@keyframes dl-in-fade { from { opacity: 0; } to { opacity: 1; } }
+html[data-dl-dir="fwd"] body  { animation: dl-in-fwd 380ms cubic-bezier(.22,.8,.3,1) backwards; }
+html[data-dl-dir="back"] body { animation: dl-in-back 380ms cubic-bezier(.22,.8,.3,1) backwards; }
+html[data-dl-dir="fade"] body { animation: dl-in-fade 320ms ease backwards; }
+body.dl-leave { pointer-events: none; transition: opacity 220ms ease, transform 260ms cubic-bezier(.4,0,.8,.3); opacity: 0; }
+html[data-dl-leave="fwd"] body.dl-leave  { transform: translateX(-36px); }
+html[data-dl-leave="back"] body.dl-leave { transform: translateX(36px); }
+@media (prefers-reduced-motion: reduce) {
+  html[data-dl-dir] body { animation: none; }
+  body.dl-leave { transition: none; opacity: 1; transform: none; }
+}

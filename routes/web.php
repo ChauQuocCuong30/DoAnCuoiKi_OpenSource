@@ -72,4 +72,8 @@ return static function (Router $router): void {
         '/learning/lesson/{id}',
         [GuestLearningController::class, 'lesson']
     );
+    $router->get('/reviews', [
+        \App\Modules\Reviews\Controllers\ReviewHttpController::class,
+        'index',
+    ]);
 };

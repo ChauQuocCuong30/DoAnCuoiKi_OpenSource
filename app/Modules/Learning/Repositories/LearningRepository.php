@@ -102,7 +102,7 @@ final class LearningRepository
 
     public function session(int $userId, int $id, bool $lock = false): ?array
     {
-        return $this->rows('SELECT * FROM learning_sessions WHERE id = ? AND user_id = ?'
+        return $this->rows("SELECT * FROM learning_sessions WHERE id = ? AND user_id = ? AND mode = 'lesson'"
             . ($lock ? ' FOR UPDATE' : ''), [$id, $userId])[0] ?? null;
     }
 
@@ -159,6 +159,14 @@ final class LearningRepository
     {
         $this->write("UPDATE learning_sessions SET status = ?, finished_at = UTC_TIMESTAMP()
             WHERE id = ? AND status = 'in_progress'", [$status, $id]);
+    }
+
+    /** Called only after finish/reward, before transaction() commits. */
+    public function initializeReviews(int $userId, int $sessionId): array
+    {
+        return \App\Modules\Reviews\Services\LessonReviewHook::afterSessionCompleted(
+            $this->db, $userId, $sessionId
+        );
     }
 
     public function reward(array $user, array $session, int $xp): void

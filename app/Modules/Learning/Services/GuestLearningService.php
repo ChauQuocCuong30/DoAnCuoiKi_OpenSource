@@ -713,6 +713,8 @@ final class GuestLearningService
                         ['id' => $sessionId],
                         (int) $rules['xp_reward']
                     );
+
+                    $this->repo->initializeReviews($userId, $sessionId);
                 }
 
                 $next = null;

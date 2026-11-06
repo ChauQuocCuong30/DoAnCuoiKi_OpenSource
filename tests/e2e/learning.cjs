@@ -604,6 +604,34 @@ function silentWav() {
             /Câu sai/
         );
 
+        // The same authenticated session opens Reviews and loads the shared word renderer.
+        const guestReviews = await guest.request.get(base + '/reviews', { maxRedirects: 0 });
+        assert.equal(guestReviews.status(), 303);
+        assert.match(guestReviews.headers().location, /\/login$/);
+        await page.goto(base + '/reviews');
+        await page.waitForFunction(() => document.getElementById('review-profile').textContent.includes('Learner A'));
+        assert.equal(await page.evaluate(() => typeof window.DoulingoReviewCard), 'function');
+        assert.equal(await page.locator('a[href$="/learning"]').count(), 1);
+        await page.waitForFunction(() => !document.getElementById('review-app').textContent.includes('Đang tải'));
+        await page.locator('[data-tab="history"]').click();
+        await page.waitForFunction(() => document.getElementById('review-app').textContent.includes('Chưa có lịch sử ôn'));
+        await page.locator('[data-tab="notifications"]').click();
+        await page.waitForFunction(() => document.getElementById('review-app').textContent.includes('Chưa có thông báo'));
+        const cardSafe = await page.evaluate(() => {
+            const node = document.createElement('div');
+            const value = '<img src=x onerror="window.__reviewXss=1">';
+            node.innerHTML = window.DoulingoReviewCard({
+                word: { english: value, vietnamese: 'nghia', example: value, image: 'javascript:alert(1)' },
+                direction: 'en_vi', revealed: true,
+            });
+            return node.querySelector('h3').textContent === value
+                && node.querySelectorAll('img,script').length === 0 && !window.__reviewXss;
+        });
+        assert(cardSafe, 'Shared review card escapes text and rejects unsafe media');
+        assert.equal(jsErrors.length, 0, jsErrors.join('\n'));
+        assert(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
+        console.log('PASS: Reviews auth redirect, shared session/word renderer, history, reminders, XSS and mobile layout');
+
         assert.equal(
             jsErrors.length,
             0,

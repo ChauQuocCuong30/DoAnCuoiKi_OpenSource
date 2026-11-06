@@ -77,4 +77,41 @@ return static function (Router $router): void {
         '/api/v1/users/{id}/status',
         [UsersController::class, 'updateStatus']
     );
+    // API on tap va nhac hoc.
+    $reviewRoutes = [
+        'GET' => [
+            '/api/v1/reviews/bootstrap',
+            '/api/v1/reviews/due',
+            '/api/v1/reviews/history',
+            '/api/v1/notifications',
+        ],
+        'POST' => [
+            '/api/v1/reviews/start',
+            '/api/v1/reviews/submit',
+            '/api/v1/notifications/review-due',
+            '/api/v1/notifications/{id}/read',
+        ],
+    ];
+
+    foreach ($reviewRoutes as $method => $paths) {
+        foreach ($paths as $path) {
+            $register = strtolower($method);
+
+            $router->$register(
+                $path,
+                static function (array $params) use ($path): void {
+                    $resolvedPath = str_replace(
+                        '{id}',
+                        $params['id'] ?? '',
+                        $path
+                    );
+
+                    $controller = new
+                        \App\Modules\Reviews\Controllers\ReviewHttpController();
+
+                    $controller->api($resolvedPath);
+                }
+            );
+        }
+    }
 };

@@ -4,8 +4,23 @@ declare(strict_types=1);
 use App\Core\Session;
 
 $isGuest = (bool) ($isGuest ?? (Session::userId() === null));
-$guestCompleted = $isGuest && (bool) ($guestCompleted ?? false);
+$hasGuestResult = $isGuest && (bool) ($guestCompleted ?? false);
 $firstLessonId = (int) ($firstLessonId ?? 0);
+
+Session::start();
+
+$preview = $_SESSION['learning_guest_preview_v1'] ?? null;
+
+$guestPreview = $isGuest
+    && !$hasGuestResult
+    && $firstLessonId > 0
+    && is_array($preview)
+    && (int) ($preview['first_lesson_id'] ?? 0) === $firstLessonId;
+
+$guestCompleted = $hasGuestResult || $guestPreview;
+
+$loginPath = '/login?next='
+    . ($hasGuestResult ? 'guest' : 'learning');
 
 $screen = ($screen ?? 'path') === 'progress'
     ? 'progress'
@@ -159,9 +174,13 @@ require __DIR__ . '/dashboard-shell.php';
     <div class="ld-page-heading">
         <div>
             <span class="ld-eyebrow">
-                <?= $isGuest
-                    ? 'KHÔNG GIAN HỌC THỬ'
-                    : 'TIẾN BỘ TỪNG NGÀY' ?>
+                <?= $guestPreview
+                    ? 'BẠN ĐÃ ĐĂNG XUẤT'
+                    : (
+                        $isGuest
+                            ? 'KHÔNG GIAN HỌC THỬ'
+                            : 'TIẾN BỘ TỪNG NGÀY'
+                    ) ?>
             </span>
 
             <h1>
@@ -175,7 +194,10 @@ require __DIR__ . '/dashboard-shell.php';
             <?= $icon('check') ?>
 
             <?= $done ?>/<?= $total ?>
-            ải <?= $isGuest ? 'học thử' : 'hoàn thành' ?>
+
+            ải <?= $guestPreview
+                ? 'đã ghi nhớ'
+                : ($isGuest ? 'học thử' : 'hoàn thành') ?>
         </span>
     </div>
 
@@ -187,9 +209,11 @@ require __DIR__ . '/dashboard-shell.php';
 
                     <?= $next !== null
                         ? 'BÀI HỌC TIẾP THEO'
-                        : ($allDone
-                            ? 'MỘT CỘT MỐC MỚI'
-                            : 'HÀNH TRÌNH CỦA BẠN') ?>
+                        : (
+                            $allDone
+                                ? 'MỘT CỘT MỐC MỚI'
+                                : 'HÀNH TRÌNH CỦA BẠN'
+                        ) ?>
                 </span>
 
                 <h2>
@@ -212,7 +236,11 @@ require __DIR__ . '/dashboard-shell.php';
                         $next['lesson']['name']
                         ?? (
                             $guestCompleted
-                                ? 'Lưu kết quả để tiếp tục sang ải mới.'
+                                ? (
+                                    $guestPreview
+                                        ? 'Đăng nhập để tiếp tục từ tiến độ tài khoản của bạn.'
+                                        : 'Lưu kết quả để tiếp tục sang ải mới.'
+                                )
                                 : (
                                     $allDone
                                         ? 'Ôn lại những từ đã học và xem thành tích của bạn.'
@@ -235,9 +263,12 @@ require __DIR__ . '/dashboard-shell.php';
                     <?php elseif ($guestCompleted): ?>
                         <a
                             class="ld-btn ld-btn-yellow"
-                            href="<?= $e($b) ?>/login?next=guest"
+                            href="<?= $e($b . $loginPath) ?>"
                         >
-                            Lưu tiến độ
+                            <?= $guestPreview
+                                ? 'Đăng nhập để học tiếp'
+                                : 'Lưu tiến độ' ?>
+
                             <?= $icon('arrow') ?>
                         </a>
 
@@ -276,7 +307,8 @@ require __DIR__ . '/dashboard-shell.php';
 
                             <div>
                                 <strong>
-                                    <?= (int) $next['lesson']['xp_reward'] ?> XP
+                                    <?= (int) $next['lesson']['xp_reward'] ?>
+                                    XP
                                 </strong>
 
                                 <small>khi hoàn thành</small>
@@ -304,7 +336,11 @@ require __DIR__ . '/dashboard-shell.php';
 
                 <span>
                     <?= $isGuest
-                        ? 'Đăng nhập để lưu XP'
+                        ? (
+                            $guestPreview
+                                ? 'Đăng nhập để xem XP'
+                                : 'Đăng nhập để lưu XP'
+                        )
                         : 'Tổng XP đã tích lũy' ?>
                 </span>
             </div>
@@ -338,7 +374,11 @@ require __DIR__ . '/dashboard-shell.php';
 
                 <span>
                     <?= $isGuest
-                        ? 'Tiến độ học thử'
+                        ? (
+                            $guestPreview
+                                ? 'Tiến độ được ghi nhớ'
+                                : 'Tiến độ học thử'
+                        )
                         : 'Đã hoàn thành' ?>
                 </span>
             </div>
@@ -382,7 +422,9 @@ require __DIR__ . '/dashboard-shell.php';
                                 </small>
 
                                 <div class="ld-meter">
-                                    <span style="width:<?= $stage['percent'] ?>%"></span>
+                                    <span
+                                        style="width:<?= $stage['percent'] ?>%"
+                                    ></span>
                                 </div>
                             </div>
                         </a>
@@ -401,7 +443,15 @@ require __DIR__ . '/dashboard-shell.php';
                     <?php foreach ($finished as $entry): ?>
                         <a
                             class="ld-finished-row"
-                            href="<?= $e($b) ?>/learning/lesson/<?= (int) $entry['lesson']['id'] ?>?focus=result"
+                            href="<?= $e(
+                                $b . (
+                                    $guestPreview
+                                        ? $loginPath
+                                        : '/learning/lesson/'
+                                            . (int) $entry['lesson']['id']
+                                            . '?focus=result'
+                                )
+                            ) ?>"
                         >
                             <span class="ld-level-icon is-done">
                                 <?= $icon('check') ?>
@@ -418,7 +468,10 @@ require __DIR__ . '/dashboard-shell.php';
                             </div>
 
                             <span class="ld-finished-link">
-                                Xem kết quả
+                                <?= $guestPreview
+                                    ? 'Đăng nhập để xem'
+                                    : 'Xem kết quả' ?>
+
                                 <?= $icon('arrow') ?>
                             </span>
                         </a>
@@ -516,7 +569,9 @@ require __DIR__ . '/dashboard-shell.php';
                         </header>
 
                         <div class="ld-stage-meter ld-meter">
-                            <span style="width:<?= $stage['percent'] ?>%"></span>
+                            <span
+                                style="width:<?= $stage['percent'] ?>%"
+                            ></span>
                         </div>
 
                         <ol class="ld-lessons">
@@ -570,9 +625,20 @@ require __DIR__ . '/dashboard-shell.php';
                                     <?php if ($lesson['ui_done']): ?>
                                         <a
                                             class="ld-btn ld-btn-small ld-btn-outline"
-                                            href="<?= $e($b) ?>/learning/lesson/<?= (int) $lesson['id'] ?>?focus=result"
+                                            href="<?= $e(
+                                                $b . (
+                                                    $guestPreview
+                                                        ? $loginPath
+                                                        : '/learning/lesson/'
+                                                            . (int) $lesson['id']
+                                                            . '?focus=result'
+                                                )
+                                            ) ?>"
                                         >
-                                            Xem lại
+                                            <?= $guestPreview
+                                                ? 'Đăng nhập để xem'
+                                                : 'Xem lại' ?>
+
                                             <?= $icon('arrow') ?>
                                         </a>
 
@@ -581,8 +647,20 @@ require __DIR__ . '/dashboard-shell.php';
                                             class="ld-btn ld-btn-small <?= $current ? 'ld-btn-green' : 'ld-btn-outline' ?>"
                                             href="<?= $e($b) ?>/learning/lesson/<?= (int) $lesson['id'] ?>?focus=practice"
                                         >
-                                            <?= $current ? 'Tiếp tục' : 'Vào học' ?>
+                                            <?= $current
+                                                ? 'Tiếp tục'
+                                                : 'Vào học' ?>
+
                                             <?= $icon('arrow') ?>
+                                        </a>
+
+                                    <?php elseif ($isGuest && $guestCompleted): ?>
+                                        <a
+                                            class="ld-btn ld-btn-small ld-btn-outline"
+                                            href="<?= $e($b . $loginPath) ?>"
+                                        >
+                                            <?= $icon('lock') ?>
+                                            Đăng nhập
                                         </a>
 
                                     <?php elseif (
@@ -656,9 +734,13 @@ require __DIR__ . '/dashboard-shell.php';
                 </h3>
 
                 <p>
-                    <?= $isGuest
-                        ? 'Kết quả học thử được giữ trong phiên này.'
-                        : 'Mỗi ải hoàn thành là một bước tiến.' ?>
+                    <?= $guestPreview
+                        ? 'Ải đầu được ghi nhớ trên trình duyệt này. Đăng nhập để xem tiến độ tài khoản.'
+                        : (
+                            $isGuest
+                                ? 'Kết quả học thử được giữ trong phiên này.'
+                                : 'Mỗi ải hoàn thành là một bước tiến.'
+                        ) ?>
                 </p>
             </section>
 
@@ -702,7 +784,7 @@ require __DIR__ . '/dashboard-shell.php';
                         <?= $icon('arrow') ?>
                     </a>
 
-                    <a href="<?= $e($b) ?>/learning/progress">
+                    <a href="<?= $e($b) ?>/reviews">
                         <span class="ld-tool-art peach">
                             <img
                                 src="<?= $e($b) ?>/assets/images/learning-ui/trophy.png"
@@ -713,8 +795,8 @@ require __DIR__ . '/dashboard-shell.php';
                         </span>
 
                         <span>
-                            <strong>Thành tích</strong>
-                            <small>Nhìn lại kết quả</small>
+                            <strong>Ôn tập SM-2</strong>
+                            <small>Ôn từ theo lịch của bạn</small>
                         </span>
 
                         <?= $icon('arrow') ?>
@@ -728,15 +810,21 @@ require __DIR__ . '/dashboard-shell.php';
                         <?= $icon('user') ?>
                     </span>
 
-                    <h3>Giữ lại hành trình của bạn</h3>
+                    <h3>
+                        <?= $guestPreview
+                            ? 'Tiếp tục hành trình'
+                            : 'Giữ lại hành trình của bạn' ?>
+                    </h3>
 
                     <p>
-                        Đăng nhập để lưu kết quả và học tiếp.
+                        <?= $guestPreview
+                            ? 'Kết quả đã lưu trong tài khoản. Đăng nhập để học tiếp.'
+                            : 'Đăng nhập để lưu kết quả và học tiếp.' ?>
                     </p>
 
                     <a
                         class="ld-btn ld-btn-green"
-                        href="<?= $e($b) ?>/login<?= $guestCompleted ? '?next=guest' : '' ?>"
+                        href="<?= $e($b . $loginPath) ?>"
                     >
                         Đăng nhập
                         <?= $icon('arrow') ?>
@@ -748,4 +836,8 @@ require __DIR__ . '/dashboard-shell.php';
 
 <?php endif; ?>
 
-<?php require __DIR__ . '/dashboard-end.php'; ?>
+<?php
+// Chỉ kết quả học thử thật mới được đi vào luồng nhận kết quả.
+$guestCompleted = $hasGuestResult;
+require __DIR__ . '/dashboard-end.php';
+?>

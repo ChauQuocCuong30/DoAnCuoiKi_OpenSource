@@ -288,6 +288,12 @@ $boot = [
                     </a>
                 <?php endif; ?>
 
+                <?php if (!$guest): ?>
+                    <a class="btn" href="<?= $e($b) ?>/reviews">
+                        Ôn tập theo lịch
+                    </a>
+                <?php endif; ?>
+
                 <a class="btn" href="<?= $e($backUrl) ?>">
                     <?= $e($backLabel) ?>
                 </a>

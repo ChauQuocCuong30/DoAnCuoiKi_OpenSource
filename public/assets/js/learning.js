@@ -1,843 +1,212 @@
+'use strict';
+
+// Shared word-card presentation for Learning and Reviews; no grading or scheduling here.
 (() => {
-    'use strict';
-
+    const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]);
+    const media = value => {
+        if (typeof value !== 'string' || /[\s<>"'\\]/.test(value)) return '';
+        if (value.startsWith('/') && !value.startsWith('//')) return value;
+        try {
+            const url = new URL(value);
+            return url.protocol === 'https:' && !url.username && !url.password ? url.href : '';
+        } catch { return ''; }
+    };
+    const render = ({ word, direction = 'en_vi', revealed = true, mode = 'review' }) => {
+        const image = media(word.image);
+        const audio = media(word.audio);
+        if (mode === 'learning') {
+            return `<img id="fc-image" class="word-image" alt="Hình minh họa" ${image ? `src="${escape(image)}"` : 'hidden'}>
+                <h2 id="fc-word">${escape(word.english)}</h2>
+                <p id="fc-pronunciation">${escape(word.ipa)}</p>
+                <h3 id="fc-translation">${escape(word.vietnamese)}</h3>
+                <p id="fc-example" ${word.example ? '' : 'hidden'}><strong>Ví dụ: </strong><span id="fc-ex-en">${escape(word.example)}</span></p>
+                <p id="fc-ex-translation">${escape(word.example_translation)}</p>`;
+        }
+        const front = direction === 'listening' ? 'Nghe rồi tự nhớ từ'
+            : direction === 'en_vi' ? word.english : word.vietnamese;
+        const back = direction === 'en_vi' ? word.vietnamese
+            : direction === 'listening' ? word.english + ' — ' + word.vietnamese : word.english;
+        return `<div class="flashcard">
+            ${image && direction === 'en_vi' ? `<img src="${escape(image)}" alt="Hình minh họa">` : ''}
+            <h3>${escape(front)}</h3>
+            ${audio ? `<button type="button" class="audio-button" data-audio="${escape(audio)}">♫ Nghe phát âm</button>` : ''}
+            ${revealed ? `<div class="back">${escape(back)}</div><p>${escape(word.ipa)}<br>${escape(word.example)}<br>${escape(word.example_translation)}</p>` : ''}
+        </div>`;
+    };
+    window.DoulingoWordCard = { render, media };
+    window.DoulingoReviewCard = options => render({ ...options, mode: 'review' });
+})();
+(() => {
+    const bootElement = document.getElementById('learning-data');
+    if (!bootElement) return; // Reviews only needs the shared presentation above.
+    const boot = JSON.parse(bootElement.textContent);
     const $ = id => document.getElementById(id);
-    const nfc = value => String(value ?? '').normalize('NFC');
+    const words = boot.words;
+    let wordIndex = 0;
+    let session = null;
+    let busy = false;
+    let pending = null;
+    let selectedTokens = [];
 
-    function text(id, value) {
-        if ($(id)) {
-            $(id).textContent = nfc(value);
+    const media = window.DoulingoWordCard.media;
+    function showWord() {
+        const word = words[wordIndex];
+        if (!word) {
+            $('btn-next-word').hidden = true;
+            $('btn-listen').hidden = true;
+            return;
         }
+        $('shared-word-card').innerHTML = window.DoulingoWordCard.render({ word, mode: 'learning' });
+        $('btn-next-word').hidden = wordIndex === words.length - 1;
+        $('progress').textContent = `Giới thiệu từ ${wordIndex + 1}/${words.length}`;
+        $('btn-listen').disabled = !word.audio && !('speechSynthesis' in window);
     }
-
-    const walker = document.createTreeWalker(
-        document.body,
-        NodeFilter.SHOW_TEXT
-    );
-
-    let node;
-
-    while ((node = walker.nextNode())) {
-        if (!['SCRIPT', 'STYLE', 'TEXTAREA'].includes(
-            node.parentElement?.tagName
-        )) {
-            node.nodeValue = nfc(node.nodeValue);
+    $('btn-next-word').addEventListener('click', () => { wordIndex++; showWord(); });
+    $('btn-listen').addEventListener('click', () => {
+        const word = words[wordIndex];
+        const src = media(word?.audio);
+        if (src) {
+            new Audio(src).play().catch(() => { $('feedback').textContent = 'Chưa thể phát âm thanh.'; });
+        } else if (word && 'speechSynthesis' in window) {
+            const voice = new SpeechSynthesisUtterance(word.english);
+            voice.lang = 'en-US'; window.speechSynthesis.cancel(); window.speechSynthesis.speak(voice);
         }
-    }
-
-    if (
-        !matchMedia('(prefers-reduced-motion: reduce)').matches
-        && matchMedia('(hover: hover) and (pointer: fine)').matches
-    ) {
-        document.querySelectorAll('[data-tilt]').forEach(scene => {
-            let frame = 0;
-            let rx = 0;
-            let ry = 0;
-
-            scene.addEventListener('pointermove', event => {
-                const rect = scene.getBoundingClientRect();
-
-                rx = -(
-                    (event.clientY - rect.top) / rect.height - .5
-                ) * 12;
-
-                ry = (
-                    (event.clientX - rect.left) / rect.width - .5
-                ) * 16;
-
-                if (!frame) {
-                    frame = requestAnimationFrame(() => {
-                        scene.style.setProperty('--rx', rx + 'deg');
-                        scene.style.setProperty('--ry', ry + 'deg');
-                        frame = 0;
-                    });
-                }
-            });
-
-            scene.addEventListener('pointerleave', () => {
-                cancelAnimationFrame(frame);
-                frame = 0;
-                scene.style.setProperty('--rx', '0deg');
-                scene.style.setProperty('--ry', '0deg');
-            });
-        });
-    }
-
-    const boot = $('lu-data')
-        ? JSON.parse($('lu-data').textContent)
-        : null;
-
-    if (!boot) return;
-
-    function gate() {
-        if ($('lu-gate') && !$('lu-gate').open) {
-            $('lu-gate').showModal();
-        }
-    }
-
-    document.querySelectorAll('[data-later]').forEach(button => {
-        button.addEventListener('click', () => {
-            $('lu-gate').close();
-        });
     });
-
-    let toastTimer;
-
-    document.querySelectorAll('[data-locked]').forEach(button => {
-        button.addEventListener('click', () => {
-            if (boot.guest && boot.pendingCompleted) {
-                gate();
-                return;
-            }
-
-            text('lu-toast', 'Hoàn thành ải trước nhé.');
-            $('lu-toast').hidden = false;
-
-            clearTimeout(toastTimer);
-
-            toastTimer = setTimeout(() => {
-                $('lu-toast').hidden = true;
-            }, 4000);
-        });
-    });
-
-    if (boot.mode === 'map') return;
 
     async function api(path, body) {
-        const response = await fetch(
-            boot.base + '/api/v1/learning/' + path,
-            {
-                method: body === undefined ? 'GET' : 'POST',
-                credentials: 'same-origin',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-CSRF-Token': boot.csrf
-                },
-                body: body === undefined
-                    ? undefined
-                    : JSON.stringify(body)
-            }
-        );
-
-        const json = await response.json().catch(() => null);
-
-        if (
-            !response.ok
-            || !json
-            || !Object.hasOwn(json, 'data')
-        ) {
-            const error = new Error(
-                response.status >= 500
-                    ? 'Chưa kết nối được máy chủ. Bạn thử lại nhé.'
-                    : json?.error?.message
-                        || 'Chưa nhận được phản hồi hợp lệ.'
-            );
-
-            if (!response.ok) {
-                error.status = response.status;
-            }
-
-            error.code = json?.error?.code;
-
-            if (error.status === 401) {
-                location.assign(
-                    boot.base + '/login?next=guest'
-                );
-            }
-
-            if (error.code === 'TRIAL_SIGNED_IN') {
-                location.assign(boot.base + '/learning');
-            }
-
+        const response = await fetch(boot.basePath + '/api/v1/learning/' + path, {
+            method: body === undefined ? 'GET' : 'POST', credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': boot.csrfToken },
+            body: body === undefined ? undefined : JSON.stringify(body)
+        });
+        const payload = await response.json();
+        if (!response.ok) {
+            const error = new Error(payload.error?.message || 'Không thể xử lý yêu cầu.');
+            error.status = response.status;
             throw error;
         }
-
-        return json.data;
+        return payload.data;
     }
-
-    if (boot.mode === 'continue') {
-        let saving = false;
-
-        async function claim() {
-            if (saving) return;
-
-            saving = true;
-            $('lu-claim-retry').hidden = true;
-            text('lu-claim-note', 'Đang lưu kết quả…');
-
-            try {
-                const result = await api('guest/claim', {});
-
-                if (!result.claimed) {
-                    text(
-                        'lu-claim-note',
-                        'Phiên học thử không còn sẵn. ' +
-                        'Bạn có thể học tiếp từ lộ trình.'
-                    );
-                    return;
-                }
-
-                location.replace(
-                    boot.base + (
-                        result.next_lesson_id
-                            ? '/learning/lesson/' +
-                                result.next_lesson_id
-                            : '/learning'
-                    )
-                );
-            } catch (error) {
-                text('lu-claim-note', error.message);
-                $('lu-claim-retry').hidden = false;
-            } finally {
-                saving = false;
+    function updateSummary() {
+        $('hearts-display').textContent = '❤️'.repeat(session.current_hp) + '🖤'.repeat(session.max_hp - session.current_hp);
+        $('hearts-display').setAttribute('aria-label', `${session.current_hp}/${session.max_hp} tim`);
+        $('progress').textContent = `Đã trả lời ${session.answered_main}/${session.total_questions} câu chính · ${session.stats.xp} XP · Chuỗi ${session.stats.streak} ngày`;
+    }
+    function renderSession() {
+        $('flashcards').hidden = true;
+        $('feedback').textContent = '';
+        updateSummary();
+        const done = session.status !== 'in_progress';
+        $('exercise').hidden = done;
+        $('result').hidden = !done;
+        if (done) {
+            $('result-title').textContent = session.status === 'completed' ? 'Hoàn thành bài học!' : 'Lượt học chưa đạt';
+            $('result-score').textContent = `${session.correct_count}/${session.total_questions} câu chính đúng · +${session.xp_earned} XP`;
+            if (session.status === 'completed' && session.review_initialization) {
+                const report = session.review_initialization;
+                $('result-score').textContent += report.legacy_questions
+                    ? ' · Lượt cũ thiếu dữ liệu từ; học lượt mới để ghi lịch ôn.'
+                    : ' · Đã lưu lịch ôn cá nhân, từ mới hẹn sau một ngày.';
             }
-        }
-
-        $('lu-claim-retry').addEventListener('click', claim);
-        claim();
-        return;
-    }
-
-    if (boot.mode !== 'lesson') return;
-
-    const words = Array.isArray(boot.words) ? boot.words : [];
-    const focus = new URLSearchParams(location.search).get('focus');
-
-    let wordIndex = 0;
-    let state = null;
-    let busy = false;
-    let initializing = true;
-    let pending = null;
-    let chosenTokens = [];
-    let mediaFault = false;
-    let sound = null;
-    let generation = 0;
-
-    function note(message = '', error = false) {
-        text('lu-feedback', message);
-        $('lu-feedback').classList.toggle('error', error);
-    }
-
-    function media(value) {
-        if (
-            typeof value !== 'string'
-            || /[\x00-\x20<>"'\\]/.test(value)
-        ) {
-            return null;
-        }
-
-        if (value.startsWith('/') && !value.startsWith('//')) {
-            return boot.base
-                && !value.startsWith(boot.base + '/')
-                ? boot.base + value
-                : value;
-        }
-
-        try {
-            return new URL(value).protocol === 'https:'
-                ? value
-                : null;
-        } catch {
-            return null;
-        }
-    }
-
-    function stopSound() {
-        sound?.pause();
-        $('lu-audio').pause();
-
-        if ('speechSynthesis' in window) {
-            speechSynthesis.cancel();
-        }
-    }
-
-    function showWords() {
-        stopSound();
-        note();
-
-        $('lu-words').hidden = false;
-        $('lu-question').hidden = true;
-        $('lu-result').hidden = true;
-
-        const word = words[wordIndex];
-
-        text('lu-word', word?.english || 'Chưa có từ vựng');
-        text('lu-ipa', word?.ipa || '');
-        text('lu-meaning', word?.vietnamese || '');
-        text('lu-example-en', word?.example || '');
-        text('lu-example-vi', word?.example_translation || '');
-
-        $('lu-example').hidden =
-            !word?.example && !word?.example_translation;
-
-        $('lu-prev').disabled = !word || wordIndex === 0;
-        $('lu-next-word').disabled =
-            !word || wordIndex >= words.length - 1;
-        $('lu-sound').disabled = !word;
-
-        const src = media(word?.image);
-
-        $('lu-image').hidden = !src;
-        $('lu-image').alt = nfc(word?.english || '');
-
-        if (src) {
-            $('lu-image').src = src;
-        } else {
-            $('lu-image').removeAttribute('src');
-        }
-
-        text(
-            'lu-count',
-            word
-                ? 'Từ ' + (wordIndex + 1) + '/' + words.length
-                : ''
-        );
-
-        $('lu-progress').max = Math.max(1, words.length);
-        $('lu-progress').value = word ? wordIndex + 1 : 0;
-
-        text('lu-hearts', '');
-
-        $('lu-start').disabled =
-            initializing
-            || busy
-            || (!boot.ready && !boot.sessionId && !state);
-
-        text(
-            'lu-start',
-            state ? 'Tiếp tục →' : 'Luyện tập →'
-        );
-    }
-
-    $('lu-image').addEventListener('error', () => {
-        $('lu-image').hidden = true;
-    });
-
-    $('lu-prev').addEventListener('click', () => {
-        if (wordIndex > 0) {
-            wordIndex--;
-            showWords();
-        }
-    });
-
-    $('lu-next-word').addEventListener('click', () => {
-        if (wordIndex < words.length - 1) {
-            wordIndex++;
-            showWords();
-        }
-    });
-
-    $('lu-sound').addEventListener('click', () => {
-        const word = words[wordIndex];
-
-        if (!word) return;
-
-        stopSound();
-
-        const src = media(word.audio);
-
-        if (src) {
-            sound = new Audio(src);
-
-            sound.play().catch(() => {
-                note('Chưa phát được âm thanh.', true);
-            });
-        } else if ('speechSynthesis' in window) {
-            const utterance = new SpeechSynthesisUtterance(
-                nfc(word.english)
-            );
-
-            utterance.lang = 'en-US';
-            speechSynthesis.speak(utterance);
-        } else {
-            note('Từ này chưa có âm thanh.', true);
-        }
-    });
-
-    function summary() {
-        text(
-            'lu-count',
-            state.answered_main + '/' + state.total_questions
-        );
-
-        text(
-            'lu-hearts',
-            '♥ ' + state.current_hp + '/' + state.max_hp
-        );
-
-        $('lu-progress').max = state.total_questions;
-        $('lu-progress').value = state.answered_main;
-    }
-
-    function inputAnswer() {
-        const q = state.question;
-        const host = $('lu-controls');
-
-        if (q.content.options) {
-            return {
-                option_id:
-                    host.querySelector('input:checked')?.value || ''
-            };
-        }
-
-        if (q.type === 'token_order') {
-            return { token_ids: chosenTokens.slice() };
-        }
-
-        if (q.type === 'match_pairs') {
-            return {
-                pairs: [...host.querySelectorAll('select')].map(
-                    select => ({
-                        left_id: select.dataset.leftId,
-                        right_id: select.value
-                    })
-                )
-            };
-        }
-
-        return {
-            text: host.querySelector('input').value
-        };
-    }
-
-    function complete() {
-        if (!state?.question) return false;
-
-        const answer = inputAnswer();
-        const q = state.question;
-
-        if (q.content.options) {
-            return Boolean(answer.option_id);
-        }
-
-        if (q.type === 'token_order') {
-            return answer.token_ids.length === q.content.tokens.length;
-        }
-
-        if (q.type === 'match_pairs') {
-            return answer.pairs.every(pair => pair.right_id)
-                && new Set(
-                    answer.pairs.map(pair => pair.right_id)
-                ).size === answer.pairs.length;
-        }
-
-        return answer.text.trim() !== '';
-    }
-
-    function sync() {
-        $('lu-submit').disabled =
-            busy || mediaFault || (!pending && !complete());
-    }
-
-    function brokenMedia(version) {
-        if (version !== generation) return;
-
-        mediaFault = true;
-        $('lu-media-retry').hidden = false;
-        note('Chưa tải được tài nguyên câu hỏi.', true);
-        sync();
-    }
-
-    function render() {
-        if (!state) return;
-
-        stopSound();
-        note();
-        summary();
-        generation++;
-
-        $('lu-words').hidden = true;
-        $('lu-next-question').hidden = true;
-        $('lu-media-retry').hidden = true;
-
-        const finished = state.status !== 'in_progress';
-
-        $('lu-question').hidden = finished;
-        $('lu-result').hidden = !finished;
-
-        if (finished) {
-            const passed = state.status === 'completed';
-
-            text(
-                'lu-result-title',
-                passed ? 'Bạn làm tốt lắm!' : 'Thử lại một chút nhé.'
-            );
-
-            text(
-                'lu-score',
-                state.correct_count + '/' +
-                state.total_questions + ' câu đúng' +
-                (
-                    !boot.guest && passed
-                        ? ' · +' + (state.xp_earned || 0) + ' XP'
-                        : ''
-                )
-            );
-
-            text(
-                'lu-result-next',
-                passed ? 'Ải tiếp theo →' : 'Thử lại'
-            );
-
             return;
         }
-
-        const q = state.question;
-
-        if (!q) {
-            note('Chưa có câu hỏi. Bạn tải lại trang nhé.', true);
-            return;
-        }
-
-        text(
-            'lu-phase',
-            {
-                main: 'Luyện tập',
-                mistake_review: 'Sửa câu sai',
-                matching: 'Ghép cặp'
-            }[q.phase] || 'Luyện tập'
-        );
-
-        text(
-            'lu-instruction',
-            q.content.instruction || 'Trả lời câu hỏi'
-        );
-
-        text('lu-prompt', q.content.prompt || '');
-
-        const version = generation;
-        const host = $('lu-controls');
-
-        host.replaceChildren();
-        host.className = '';
-
-        chosenTokens = [];
-        mediaFault = false;
-
-        const audio = $('lu-audio');
-        const src = media(q.content.audio);
-
-        audio.hidden = !src;
-
-        if (src) {
-            audio.src = src;
-            audio.load();
-        } else {
-            audio.removeAttribute('src');
-        }
-
-        $('lu-form').hidden = false;
-        text('lu-submit', 'Kiểm tra');
-
-        if (q.content.options) {
-            host.className = 'options';
-
-            q.content.options.forEach((option, i) => {
-                const label = document.createElement('label');
-                label.className = 'option';
-
-                const radio = document.createElement('input');
-                radio.type = 'radio';
-                radio.name = 'answer';
-                radio.value = option.id;
-
-                label.append(radio);
-
-                if (q.type === 'choose_image') {
-                    label.classList.add('picture');
-
-                    const image = document.createElement('img');
-                    image.alt = 'Hình ' + (i + 1);
-
-                    image.addEventListener('error', () => {
-                        brokenMedia(version);
-                    });
-
-                    const url = media(option.image);
-
-                    if (url) {
-                        image.src = url;
-                    } else {
-                        brokenMedia(version);
-                    }
-
+        const question = session.question;
+        if (!question) return;
+        $('phase-label').textContent = { main: 'Bài tập', mistake_review: 'Sửa câu sai — không trừ tim', matching: 'Ghép cặp để hoàn tất bài' }[question.phase];
+        $('instruction').textContent = question.content.instruction;
+        $('prompt').textContent = question.content.prompt;
+        const audio = media(question.content.audio);
+        $('question-audio').hidden = !audio;
+        $('question-audio').pause();
+        if (audio) $('question-audio').src = audio; else $('question-audio').removeAttribute('src');
+        const controls = $('answer-controls');
+        controls.replaceChildren();
+        selectedTokens = [];
+        $('answer-form').hidden = false;
+        $('btn-next-question').hidden = true;
+        $('btn-submit').disabled = false;
+        $('btn-submit').textContent = 'Kiểm tra';
+        if (question.content.options) {
+            controls.className = 'answer-options';
+            question.content.options.forEach((option, index) => {
+                const label = document.createElement('label'); label.className = 'answer-option';
+                const input = document.createElement('input');
+                input.type = 'radio'; input.name = 'option'; input.value = option.id; input.required = true;
+                label.append(input);
+                if (question.type === 'choose_image') {
+                    const image = document.createElement('img'); image.src = media(option.image); image.alt = `Hình ${index + 1}`;
                     label.append(image);
                 } else {
-                    const span = document.createElement('span');
-                    span.textContent = nfc(option.text);
-                    label.append(span);
+                    const text = document.createElement('span'); text.textContent = option.text; label.append(text);
                 }
-
-                host.append(label);
+                controls.append(label);
             });
-        } else if (q.type === 'token_order') {
-            const line = document.createElement('div');
-            line.className = 'token-line';
-
-            const bank = document.createElement('div');
-            bank.className = 'token-bank';
-
-            q.content.tokens.forEach(token => {
-                const button = document.createElement('button');
-
-                button.type = 'button';
-                button.className = 'btn mini';
-                button.textContent = nfc(token.text);
-
+        } else if (question.type === 'token_order') {
+            const sequence = document.createElement('p'); sequence.id = 'token-sequence'; controls.append(sequence);
+            question.content.tokens.forEach(token => {
+                const button = document.createElement('button'); button.type = 'button'; button.textContent = token.text;
                 button.addEventListener('click', () => {
-                    chosenTokens.push(token.id);
-                    button.disabled = true;
-
-                    line.textContent = nfc(
-                        chosenTokens.map(id => (
-                            q.content.tokens.find(
-                                item => item.id === id
-                            ).text
-                        )).join(' ')
-                    );
-
-                    sync();
-                });
-
-                bank.append(button);
+                    selectedTokens.push(token.id); button.disabled = true;
+                    sequence.textContent = selectedTokens.map(id => question.content.tokens.find(t => t.id === id).text).join(' ');
+                }); controls.append(button);
             });
-
-            const reset = document.createElement('button');
-            reset.type = 'button';
-            reset.className = 'btn mini';
-            reset.textContent = 'Xếp lại';
-            reset.addEventListener('click', render);
-
-            bank.append(reset);
-            host.append(line, bank);
-        } else if (q.type === 'match_pairs') {
-            q.content.left.forEach(left => {
-                const label = document.createElement('label');
-                label.className = 'pair';
-
-                const span = document.createElement('span');
-                span.textContent = nfc(left.text);
-
-                const select = document.createElement('select');
-                select.dataset.leftId = left.id;
-
-                select.add(new Option('Chọn từ', ''));
-
-                q.content.right.forEach(right => {
-                    select.add(
-                        new Option(nfc(right.text), right.id)
-                    );
-                });
-
-                label.append(span, select);
-                host.append(label);
+            const clear = document.createElement('button'); clear.type = 'button'; clear.textContent = 'Xếp lại';
+            clear.addEventListener('click', renderSession); controls.append(clear);
+        } else if (question.type === 'match_pairs') {
+            question.content.left.forEach(left => {
+                const label = document.createElement('label'); label.className = 'pair-row';
+                const text = document.createElement('span'); text.textContent = left.text;
+                const select = document.createElement('select'); select.dataset.leftId = left.id; select.required = true;
+                const empty = document.createElement('option'); empty.value = ''; empty.textContent = 'Chọn từ tương ứng'; select.append(empty);
+                question.content.right.forEach(right => {
+                    const option = document.createElement('option'); option.value = right.id; option.textContent = right.text; select.append(option);
+                }); label.append(text, select); controls.append(label);
             });
         } else {
-            const input = document.createElement('input');
-
-            input.type = 'text';
-            input.className = 'answer-input';
-            input.maxLength = 1000;
-            input.autocomplete = 'off';
-            input.setAttribute('aria-label', 'Câu trả lời');
-
-            host.append(input);
-        }
-
-        sync();
-    }
-
-    $('lu-controls').addEventListener('input', sync);
-    $('lu-controls').addEventListener('change', sync);
-
-    $('lu-audio').addEventListener('error', () => {
-        if (!$('lu-audio').hidden) {
-            brokenMedia(generation);
-        }
-    });
-
-    $('lu-media-retry').addEventListener('click', () => {
-        if (!busy && !pending) {
-            render();
-        }
-    });
-
-    async function start(restart = false) {
-        if (busy || initializing) return;
-
-        if (state && !restart) {
-            render();
-            return;
-        }
-
-        busy = true;
-        $('lu-start').disabled = true;
-        $('lu-result-next').disabled = true;
-
-        try {
-            state = boot.guest
-                ? await api('guest/start', { restart })
-                : await api(
-                    'lessons/' + boot.lessonId + '/sessions',
-                    {}
-                );
-
-            pending = null;
-            render();
-        } catch (error) {
-            note(error.message, true);
-        } finally {
-            busy = false;
-
-            $('lu-start').disabled =
-                !boot.ready && !boot.sessionId && !state;
-
-            $('lu-result-next').disabled = false;
-            sync();
+            const input = document.createElement('input'); input.type = 'text'; input.name = 'text'; input.required = true;
+            input.maxLength = 1000; input.autocomplete = 'off'; input.setAttribute('aria-label', 'Câu trả lời'); controls.append(input);
         }
     }
-
-    $('lu-start').addEventListener('click', () => start());
-    $('lu-show-words').addEventListener('click', showWords);
-
-    $('lu-result-next').addEventListener('click', () => {
-        if (state?.status === 'completed') {
-            if (boot.guest) {
-                gate();
-            } else {
-                location.assign(
-                    boot.base + '/learning/launch?mode=words'
-                );
-            }
-        } else {
-            start(true);
-        }
-    });
-
-    $('lu-next-question').addEventListener('click', render);
-
-    $('lu-form').addEventListener('submit', async event => {
-        event.preventDefault();
-
-        if (
-            busy
-            || !state?.question
-            || (!pending && (!complete() || mediaFault))
-        ) {
-            return;
-        }
-
-        busy = true;
-        $('lu-submit').disabled = true;
-
-        pending ??= {
-            question_id: state.question.id,
-            request_key: [
-                ...crypto.getRandomValues(new Uint8Array(16))
-            ].map(number => (
-                number.toString(16).padStart(2, '0')
-            )).join(''),
-            answer: inputAnswer(),
-            ...(boot.guest ? { session_token: state.id } : {})
-        };
-
-        $('lu-controls')
-            .querySelectorAll('input,select,button')
-            .forEach(control => {
-                control.disabled = true;
-            });
-
+    function readAnswer() {
+        const type = session.question.type;
+        if (session.question.content.options) return { option_id: $('answer-form').elements.option.value };
+        if (type === 'token_order') return { token_ids: selectedTokens.slice() };
+        if (type === 'match_pairs') return { pairs: Array.from($('answer-controls').querySelectorAll('select')).map(select => ({ left_id: select.dataset.leftId, right_id: select.value })) };
+        return { text: $('answer-form').elements.text.value };
+    }
+    $('btn-start').addEventListener('click', async () => {
+        if (busy) return;
+        busy = true; $('btn-start').disabled = true;
         try {
-            const result = await api(
-                boot.guest
-                    ? 'guest/answers'
-                    : 'sessions/' + state.id + '/answers',
-                pending
-            );
-
-            state = result.session;
-            pending = null;
-            summary();
-
-            if (state.status !== 'in_progress') {
-                render();
-            } else {
-                $('lu-form').hidden = true;
-                $('lu-next-question').hidden = false;
-
-                note(
-                    result.is_correct
-                        ? 'Chính xác!'
-                        : 'Chưa đúng. Tiếp tục nhé.'
-                );
-            }
+            session = boot.sessionId ? await api(`sessions/${boot.sessionId}`) : await api(`lessons/${boot.lessonId}/sessions`, {});
+            renderSession();
+        } catch (error) { $('feedback').textContent = error.message; }
+        finally { busy = false; $('btn-start').disabled = false; }
+    });
+    $('answer-form').addEventListener('submit', async event => {
+        event.preventDefault(); if (busy) return;
+        busy = true; $('btn-submit').disabled = true;
+        // A lost response reuses the exact body/key. Controls stay frozen until success or a definite rejection.
+        pending ??= { question_id: session.question.id, request_key: crypto.randomUUID?.() || Array.from(crypto.getRandomValues(new Uint8Array(16)), byte => byte.toString(16).padStart(2, '0')).join(''), answer: readAnswer() };
+        const frozen = Array.from($('answer-controls').querySelectorAll('input,button,select'));
+        frozen.forEach(control => { control.disabled = true; });
+        try {
+            const result = await api(`sessions/${session.id}/answers`, pending);
+            session = result.session; pending = null; updateSummary();
+            $('feedback').textContent = result.is_correct ? 'Chính xác!' : 'Chưa chính xác. Hãy tiếp tục hoặc sửa lại khi đến phần sửa sai.';
+            $('answer-form').hidden = true; $('btn-next-question').hidden = false;
         } catch (error) {
+            $('feedback').textContent = error.message;
             if (error.status) {
                 pending = null;
-
-                if ([
-                    'GUEST_EXPIRED',
-                    'GUEST_SESSION_CHANGED'
-                ].includes(error.code)) {
-                    location.reload();
-                    return;
-                }
-
-                try {
-                    const fresh = await api(
-                        boot.guest
-                            ? 'guest/session'
-                            : 'sessions/' + state.id
-                    );
-
-                    if (fresh) {
-                        state = fresh;
-                        render();
-                    }
-                } catch {
-                    location.reload();
-                    return;
-                }
-            } else {
-                text('lu-submit', 'Gửi lại');
-            }
-
-            note(error.message, true);
-        } finally {
-            busy = false;
-            sync();
-        }
+                try { session = await api(`sessions/${session.id}`); renderSession(); $('feedback').textContent = error.message; }
+                catch { frozen.forEach(control => { control.disabled = false; }); }
+            } else { $('btn-submit').textContent = 'Gửi lại câu trả lời'; }
+            $('btn-submit').disabled = false;
+        } finally { busy = false; }
     });
-
-    async function init() {
-        showWords();
-
-        try {
-            if (boot.guest) {
-                state = await api('guest/session');
-            } else if (boot.sessionId) {
-                state = await api('sessions/' + boot.sessionId);
-            }
-
-            initializing = false;
-
-            if (focus === 'words') {
-                showWords();
-            } else if (state) {
-                render();
-            } else if (focus === 'practice' && boot.ready) {
-                await start();
-            }
-        } catch (error) {
-            note(error.message, true);
-        } finally {
-            initializing = false;
-
-            $('lu-start').disabled =
-                !boot.ready && !boot.sessionId && !state;
-        }
-    }
-
-    init();
+    $('btn-next-question').addEventListener('click', renderSession);
+    showWord();
 })();

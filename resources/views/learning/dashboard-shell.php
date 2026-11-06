@@ -58,6 +58,8 @@ $icon = static function (string $name): string {
             'M8 3h8v6a4 4 0 0 1-8 0ZM8 5H4v3a4 4 0 0 0 4 4m8-7h4v3a4 4 0 0 1-4 4m-4 1v5m-4 3h8m-6-3h4',
         'arrow' =>
             'M4 12h15m-6-6 6 6-6 6',
+        'back' =>
+            'M20 12H5m7-7-7 7 7 7',
         'check' =>
             'm5 12 4 4L19 6',
         'lock' =>
@@ -88,16 +90,23 @@ $icon = static function (string $name): string {
 <html lang="vi">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1">
 
-    <meta name="description"
-          content="Học từ vựng qua flashcard, hình ảnh và âm thanh cùng Doulingo.">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <meta
+        name="description"
+        content="Học từ vựng qua flashcard, hình ảnh và âm thanh cùng Doulingo."
+    >
 
     <title><?= $e($pageTitle) ?></title>
 
-    <link rel="stylesheet"
-          href="<?= $e($b) ?>/assets/css/learning-dashboard.css?v=1">
+    <link
+        rel="stylesheet"
+        href="<?= $e($b) ?>/assets/css/learning-dashboard.css?v=1"
+    >
 
     <style>
         .ld .ld-shortcuts {
@@ -108,6 +117,17 @@ $icon = static function (string $name): string {
             margin-top: auto;
         }
 
+        .ld .ld-back-row {
+            display: flex;
+            margin-bottom: 18px;
+        }
+
+        .ld .ld-back-link {
+            min-height: 44px;
+            padding: 10px 16px;
+            gap: 8px;
+        }
+
         @media (max-width: 680px) {
             .ld .ld-shortcuts {
                 grid-template-columns: 1fr;
@@ -115,8 +135,10 @@ $icon = static function (string $name): string {
         }
     </style>
 
-    <script src="<?= $e($b) ?>/assets/js/learning-ui.js?v=13"
-            defer></script>
+    <script
+        src="<?= $e($b) ?>/assets/js/learning-ui.js?v=13"
+        defer
+    ></script>
 </head>
 
 <body class="ld">
@@ -126,10 +148,11 @@ $icon = static function (string $name): string {
 
 <div class="ld-app">
     <aside class="ld-sidebar">
-        <a class="ld-brand"
-           href="<?= $e($b) ?>/"
-           aria-label="Doulingo — Trang chủ">
-
+        <a
+            class="ld-brand"
+            href="<?= $e($b) ?>/"
+            aria-label="Doulingo — Trang chủ"
+        >
             <span class="ld-mark">D</span>
 
             <span>
@@ -172,8 +195,10 @@ $icon = static function (string $name): string {
 
     <div class="ld-workspace">
         <header class="ld-topbar">
-            <a class="ld-mobile-brand"
-               href="<?= $e($b) ?>/">
+            <a
+                class="ld-mobile-brand"
+                href="<?= $e($b) ?>/"
+            >
                 <span class="ld-mark">D</span>
                 <strong>Doulingo.</strong>
             </a>
@@ -187,9 +212,10 @@ $icon = static function (string $name): string {
                 </strong>
             </div>
 
-            <a class="ld-account"
-               href="<?= $e($b) ?><?= $isGuest ? '/login' : '/profile' ?>">
-
+            <a
+                class="ld-account"
+                href="<?= $e($b) ?><?= $isGuest ? '/login' : '/profile' ?>"
+            >
                 <span><?= $icon('user') ?></span>
 
                 <?= $isGuest ? 'Đăng nhập' : 'Tài khoản' ?>
@@ -197,3 +223,84 @@ $icon = static function (string $name): string {
         </header>
 
         <main class="ld-content" id="main-content">
+            <?php if (
+                in_array(
+                    $navActive,
+                    ['explore', 'practice'],
+                    true
+                )
+            ): ?>
+                <div class="ld-back-row">
+                    <a
+                        class="ld-btn ld-btn-outline ld-back-link"
+                        href="<?= $e($b) ?>/"
+                        data-studio-back
+                    >
+                        <?= $icon('back') ?>
+                        Quay về
+                    </a>
+                </div>
+
+                <script>
+                (() => {
+                    'use strict';
+
+                    const link = document.querySelector(
+                        '[data-studio-back]'
+                    );
+
+                    if (!link || !document.referrer) {
+                        return;
+                    }
+
+                    let previous;
+                    let root;
+
+                    try {
+                        previous = new URL(document.referrer);
+                        root = new URL(link.href);
+                    } catch {
+                        return;
+                    }
+
+                    if (previous.origin !== root.origin) {
+                        return;
+                    }
+
+                    const base = root.pathname.replace(/\/+$/, '');
+
+                    if (
+                        base
+                        && previous.pathname !== base
+                        && !previous.pathname.startsWith(base + '/')
+                    ) {
+                        return;
+                    }
+
+                    const path = previous.pathname.slice(
+                        base.length
+                    ) || '/';
+
+                    if (
+                        path !== '/'
+                        && path !== '/reviews'
+                        && !/^\/learning(?:\/|$)/.test(path)
+                    ) {
+                        return;
+                    }
+
+                    if (
+                        /^\/learning\/(?:continue|launch)(?:\/|$)/
+                            .test(path)
+                    ) {
+                        return;
+                    }
+
+                    if (previous.href === window.location.href) {
+                        return;
+                    }
+
+                    link.href = previous.href;
+                })();
+                </script>
+            <?php endif; ?>
