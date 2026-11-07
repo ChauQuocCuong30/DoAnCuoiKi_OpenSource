@@ -490,8 +490,7 @@ final class GuestLearningService
                 'phase' => $question['phase'],
                 'type' => $question['snapshot']['type'],
                 'content' => $this->grader->publicContent($question['snapshot'],
-                    in_array($question['snapshot']['type'], ['listen_type', 'listen_select'], true)
-                        ? $this->repo->getWordsByLessonId((int) $state['lesson']['id']) : []),
+                    $this->repo->getWordsByLessonId((int) $state['lesson']['id'])),
             ],
         ];
     }

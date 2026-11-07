@@ -65,18 +65,18 @@ final class LearningRepository
         if ($sameTopic !== '' && \App\Shared\Cefr::installed($this->db)) {
             $sameTopic .= " AND w.cefr_level=CASE l.level WHEN 1 THEN 'A1' WHEN 2 THEN 'A2' WHEN 3 THEN 'B1' WHEN 4 THEN 'B2' WHEN 5 THEN 'C1' WHEN 6 THEN 'C2' END";
         }
-        return $this->rows('SELECT w.* FROM words w
+        return \App\Modules\Learning\Services\WordArtwork::decorate($this->rows('SELECT w.* FROM words w
             JOIN lesson_words lw ON lw.word_id = w.id JOIN lessons l ON l.id = lw.lesson_id
             JOIN topics t ON t.id = l.topic_id JOIN topics wt ON wt.id = w.topic_id
             WHERE lw.lesson_id = ? AND w.is_active = 1 AND l.is_active = 1
-            AND t.is_active = 1 AND wt.is_active = 1' . $sameTopic . ' ORDER BY w.id', [$lessonId]);
+            AND t.is_active = 1 AND wt.is_active = 1' . $sameTopic . ' ORDER BY w.id', [$lessonId]));
     }
 
     public function getWordsByTopicId(int $topicId, ?string $cefr = null): array
     {
         $filter=$cefr!==null && \App\Shared\Cefr::installed($this->db);
-        return $this->rows('SELECT w.* FROM words w JOIN topics t ON t.id=w.topic_id
-            WHERE w.topic_id=? AND w.is_active=1 AND t.is_active=1'.($filter?' AND w.cefr_level=?':'').' ORDER BY w.id', $filter?[$topicId,$cefr]:[$topicId]);
+        return \App\Modules\Learning\Services\WordArtwork::decorate($this->rows('SELECT w.* FROM words w JOIN topics t ON t.id=w.topic_id
+            WHERE w.topic_id=? AND w.is_active=1 AND t.is_active=1'.($filter?' AND w.cefr_level=?':'').' ORDER BY w.id', $filter?[$topicId,$cefr]:[$topicId]));
     }
 
     public function syncForLesson(int $id): void
@@ -103,6 +103,12 @@ final class LearningRepository
             AND (e.word_id IS NULL OR (w.is_active = 1 AND wt.is_active = 1)) ORDER BY e.id', [$lessonId]);
     }
 
+    public function chapterStates(int $userId): ?array
+    {
+        $chapters=new ChapterRepository($this->db);
+        return $chapters->installed()?$chapters->states($userId):null;
+    }
+
     public function completedLessons(int $userId): array
     {
         return array_map('intval', array_column($this->rows("SELECT DISTINCT lesson_id FROM learning_sessions
@@ -111,6 +117,12 @@ final class LearningRepository
 
     public function unlocked(int $userId, array $lesson): bool
     {
+        $chapterRepo=new ChapterRepository($this->db);
+        if ($chapterRepo->installed()) {
+            $chapter=$chapterRepo->states($userId)[(int)$lesson['topic_id']]??null;
+            if ($chapter!==null && !$chapter['unlocked']) return false;
+            if ($chapter!==null && $chapter['passed']) return true;
+        }
         if ($this->managedLesson((int) $lesson['id'])) {
             return $this->rows("SELECT c.lesson_id FROM learning_topic_catalog c
                 JOIN lessons l ON l.id=c.lesson_id JOIN topics t ON t.id=c.topic_id

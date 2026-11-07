@@ -106,6 +106,16 @@ final class ExerciseService
     public function publicContent(array $snapshot, array $words): array
     {
         $content = $snapshot['content'];
+        if (in_array($snapshot['type'], ['fill_blank','translate_text','choose_meaning','token_order'], true)) {
+            foreach ($words as $word) {
+                if (in_array((int)$word['id'], $snapshot['target_word_ids'], true)) {
+                    $image=WordArtwork::image($word);
+                    if ($image!==null) $content['hint_image']=$image;
+                    break;
+                }
+            }
+        }
+
         if (isset($content['media_fallback'])) { return $content; }
         if (!in_array($snapshot['type'], ['listen_type', 'listen_select'], true)) { return $content; }
         $word = null;

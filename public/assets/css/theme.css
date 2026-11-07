@@ -46,3 +46,178 @@ html[data-theme="dark"] .brand-panel .face.front{color:var(--theme-ink)}
 
 .result-page .top nav{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
 @media(max-width:680px){.result-page .top{flex-wrap:wrap;gap:12px}.result-page .top nav{width:100%;gap:10px}}
+
+/* Placement: shared light/dark answer states. */
+html[data-theme] .dq-demo {
+  --body: var(--theme-muted);
+  --line: var(--theme-line);
+  --card: var(--theme-surface);
+  --green: var(--dq-green);
+  --green2: var(--dq-green-edge);
+  --bad: var(--theme-bad);
+}
+html[data-theme] .dq-demo .opt,
+html[data-theme] .dq-demo .lv,
+html[data-theme] .dq-demo .test-card {
+  background: var(--theme-surface);
+  color: var(--theme-ink);
+  border-color: var(--theme-line);
+}
+html[data-theme] .dq-demo .opt.sel {
+  background: var(--theme-selected);
+  color: var(--theme-ink);
+  border-color: var(--dq-green);
+}
+html[data-theme] .dq-demo .opt.right {
+  background: var(--theme-good-bg);
+  color: var(--theme-good);
+  border-color: var(--theme-good);
+}
+html[data-theme] .dq-demo .opt.wrong {
+  background: var(--theme-bad-bg);
+  color: var(--theme-bad);
+  border-color: var(--theme-bad);
+}
+html[data-theme] .dq-demo .opt.right .n,
+html[data-theme] .dq-demo .opt.wrong .n {
+  color: inherit;
+  border-color: currentColor;
+  background: transparent;
+}
+html[data-theme] .dq-demo .opt.dim { opacity: 0.8; }
+html[data-theme] .dq-demo .speak {
+  background: var(--dq-green);
+  color: var(--dq-on-green);
+  box-shadow: 0 4px 0 var(--dq-green-edge);
+}
+html[data-theme] .dq-demo .stat,
+html[data-theme] .dq-demo .steps li {
+  background: var(--theme-surface);
+  color: var(--theme-ink);
+  border-color: var(--theme-line);
+}
+
+/* Word introduction. */
+html[data-theme] .lu .word-art {
+  background: var(--theme-soft);
+  border: 1px solid var(--theme-line);
+}
+html[data-theme] .lu .word-art img { background: transparent; }
+html[data-theme] .lu .word-title { color: var(--theme-ink); }
+html[data-theme] .lu .ipa,
+html[data-theme] .lu .meaning,
+html[data-theme] .lu .word-media-empty,
+html[data-theme] .lu .player-count { color: var(--theme-muted); }
+html[data-theme] .lu .ipa,
+html[data-theme] #ls-ipa {
+  font-family: "Segoe UI", "Arial", sans-serif;
+  font-size: 18px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+html[data-theme] .lu .ipa:empty,
+html[data-theme] #ls-ipa:empty { display: none; }
+html[data-theme] .lu .example {
+  background: var(--theme-soft);
+  color: var(--theme-ink);
+}
+html[data-theme] .lu .example strong,
+html[data-theme] .lu .example small { color: var(--theme-muted); }
+html[data-theme] .lu .word-grid > * { min-width: 0; }
+
+/* Explore and practice. */
+html[data-theme] .ld .ls-hero {
+  background: var(--theme-soft);
+  border-color: var(--theme-line);
+}
+html[data-theme] .ld .ls-card,
+html[data-theme] .ld .ls-flashcard,
+html[data-theme] .ld .ls-tabs a,
+html[data-theme] .ld .ls-word-list button {
+  background: var(--theme-surface);
+  color: var(--theme-ink);
+  border-color: var(--theme-line);
+}
+html[data-theme] .ld .ls-picture,
+html[data-theme] .ld .ls-example {
+  background: var(--theme-soft);
+  color: var(--theme-ink);
+  border-color: var(--theme-line);
+}
+html[data-theme] .ld .ls-word-copy h2 { color: var(--theme-ink); }
+html[data-theme] .ld .ls-muted,
+html[data-theme] .ld .ls-hero p,
+html[data-theme] .ld .ls-card p,
+html[data-theme] .ld .ls-example small,
+html[data-theme] .ld .ls-audio-note { color: var(--theme-muted); }
+html[data-theme] .ld .ls-tabs a[aria-current],
+html[data-theme] .ld .ls-word-list button[aria-current],
+html[data-theme] .ld .ls-number {
+  background: var(--theme-selected);
+  color: var(--theme-good);
+  border-color: var(--theme-good);
+}
+html[data-theme] .ld .ls-notice {
+  background: var(--theme-soft);
+  color: var(--theme-ink);
+  border-color: var(--theme-line);
+}
+html[data-theme] .ld .ld-btn-yellow { color: #193d30 !important; }
+
+/* Reviews. */
+html[data-theme] .review-shell .flashcard,
+html[data-theme] .review-shell .benefit-card,
+html[data-theme] .review-shell .guide-card {
+  background: var(--theme-surface);
+  color: var(--theme-ink);
+  border-color: var(--theme-line);
+}
+html[data-theme] .review-shell .flashcard p,
+html[data-theme] .review-shell .benefit-card p,
+html[data-theme] .review-shell .guide-note { color: var(--theme-muted); }
+html[data-theme] .review-shell .flashcard img {
+  display: block;
+  max-width: 100%;
+  max-height: 240px;
+  margin-inline: auto;
+  object-fit: contain;
+}
+html[data-theme] .review-shell .flashcard img[hidden] { display: none; }
+
+/* Admin. */
+html[data-theme] body[data-app-base] .paper-panel,
+html[data-theme] body[data-app-base] dialog {
+  background: var(--theme-surface);
+  color: var(--theme-ink);
+  border-color: var(--theme-line);
+}
+html[data-theme] body[data-app-base] input,
+html[data-theme] body[data-app-base] textarea,
+html[data-theme] body[data-app-base] select {
+  background: var(--theme-surface);
+  color: var(--theme-ink);
+  border-color: var(--theme-line);
+}
+html[data-theme] body[data-app-base] input::placeholder,
+html[data-theme] body[data-app-base] textarea::placeholder { color: var(--theme-muted); }
+html[data-theme] body[data-app-base] th {
+  background: var(--theme-soft);
+  color: var(--theme-ink);
+}
+html[data-theme] body[data-app-base] td { border-color: var(--theme-line); }
+html[data-theme] body[data-app-base] .notice.is-error {
+  background: var(--theme-bad-bg);
+  color: var(--theme-bad);
+  border-color: var(--theme-bad);
+}
+html[data-theme] body[data-app-base] .badge.active {
+  background: var(--theme-good-bg);
+  color: var(--theme-good);
+  border-color: var(--theme-good);
+}
+@media (max-width: 680px) {
+  html[data-theme] .lu .word-grid,
+  html[data-theme] .ld .ls-word-grid { grid-template-columns: minmax(0, 1fr); }
+  html[data-theme] .lu .word-actions,
+  html[data-theme] .ld .ls-controls { flex-wrap: wrap; }
+}

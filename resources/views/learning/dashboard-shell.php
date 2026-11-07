@@ -34,12 +34,14 @@ $navTitles = [
     'progress' => 'Tiến độ',
     'explore' => 'Khám phá từ mới',
     'practice' => 'Luyện tập',
+    'reviews' => 'Ôn tập từ vựng',
 ];
 
 $navItems = [
     ['home', '/', 'home', 'Trang chủ'],
     ['path', '/learning', 'map', 'Lộ trình học'],
     ['progress', '/learning/progress', 'chart', 'Tiến độ'],
+    ...($isGuest ? [] : [['reviews', '/reviews', 'book', 'Ôn tập từ vựng'],]),
     ['placement', '/placement', 'chart', 'Kiểm tra trình độ demo'],
     ...($isGuest ? [] : [['hearts', '/learning/hearts', 'heart', 'Ôn từ sai · Hồi tim']]),
 ];
@@ -145,9 +147,16 @@ $icon = static function (string $name): string {
             gap: 8px;
         }
 
-        @media (max-width: 680px) {
-            .ld .ld-shortcuts {
-                grid-template-columns: 1fr;
+        @media (max-width: 900px) {
+            .ld .ld-bottom-nav {
+                display: flex;
+                overflow-x: auto;
+                gap: 8px;
+            }
+
+            .ld .ld-bottom-nav a {
+                flex: 1 0 100px;
+                white-space: nowrap;
             }
         }
     </style>
@@ -156,7 +165,8 @@ $icon = static function (string $name): string {
         src="<?= $e($b) ?>/assets/js/learning-ui.js?v=14"
         defer
     ></script>
-<?php require dirname(__DIR__) . '/layouts/theme-head.php'; ?></head>
+<?php require dirname(__DIR__) . '/layouts/theme-head.php'; ?><link rel="stylesheet" href="<?= $e($b) ?>/assets/css/chapter-path.css?v=1">
+</head>
 
 <body class="ld">
 <a class="ld-skip" href="#main-content">

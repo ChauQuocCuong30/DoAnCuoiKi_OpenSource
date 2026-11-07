@@ -22,6 +22,7 @@ final class ContentCsvImporter
         'image_license',
         'audio_source',
         'audio_license',
+        'thiings_icon_url',
     ];
     public function __construct(private ContentRepository $repo) {}
     public function preview(string $csv, string $duplicateMode = 'error', ?int $topicId = null, string $defaultLevel = 'A1'): array
@@ -39,6 +40,7 @@ final class ContentCsvImporter
             ContentInput::fail('CSV phải mã hóa UTF-8.');
         }
         $csv = preg_replace('/^\xEF\xBB\xBF/', '', $csv);
+        $csv = str_replace(["\r\r\n", "\r\n", "\r"], "\n", $csv);
         $this->syntax($csv);
         $stream = fopen('php://temp', 'w+');
         fwrite($stream, $csv);
@@ -75,6 +77,10 @@ final class ContentCsvImporter
                         ContentInput::fail('Thiếu hoặc thừa cột.');
                     }
                     $b = array_combine($headers, $values);
+                    if (trim((string) ($b['image_source'] ?? '')) === '') {
+                        $b['image_source'] = trim((string) ($b['thiings_icon_url'] ?? ''));
+                    }
+                    unset($b['thiings_icon_url']);
                     if ($topicId !== null) {
                         if (($b['topic_id'] ?? '') !== '' && ContentInput::id($b['topic_id']) !== $topicId) {
                             ContentInput::fail('topic_id trong CSV khác sách đang chọn.');
@@ -115,7 +121,7 @@ final class ContentCsvImporter
                         );
                     }
                     $seen[$identity] = $record;
-                    if ($this->repo->duplicate($w) !== null) {
+                    if ($this->repo->duplicate($w) !== null && $duplicateMode !== 'update') {
                         if ($duplicateMode === 'skip') { $skipped++; continue; }
                         ContentInput::fail(
                             'Từ/nghĩa đã có trong database, kể cả từ đã ẩn.',
@@ -196,8 +202,8 @@ final class ContentCsvImporter
     }
     public static function duplicateMode(string $mode): string
     {
-        if (!in_array($mode, ['error', 'skip'], true)) {
-            ContentInput::fail('Chế độ từ trùng phải là error hoặc skip.');
+        if (!in_array($mode, ['error', 'skip', 'update'], true)) {
+            ContentInput::fail('Chế độ từ trùng phải là error, skip hoặc update.');
         }
         return $mode;
     }
@@ -205,34 +211,49 @@ final class ContentCsvImporter
     {
         self::duplicateMode($duplicateMode);
         if (!$rows || count($rows) > 1000) {
-            ContentInput::fail('Bản xem trước không hợp lệ.');
+            ContentInput::fail('Bản nhập không hợp lệ.');
         }
         return $this->repo->transaction(function () use ($rows, $duplicateMode) {
-            // Khóa các chủ đề theo cùng thứ tự; mọi ghi CSV là một transaction.
-            $topics = array_values(
-                array_unique(
-                    array_column(array_column($rows, 'word'), 'topic_id'),
-                ),
-            );
+            $topics = array_values(array_unique(array_column(array_column($rows, 'word'), 'topic_id')));
             sort($topics, SORT_NUMERIC);
-            foreach ($topics as $id) {
-                $this->repo->topic((int) $id);
-            }
-            $ids = [];
+            foreach ($topics as $id) $this->repo->topic((int) $id);
+            $ids = $updatedIds = [];
             $skipped = 0;
             foreach ($rows as $row) {
-                // Recheck after topic locks: another import may have committed since preview.
-                if ($duplicateMode === 'skip' && $this->repo->duplicate($row['word'], null, true) !== null) {
+                $existing = $this->repo->duplicate($row['word'], null, true);
+                if ($existing !== null && $duplicateMode === 'skip') {
                     $skipped++;
                     continue;
                 }
-                $ids[] = $this->repo->saveWord(
-                    null,
-                    $row['word'],
-                    $row['source'],
-                );
+                if ($existing !== null && $duplicateMode === 'update') {
+                    $id = (int) $existing['id'];
+                    $old = $this->repo->get('words', $id);
+                    foreach (['ipa', 'example', 'example_translation', 'image', 'audio'] as $field) {
+                        $value = $row['word'][$field] ?? null;
+                        if ($value !== null && $value !== '') $old[$field] = $value;
+                    }
+                    foreach (['image', 'audio'] as $media) {
+                        if (!empty($row['word'][$media])) {
+                            foreach (['_source', '_license'] as $suffix) {
+                                $old[$media . $suffix] = $row['source']['manual'][$media . $suffix] ?? '';
+                            }
+                        }
+                    }
+                    $old['topic_id'] = (int) $old['topic_id'];
+                    $old['is_active'] = (int) $old['is_active'];
+                    $data = ContentInput::word($old);
+                    $data['source']['provider'] = 'csv_admin';
+                    $this->repo->saveWord($id, $data['word'], $data['source']);
+                    $updatedIds[] = $id;
+                    continue;
+                }
+                $ids[] = $this->repo->saveWord(null, $row['word'], $row['source']);
             }
-            return ['imported' => count($ids), 'skipped' => $skipped, 'word_ids' => $ids];
+            return [
+                'imported' => count($ids), 'updated' => count($updatedIds),
+                'skipped' => $skipped, 'word_ids' => $ids,
+                'updated_word_ids' => $updatedIds,
+            ];
         });
     }
 }

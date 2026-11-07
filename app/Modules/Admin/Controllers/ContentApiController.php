@@ -29,6 +29,7 @@ final class ContentApiController
             self::class,
             'commit',
         ]);
+        $router->post('/api/v1/admin/content/csv/import', [self::class, 'importCsv']);
         $router->get('/api/v1/admin/content/books', [self::class, 'books']);
         $router->get('/api/v1/admin/content/samples', [self::class, 'samples']);
         $router->get('/api/v1/admin/content/csv/template', [self::class, 'template']);
@@ -150,6 +151,60 @@ final class ContentApiController
         $data = Input::word($b);
         $saved = $repo->saveWord($id, $data['word'], $data['source']);
         Response::data(['id' => $saved], $id === null ? 201 : 200);
+    }
+    public function importCsv(array $params): void
+    {
+        $this->admin();
+        $this->csrf();
+        unset($_SESSION['admin_content_csv']);
+        $db = \App\Core\Database::connection();
+        $file = $_FILES['csv'] ?? null;
+        if (!is_array($file) || ($file['error'] ?? null) !== UPLOAD_ERR_OK
+            || !is_string($file['tmp_name'] ?? null) || !is_uploaded_file($file['tmp_name'])) {
+            Input::fail('Chọn file CSV UTF-8 hợp lệ, tối đa 1 MiB.');
+        }
+        $csv = file_get_contents($file['tmp_name'], false, null, 0, 1048577);
+        if ($csv === false || strlen($csv) > 1048576) {
+            throw new ApiException('CSV_TOO_LARGE', 'CSV tối đa 1 MiB.', 413);
+        }
+        $mode = ContentCsvImporter::duplicateMode(Input::text(
+            $_POST + ['duplicate_mode' => 'skip'], 'duplicate_mode', 10
+        ));
+        $topic = Input::id($_POST['topic_id'] ?? null);
+        $importer = new ContentCsvImporter(new ContentRepository($db));
+        $preview = $importer->preview($csv, $mode, $topic, Input::cefr($_POST['cefr_level'] ?? 'A1'));
+        if ($preview['errors']) {
+            $messages = array_map(static fn ($error) => 'Bản ghi ' . $error['record'] . ': ' . $error['message'], array_slice($preview['errors'], 0, 5));
+            throw new ApiException('CSV_INVALID', implode(' | ', $messages), 422, ['errors' => $preview['errors']]);
+        }
+        // Legacy installations may still import A1. Other bands need migration 006.
+        // Inspect all records, including skipped duplicates, before any write.
+        if (!\App\Shared\Cefr::installed($db)) {
+            $needsUpgrade = Input::cefr($_POST['cefr_level'] ?? 'A1') !== 'A1';
+            $stream = fopen('php://temp', 'w+');
+            try {
+                $normalized = preg_replace('/^\xEF\xBB\xBF/', '', $csv);
+                fwrite($stream, str_replace(["\r\r\n", "\r\n", "\r"], "\n", $normalized));
+                rewind($stream);
+                $headers = fgetcsv($stream, 0, ',', '"', '');
+                $column = is_array($headers) ? array_search('cefr_level', $headers, true) : false;
+                while (($values = fgetcsv($stream, 0, ',', '"', '')) !== false) {
+                    if ($values === [null] || $column === false) continue;
+                    $band = trim((string) ($values[$column] ?? ''));
+                    if ($band !== '' && Input::cefr($band) !== 'A1') $needsUpgrade = true;
+                }
+            } finally {
+                fclose($stream);
+            }
+            if ($needsUpgrade) {
+                throw new ApiException('SCHEMA_REQUIRED', 'CSDL chưa có cefr_level. Cần áp dụng migration 006 để nhập A2–C2.', 409);
+            }
+        }
+        $result = $preview['rows']
+            ? $importer->commit($preview['rows'], $mode)
+            : ['imported' => 0, 'updated' => 0, 'skipped' => 0];
+        $result['skipped'] += $preview['skipped_count'];
+        Response::data($result, 201);
     }
     public function preview(array $params): void
     {

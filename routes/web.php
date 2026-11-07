@@ -9,6 +9,7 @@ use App\Modules\Learning\Controllers\GuestLearningController;
 use App\Modules\Learning\Controllers\LearningStudioController;
 
 return static function (Router $router): void {
+    $router->get('/learning/chapters/{id}/challenge', [\App\Modules\Learning\Controllers\ChapterController::class, 'page']);
     ContentController::register($router);
     $router->get('/learning/hearts', [\App\Modules\Learning\Controllers\HeartPracticeController::class, 'page']);
 

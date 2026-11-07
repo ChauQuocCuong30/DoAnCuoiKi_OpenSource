@@ -20,6 +20,18 @@
     window.DLQuestionUI = {mount({question:q, host, words=[], base='', autoReadDelay=0,
         onChange=()=>{}, onBrokenMedia=()=>{}}) {
         const c = q.content || {}, selected = [], paired = new Map();
+        const artwork=document.querySelector('.dq-prompt-row > img');
+        if (artwork) {
+            const value=c.hint_image;
+            const valid=typeof value==='string'&&!/[\s<>"'\\]/.test(value)&&((value.startsWith('/')&&!value.startsWith('//'))||/^https:\/\//.test(value));
+            const prefix=String(base||'').replace(/\/+$/,'');
+            artwork.classList.add('dq-word-art');
+            artwork.hidden=!valid;artwork.alt='Gợi ý hình ảnh';
+            artwork.onerror=()=>{artwork.hidden=true;};
+            if(valid)artwork.src=value.startsWith('/')&&prefix&&!value.startsWith(prefix+'/')?prefix+value:value;
+            else artwork.removeAttribute('src');
+        }
+
         let pendingLeft = null, locked = false, autoReadTimer = null;
         host.replaceChildren(); host.className = 'dq-controls';
         const defaults = q.type === 'token_order' ? {prompt:'vi',answer:'en'}

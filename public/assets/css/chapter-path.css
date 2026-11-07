@@ -1,0 +1,57 @@
+/* A chapter is a vocabulary topic. Its existing lessons become a winding path. */
+.ld .ld-stage { overflow:hidden; border:0; background:transparent; margin:32px 0 64px; }
+.ld .ld-stage-head { padding:22px; border-radius:20px; background:#f5a000; color:#17313b; gap:18px; }
+.ld .ld-stage-title span,.ld .ld-stage-title h3 { color:inherit; }
+.ld .ld-stage-art { background:#ffffff33!important; border:0; }
+.ld .ld-stage-count { background:#ffffff55; color:#17313b; }
+.ld .ld-stage-meter { margin:14px 22px; }
+.ld .chapter-actions { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:12px 22px 24px; color:var(--theme-muted); }
+.ld .chapter-actions p { font-size:13px; max-width:380px; }
+.ld .chapter-actions .ld-btn { border:2px solid var(--theme-line); border-bottom-width:5px; color:var(--theme-ink); background:var(--theme-surface); }
+.ld .ld-lessons { position:relative; max-width:540px; margin:0 auto; padding:18px 40px 45px; display:flex; flex-direction:column; align-items:center; gap:30px; }
+.ld .ld-lessons::before { content:""; position:absolute; left:50%; top:42px; bottom:60px; width:5px; background:var(--theme-line); border-radius:8px; }
+.ld .ld-lesson { position:relative; width:190px; min-height:160px; padding:10px; display:flex; flex-direction:column; align-items:center; gap:9px; background:transparent; border:0!important; box-shadow:none; text-align:center; }
+.ld .ld-lesson:nth-child(4n+2) { align-self:flex-end; }
+.ld .ld-lesson:nth-child(4n) { align-self:flex-start; }
+.ld .ld-lesson .ld-level-icon { position:relative; z-index:1; width:78px; height:78px; flex:0 0 78px; border-radius:50%; background:#ffb000; border:0; border-bottom:8px solid #d58a00; color:#fff; box-shadow:0 0 0 9px var(--theme-bg); }
+.ld .ld-lesson .ld-level-icon .ld-icon { width:33px; height:33px; }
+.ld .ld-lesson.is-current { margin:0; background:none; box-shadow:none; }
+.ld .ld-lesson.is-current .ld-level-icon { background:var(--dq-green); border-bottom-color:var(--dq-green-edge); box-shadow:0 0 0 6px var(--theme-bg),0 0 0 12px var(--theme-line); }
+.ld .ld-lesson.is-done .ld-level-icon { background:var(--dq-green); border-bottom-color:var(--dq-green-edge); color:var(--dq-on-green); }
+.ld .ld-lesson.is-locked .ld-level-icon { background:var(--theme-soft); border-bottom-color:var(--theme-line); color:var(--theme-muted); }
+.ld .ld-lesson-copy { flex:none; }
+.ld .ld-lesson-copy h4 { justify-content:center; font-size:14px; overflow-wrap:anywhere; }
+.ld .ld-lesson-copy p { justify-content:center; font-size:12px; }
+.ld .ld-lesson .ld-btn { position:relative; z-index:1; min-height:38px; font-size:12px; background:var(--theme-surface); color:var(--theme-ink)!important; }
+.ld .ld-lesson .ld-btn-green { background:var(--dq-green); color:var(--dq-on-green)!important; }
+.ld .chapter-locked .ld-stage-head { background:var(--theme-soft); color:var(--theme-muted); border:1px solid var(--theme-line); }
+.ld .chapter-passed { font-weight:700; color:var(--theme-good); }
+.dq-lesson .dq-prompt-row > img.dq-word-art { width:150px; height:150px; flex:0 0 150px; object-fit:contain; filter:drop-shadow(0 8px 8px #0002); }
+.chapter-challenge { max-width:900px!important; padding-bottom:70px!important; }
+.chapter-challenge .card { padding:28px 12px; }
+.chapter-challenge h1 { font-size:32px; margin:20px 0; }
+.chapter-challenge p { margin:18px 0; line-height:1.6; }
+.chapter-challenge .btn { margin:16px 10px 0 0; }
+.chapter-challenge .cc-eyebrow { color:var(--theme-muted); font-size:12px; font-weight:700; letter-spacing:2px; }
+.chapter-challenge .cc-progress { display:flex; align-items:center; gap:18px; color:var(--theme-muted); }
+.chapter-challenge #cc-error { color:var(--theme-bad); }
+.chapter-challenge [hidden] { display:none!important; }
+@media(max-width:680px) {
+  .ld .ld-lessons { padding:20px 20px 40px; max-width:360px; gap:20px; }
+  .ld .ld-lesson { width:150px; }
+  .ld .ld-stage-head { padding:18px 14px; }
+  .ld .chapter-actions { padding-inline:14px; }
+  .dq-lesson .dq-prompt-row > img.dq-word-art { width:90px; height:100px; flex-basis:90px; }
+  .dq-lesson .dq-prompt-row { gap:12px; }
+  .chapter-challenge h1 { font-size:25px; }
+}
+
+html[data-theme] .ld-bottom-nav {
+  background:var(--theme-surface); border-color:var(--theme-line);
+}
+html[data-theme] .ld-bottom-nav a { color:var(--theme-muted); }
+html[data-theme] .ld-bottom-nav a.is-active { color:var(--theme-good); }
+
+.ld .ld-skip:not(:focus-visible) {
+  clip-path:inset(50%); width:1px; height:1px; padding:0; overflow:hidden;
+}

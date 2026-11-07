@@ -27,7 +27,13 @@ final class LearningService
             $lesson['unlocked'] = !empty($lesson['active_session']) || $this->repo->unlocked((int) $user['id'], $lesson);
             $lessonsByTopic[$lesson['topic_id']][] = $lesson;
         }
-        return ['topics' => $this->repo->getActiveTopics(), 'lessonsByTopic' => $lessonsByTopic,
+        $topics=$this->repo->getActiveTopics();
+        $chapterStates=$this->repo->chapterStates((int)$user['id']);
+        if ($chapterStates!==null) {
+            foreach ($topics as &$topic) $topic['chapter']=$chapterStates[(int)$topic['id']]??['unlocked'=>false,'passed'=>false,'completed'=>false,'available'=>false];
+            unset($topic);
+        }
+        return ['topics' => $topics, 'lessonsByTopic' => $lessonsByTopic,
             'stats' => $this->stats($user), 'hearts'=>$hearts, 'history'=>$this->repo->history((int)$user['id']), 'resumeSession'=>$active[0]??null];
     }
 
@@ -222,8 +228,7 @@ final class LearningService
             $snapshot = json_decode($question['snapshot_json'], true, 512, JSON_THROW_ON_ERROR);
             $public = ['id' => (int) $question['id'], 'phase' => $question['phase'], 'position' => (int) $question['position'],
                 'type' => $snapshot['type'], 'content' => $this->grader->publicContent($snapshot,
-                    in_array($snapshot['type'], ['listen_type', 'listen_select'], true)
-                        ? $this->repo->getWordsByLessonId((int) $session['lesson_id']) : [])];
+                    $this->repo->getWordsByLessonId((int) $session['lesson_id']))];
         }
         $rules = json_decode($session['rules_json'], true, 512, JSON_THROW_ON_ERROR);
         return ['id' => (int) $session['id'], 'lesson_id' => (int) $session['lesson_id'], 'status' => $session['status'],

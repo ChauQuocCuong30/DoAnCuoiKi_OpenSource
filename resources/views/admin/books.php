@@ -49,8 +49,12 @@ $activeAdminPage = 'words';
         <p id="no-import-topics" class="notice" hidden>Chưa có chủ đề đang hiện. <a href="<?= $escape($appBase . '/admin/topics') ?>">Tạo hoặc mở lại chủ đề</a> để nhập từ.</p>
         <label>Mức mặc định (khi CSV chưa có cột cefr_level)<select id="import-level" name="cefr_level"><?php foreach (\App\Shared\Cefr::LEVELS as $level): ?><option value="<?= $level ?>"><?= $level ?></option><?php endforeach; ?></select></label><fieldset class="import-choice"><legend>Nguồn dữ liệu</legend><label><input type="radio" name="source" value="sample" checked> Bộ từ mẫu có sẵn</label><label><input type="radio" name="source" value="csv"> File CSV của bạn</label></fieldset>
         <div id="sample-fields"><label>Bộ từ mẫu<select id="sample-key" name="sample_key"></select></label><p class="muted">Có sẵn nghĩa tiếng Việt và ví dụ song ngữ. Nhập cả bộ, không cần tra từng từ.</p></div>
-        <div id="csv-fields" hidden><label>File CSV UTF-8<input id="csv-file" type="file" name="csv" accept=".csv,text/csv"></label><p class="muted">Tối đa 1 MiB / 1.000 từ. Cần 4 cột: english, vietnamese, part_of_speech, example. Thêm cột cefr_level (A1, A2, B1, B2, C1, C2) để nhập nhiều mức trong cùng file. Chọn sách ở trên để tự gán chủ đề.</p><a class="text-link" href="<?= $escape($appBase . '/api/v1/admin/content/csv/template') ?>">↓ Tải file CSV mẫu</a></div>
+        <div id="csv-fields" hidden><label>File CSV UTF-8<input id="csv-file" type="file" name="csv" accept=".csv,text/csv"></label><p class="muted">Tối đa 1 MiB / 1.000 từ. Cần 4 cột: english, vietnamese, part_of_speech, example. Thêm cột cefr_level (A1, A2, B1, B2, C1, C2) để nhập nhiều mức trong cùng file. Chọn sách ở trên để tự gán chủ đề. Cột ipa lưu phiên âm; image là URL ảnh trực tiếp hoặc đường dẫn /assets/media/..., kèm image_source và image_license. Cột thiings_icon_url là nguồn tham khảo, không phải tệp ảnh.</p><a class="text-link" href="<?= $escape($appBase . '/api/v1/admin/content/csv/template') ?>">↓ Tải file CSV mẫu</a></div>
         <label class="check-label"><input id="skip-duplicates" type="checkbox" checked> Bỏ qua từ trùng, giữ nguyên dữ liệu đã có</label>
+        <label id="csv-update-row" class="check-label" hidden>
+            <input id="update-existing" type="checkbox">
+            Cập nhật IPA, ví dụ và ảnh cho từ đã có; giữ ID, trạng thái ẩn/hiện và lịch sử học
+        </label>
         <p class="muted">Từ trùng được xác định theo chủ đề, mức CEFR, từ tiếng Anh, từ loại và nghĩa tiếng Việt; bao gồm cả từ đã ẩn.</p>
         <button id="preview-import" class="button-primary" type="submit">Kiểm tra &amp; xem trước →</button>
     </form>
