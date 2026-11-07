@@ -545,7 +545,7 @@ function silentWav() {
 
         assert.equal(
             await page.locator('#lu-hearts').textContent(),
-            ''
+            '♥ ' + mediaState.current_hp + '/' + mediaState.max_hp
         );
 
         await page.setViewportSize({
