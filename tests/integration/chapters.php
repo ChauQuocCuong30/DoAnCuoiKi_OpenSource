@@ -52,11 +52,13 @@ try {
     errorIs(fn()=>$service->answer($uid,$attempt['id'],['unlocked'=>true,'correct_count'=>12]),'VALIDATION_FAILED');
     $private=json_decode($chapters->attempt($uid,$attempt['id'])['questions_json'],true);
     foreach($private as $i=>$q){$body=['question_number'=>$i+1,'request_key'=>bin2hex(random_bytes(12)),'answer'=>answer($q,false)];$reply=$service->answer($uid,$attempt['id'],$body);}
+    check(!empty($reply['feedback']['correct_text']),'Incorrect final answer includes the correct answer');
     check($reply['attempt']['status']==='failed'&&!$chapters->states($uid)[$topics[1]]['unlocked'],'Failed challenge never unlocks a chapter');
     $attempt=$service->start($uid,$topics[1]);$private=json_decode($chapters->attempt($uid,$attempt['id'])['questions_json'],true);
     foreach($private as $i=>$q){
         $body=['question_number'=>$i+1,'request_key'=>bin2hex(random_bytes(12)),'answer'=>answer($q)];$reply=$service->answer($uid,$attempt['id'],$body);
-        if($i===0){$replay=$service->answer($uid,$attempt['id'],$body);check($replay['replayed']&&$replay['attempt']['answered']===1,'A retried answer scores only once');}
+        check(!empty($reply['feedback']['correct_text']),'Submitted question includes answer feedback');
+        if($i===0){$replay=$service->answer($uid,$attempt['id'],$body);check($replay['replayed']&&$replay['attempt']['answered']===1,'A retried answer scores only once');check($replay['feedback']===$reply['feedback'],'Retry returns identical answer feedback');}
     }
     check($reply['attempt']['unlocked']&&$reply['attempt']['status']==='completed','Passing challenge records a chapter unlock');
     foreach($second as $lesson)check($repo->unlocked($uid,$lesson),'Every lesson in the passed chapter opens');

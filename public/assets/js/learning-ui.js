@@ -322,6 +322,7 @@
 
         let wordIndex = 0;
         let state = null;
+        let streakBefore = null;
         let busy = false;
         let initializing = true;
 
@@ -890,6 +891,9 @@
 
         function render() {
             if (!state) return;
+            if (state.status === 'in_progress') {
+                streakBefore = Number(state.stats?.streak || 0);
+            }
 
             stopSound();
             questionUI?.destroy(); questionUI = null;
@@ -953,7 +957,16 @@
 
                 text('lu-result-accuracy', Math.round(100 * state.correct_count / Math.max(1, state.total_questions)) + '%');
                 text('lu-result-xp', boot.guest ? 'Chờ lưu hồ sơ' : '+' + (state.xp_earned || 0) + ' XP');
-                text('lu-result-streak', boot.guest ? 'Tạo hồ sơ để lưu chuỗi ngày học' : (state.stats?.streak || 0) + ' ngày streak');
+                window.DLRewards?.streak($('lu-result-streak'), {
+                    current: state.stats?.streak || 0,
+                    previous: streakBefore,
+                    key: 'lesson:' + state.id,
+                    guest: boot.guest
+                });
+                window.DLRewards?.outcome($('lu-result'), passed, {
+                    key: 'lesson:' + state.id,
+                    fresh: streakBefore !== null
+                });
                 return;
             }
 

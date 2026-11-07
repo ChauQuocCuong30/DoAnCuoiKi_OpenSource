@@ -73,7 +73,8 @@ final class ChapterChallengeService
             if (isset($submissions[$key])) {
                 $old=$submissions[$key];
                 if ($old['number']!==$number || $old['answer']!==$answer) throw new ApiException('REQUEST_KEY_CONFLICT','Mã gửi đã được dùng cho đáp án khác.',409);
-                return ['is_correct'=>$old['correct'],'replayed'=>true,'attempt'=>$this->state($attempt)];
+                return ['is_correct'=>$old['correct'],'replayed'=>true,
+                    'feedback'=>$this->grader->feedback($q,$answer),'attempt'=>$this->state($attempt)];
             }
             if ($attempt['status']!=='in_progress' || (int)$attempt['current_index']!==$number-1) throw new ApiException('QUESTION_OUT_OF_ORDER','Câu hỏi chưa đến lượt hoặc đã trả lời.',409);
             $correct=$this->grader->grade($q,$answer);
@@ -82,7 +83,8 @@ final class ChapterChallengeService
             $attempt['correct_count']=(int)$attempt['correct_count']+(int)$correct;
             if ($attempt['current_index']===count($questions)) $attempt['status']=$attempt['correct_count']*100>=count($questions)*80?'completed':'failed';
             $this->repo->save($attempt,$submissions);
-            return ['is_correct'=>$correct,'replayed'=>false,'attempt'=>$this->state($attempt)];
+            return ['is_correct'=>$correct,'replayed'=>false,
+                'feedback'=>$this->grader->feedback($q,$answer),'attempt'=>$this->state($attempt)];
         });
     }
     private function state(array $attempt): array

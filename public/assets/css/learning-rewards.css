@@ -1,0 +1,67 @@
+/* Checkpoint layout shares Learning's question and feedback components. */
+.chapter-check .cc-view { max-width:800px; margin:38px auto; padding:28px; }
+.chapter-check .cc-view.card { border:2px solid var(--theme-line); border-radius:24px; background:var(--theme-surface); }
+.chapter-check #cc-test { padding:0 20px 190px; }
+.chapter-check #lu-question { padding:0; }
+.chapter-check .cc-eyebrow { display:block; margin:0 0 16px; color:var(--theme-muted); font-size:12px; font-weight:750; letter-spacing:1.2px; }
+.chapter-check .cc-progress { display:flex; align-items:center; gap:16px; margin-bottom:30px; }
+.chapter-check .cc-progress progress { flex:1; min-width:0; height:12px; }
+.chapter-check #cc-count { flex-shrink:0; color:var(--theme-muted); font-size:14px; }
+.chapter-check .cc-view p { line-height:1.8; color:var(--theme-muted); }
+.chapter-check .cc-view h1 { font-size:clamp(26px,4vw,36px); margin:14px 0; }
+.chapter-check #cc-start { margin-top:18px; }
+.chapter-check #cc-form { margin:0; }
+.chapter-check #cc-check-actions { position:fixed; bottom:0; left:0; right:0; z-index:8; display:flex; justify-content:flex-end; gap:16px; padding:18px max(18px,calc((100vw - 760px)/2)); padding-bottom:max(18px,env(safe-area-inset-bottom)); border-top:2px solid var(--dq-line); background:var(--dq-bg); min-height:88px; }
+.chapter-check #cc-feedback-actions.is-wrong #cc-next { background:var(--theme-bad); border-color:var(--theme-bad); color:var(--theme-bad-bg); }
+.chapter-check #cc-next { flex-shrink:0; }
+.chapter-check #cc-result { text-align:center; }
+.chapter-check .cc-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:24px 0; }
+.chapter-check .cc-metrics div { padding:16px 10px; border:1px solid var(--theme-line); border-radius:15px; background:var(--theme-surface); }
+.chapter-check .cc-metrics strong { display:block; font-size:24px; color:var(--theme-ink); }
+.chapter-check .cc-metrics span { display:block; margin-top:6px; font-size:12px; color:var(--theme-muted); }
+.chapter-check .cc-result-actions { display:flex; justify-content:center; flex-wrap:wrap; gap:12px; margin-top:24px; }
+.chapter-check #cc-error { max-width:800px; margin:16px auto; color:var(--theme-bad); }
+.chapter-check #cc-error:not(:empty) { padding:16px; border:1px solid var(--theme-bad); border-radius:12px; background:var(--theme-bad-bg); }
+.lu .lr-outcome { border-radius:24px; }
+.lu .lr-outcome.is-pass { border:2px solid var(--theme-good); background:var(--theme-surface); }
+.lu .lr-outcome.is-fail { border:2px solid var(--theme-bad); background:var(--theme-bad-bg); }
+.lu .lr-outcome.is-pass :is(#cc-result-title,#lu-result-title) { color:var(--theme-good); }
+.lu .lr-outcome.is-fail :is(#cc-result-title,#lu-result-title,.result-score) { color:var(--theme-bad); }
+.lu .lr-outcome.is-fail :is(.scene,.cc-trophy) { display:none; }
+.lu .lr-outcome.is-fail .btn.primary { background:var(--theme-bad); border-color:var(--theme-bad); color:var(--theme-bad-bg); }
+.lr-fail-symbol { display:none; }
+.is-fail > .lr-fail-symbol { display:grid; place-items:center; width:86px; height:86px; margin:0 auto 20px; border:3px solid var(--theme-bad); border-radius:50%; color:var(--theme-bad); font-size:65px; line-height:1; }
+.lr-fireworks { position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:1000; }
+.lr-fireworks i { position:absolute; width:7px; height:7px; border-radius:50%; opacity:0; animation:lr-firework 1s ease-out var(--delay) both; box-shadow:0 0 8px currentColor; }
+@keyframes lr-firework { 0%{transform:translate(0,0) scale(.5);opacity:0} 12%{opacity:1} 100%{transform:translate(var(--dx),var(--dy)) scale(.15);opacity:0} }
+.lu #lu-result-streak.lr-streak { display:inline-flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:14px; margin:24px auto; padding:16px 24px; border:1px solid var(--theme-line); border-radius:18px; background:var(--theme-surface); color:var(--theme-ink); }
+.lr-flame { display:block; width:46px; height:58px; }
+.lr-flame svg { width:100%; height:100%; transform-origin:50% 90%; animation:lr-flicker 1.3s ease-in-out infinite alternate; filter:drop-shadow(0 3px 7px #ff9b1940); }
+.lr-flame-outer { fill:#ff9418; }
+.lr-flame-inner { fill:#ffe26c; }
+.lr-streak.is-empty .lr-flame svg { animation:none; filter:none; opacity:.45; }
+.lr-streak.is-empty .lr-flame path { fill:var(--theme-muted); }
+.lr-number { display:block; position:relative; min-width:2ch; height:40px; overflow:hidden; font-size:32px; line-height:40px; font-weight:850; color:var(--theme-ink); }
+.lr-number-old { position:absolute; inset:0; }
+.lr-number-new { display:block; font:inherit; color:inherit; }
+.lr-streak-label { display:block; color:var(--theme-muted); font-size:13px; }
+.lr-streak small { flex-basis:100%; color:var(--theme-good); font-size:13px; }
+.lr-streak.is-increasing .lr-number-old { animation:lr-number-out .65s ease both; }
+.lr-streak.is-increasing .lr-number-new { animation:lr-number-in .65s ease both; }
+.lr-streak.is-increasing .lr-flame { animation:lr-ignite .8s ease-out both; }
+@keyframes lr-flicker { from{transform:rotate(-3deg) scale(.96,1)} to{transform:rotate(3deg) scale(1.04,1.05)} }
+@keyframes lr-ignite { 0%{transform:scale(.7);filter:brightness(.8)} 50%{transform:scale(1.25);filter:brightness(1.25)} 100%{transform:scale(1);filter:brightness(1)} }
+@keyframes lr-number-out { to{transform:translateY(-110%);opacity:0} }
+@keyframes lr-number-in { from{transform:translateY(110%);opacity:0} to{transform:translateY(0);opacity:1} }
+@media(max-width:680px) {
+    .chapter-check .cc-view { margin:24px auto; padding:22px 18px; }
+    .chapter-check #cc-test { padding:0 4px 190px; }
+    .chapter-check .cc-metrics { gap:8px; }
+    .chapter-check .cc-metrics strong { font-size:21px; }
+    .chapter-check #cc-feedback-actions { gap:12px; padding-inline:16px; }
+    .chapter-check #cc-next { min-width:110px; padding-inline:12px; }
+}
+@media(prefers-reduced-motion:reduce) {
+    .lr-fireworks { display:none; }
+    .lr-flame svg,.lr-streak.is-increasing .lr-flame,.lr-streak.is-increasing .lr-number-old,.lr-streak.is-increasing .lr-number-new { animation:none!important; }
+}

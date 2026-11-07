@@ -75,7 +75,9 @@ $boot = [
     <script defer src="<?= $e($b) ?>/assets/js/learning-audio.js?v=2"></script>
     <script defer src="<?= $e($b) ?>/assets/js/learning-question-ui.js?v=3"></script>
     <script defer src="<?= $e($b) ?>/assets/js/learning-feedback-sound.js?v=1"></script>
-    <script defer src="<?= $e($b) ?>/assets/js/learning-ui.js?v=17"></script>
+    <link rel="stylesheet" href="<?= $e($b) ?>/assets/css/learning-rewards.css?v=1">
+    <script defer src="<?= $e($b) ?>/assets/js/learning-rewards.js?v=1"></script>
+    <script defer src="<?= $e($b) ?>/assets/js/learning-ui.js?v=18"></script>
 <?php require dirname(__DIR__) . '/layouts/theme-head.php'; ?><link rel="stylesheet" href="<?= $e($b) ?>/assets/css/chapter-path.css?v=1"></head>
 
 <body class="lu dq-lesson">
@@ -222,7 +224,7 @@ $boot = [
                 : '' ?></h2>
 
             <div class="dq-prompt-row"><img src="<?= $e($b) ?>/assets/images/learning-ui/notebook.png" width="88" height="88" alt="">
-                <div class="dq-speech-bubble"><button type="button" id="lu-question-sound" class="dq-speaker" aria-label="Nghe lại tiếng Anh" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg></button><button type="button" id="lu-question-slow" class="dq-speaker dq-speaker-slow" aria-label="Nghe chậm tiếng Anh" hidden>0.75×</button><p class="prompt" id="lu-prompt"></p></div>
+                <div class="dq-speech-bubble"><button type="button" id="lu-question-sound" class="dq-speaker" aria-label="Nghe lại tiếng Anh" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg></button><p class="prompt" id="lu-prompt"></p></div>
             </div><p id="lu-audio-note" class="dq-audio-note" role="status"></p>
 
             <audio id="lu-audio"
@@ -283,7 +285,7 @@ $boot = [
 
             <p class="result-score" id="lu-score"></p>
             <div class="dq-result-stats"><div><span>ĐIỂM KINH NGHIỆM</span><strong id="lu-result-xp"></strong></div><div><span>TỶ LỆ ĐÚNG</span><strong id="lu-result-accuracy"></strong></div></div>
-            <p id="lu-result-streak"></p>
+            <div id="lu-result-streak" aria-live="polite"></div>
 
             <div class="actions">
                 <button class="btn primary"

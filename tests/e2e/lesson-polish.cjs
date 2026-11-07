@@ -101,12 +101,36 @@ async function footerContrast(page,label){
    if(process.env.ADMIN_SCREENSHOT_DIR){fs.mkdirSync(process.env.ADMIN_SCREENSHOT_DIR,{recursive:true});await vp.screenshot({path:process.env.ADMIN_SCREENSHOT_DIR+'/tokens-'+mode+'.png',fullPage:true});}
   }
   await mount({type:'fill_blank',content:{prompt:'I ____ new words.',prompt_lang:'en',answer_lang:'en',prompt_audio:'/assets/media/recording.mp3'}});
-  await vp.locator('#lu-controls input').fill('learn');assert.deepEqual(await vp.evaluate(()=>window.__spoken),[]);assert(await vp.locator('#lu-question-sound').isHidden());assert(await vp.locator('#lu-question-slow').isHidden());
+  await vp.locator('#lu-controls input').fill('learn');assert.deepEqual(await vp.evaluate(()=>window.__spoken),[]);assert(await vp.locator('#lu-question-sound').isHidden());assert.equal(await vp.locator('#lu-question-slow').count(),0);
   await mount({type:'translate_text',content:{prompt:'Write the English word.',prompt_lang:'en',answer_lang:'en'}});assert.deepEqual(await vp.evaluate(()=>window.__spoken),[]);assert(await vp.locator('#lu-question-sound').isHidden());
   const vietnamese={type:'token_order',content:{prompt:'I can find words.',prompt_lang:'en',answer_lang:'vi',tokens:['Tôi','tìm','từ'].map((text,i)=>({id:'v'+i,text}))}};
-  await mount(vietnamese,120);await vp.waitForFunction(()=>window.__spoken.length===1);await vp.locator('.token-bank button').first().click();assert.equal((await vp.evaluate(()=>window.__spoken)).length,1);await vp.locator('#lu-question-slow').click();assert.equal((await vp.evaluate(()=>window.__spoken.at(-1))).rate,.75);
+  await mount(vietnamese,120);await vp.waitForFunction(()=>window.__spoken.length===1);await vp.locator('.token-bank button').first().click();assert.equal((await vp.evaluate(()=>window.__spoken)).length,1);assert.equal(await vp.locator('#lu-question-slow').count(),0);await vp.locator('#lu-question-sound').click();assert.equal((await vp.evaluate(()=>window.__spoken.at(-1))).rate,1);
   await mount(vietnamese,300);await mount({type:'fill_blank',content:{prompt:'I ____ words.',prompt_lang:'en',answer_lang:'en'}});await vp.waitForTimeout(350);assert.deepEqual(await vp.evaluate(()=>window.__spoken),[],'Leaving a question cancels scheduled speech');
-  await vp.emulateMedia({reducedMotion:'reduce'});await mount(english);await vp.locator('.token-bank button').first().click();assert.equal(await vp.locator('.token-line button').evaluate(e=>e.getAnimations().length),0);
-  assert.deepEqual(errors,[]);console.log('PASS: token/guest-dialog contrast >=4.5:1 in both themes, stable token order, silent keyboard questions, timed sentence/replay/slow speech, cancellation, mobile and reduced motion');
+  const reward=await vp.evaluate(()=>{
+   const root=document.getElementById('lu-result-streak'),result=document.getElementById('lu-result');
+   const cues=[];window.DLFeedbackSound.play=(...args)=>cues.push(args);
+   window.DLRewards.streak(root,{current:2,previous:1,key:'next-day'});
+   const increased=root.classList.contains('is-increasing')&&root.querySelector('.lr-number-old').textContent==='1'&&root.querySelector('strong').textContent==='2'&&!!root.querySelector('.lr-flame svg');
+   window.DLRewards.streak(root,{current:2,previous:2,key:'same-day'});
+   const sameDay=!root.classList.contains('is-increasing')&&!root.querySelector('.lr-number-old');
+   window.DLRewards.streak(root,{current:2,key:'reload'});
+   const reload=!root.classList.contains('is-increasing');
+   window.DLRewards.outcome(result,false,{key:'failed',fresh:true});
+   const failure=result.classList.contains('is-fail')&&cues.length===0&&!document.querySelector('.lr-fireworks');
+   window.DLRewards.outcome(result,true,{key:'passed',fresh:true});
+   window.DLRewards.outcome(result,true,{key:'passed',fresh:true});
+   return {increased,sameDay,reload,failure,cues:cues.length,bursts:document.querySelectorAll('.lr-fireworks').length};
+  });
+  assert.deepEqual(reward,{increased:true,sameDay:true,reload:true,failure:true,cues:1,bursts:1});
+  await vp.emulateMedia({reducedMotion:'reduce'});
+  assert(await vp.evaluate(()=>{
+   document.querySelectorAll('.lr-fireworks').forEach(el=>el.remove());
+   window.DLRewards.streak(document.getElementById('lu-result-streak'),{current:3,previous:2,key:'reduced'});
+   window.DLRewards.celebrate('reduced');
+   return !document.querySelector('.lr-fireworks')&&!document.querySelector('.lr-number-old')&&getComputedStyle(document.querySelector('.lr-flame svg')).animationName==='none';
+  }),'Reduced motion keeps the final streak without fireworks or number animation');
+  console.log('PASS: server-provided streak 1→2, same-day/reloaded totals, failed result, one celebration and reduced motion');
+  await mount(english);await vp.locator('.token-bank button').first().click();assert.equal(await vp.locator('.token-line button').evaluate(e=>e.getAnimations().length),0);
+  assert.deepEqual(errors,[]);console.log('PASS: token/guest-dialog contrast >=4.5:1 in both themes, stable token order, silent keyboard questions, timed sentence/replay speech and removed slow button, cancellation, mobile and reduced motion');
  }finally{await browser.close();}
 })().catch(error=>{console.error(error);process.exitCode=1});

@@ -35,6 +35,9 @@ const fixture=JSON.parse(fs.readFileSync(process.env.CHAPTER_FIXTURE_FILE||path.
     const response=page.waitForResponse(r=>r.request().method()==='POST'&&r.url().endsWith('/chapter-attempts/'+id+'/answers'));
     await page.locator('#cc-submit:enabled').click();const reply=await response;assert.equal(reply.status(),200,await reply.text());current=(await reply.json()).data.attempt;answered++;
     await page.locator('#cc-next').waitFor({state:'visible'});
+    assert(await page.locator('#lu-controls').isVisible(),'Submitted answer stays visible with feedback');
+    assert.match(await page.locator('#lu-answer-feedback').textContent(),/Đáp án:/,'Correct answer appears below the question');
+    assert.equal(await page.locator('#lu-controls input:enabled, #lu-controls button:enabled').count(),0,'Answer cannot change after grading');
     if(answered===1){await page.reload();await page.locator('#cc-test').waitFor({state:'visible'});assert.equal((await state()).answered,1,'Reload resumes stored progress');}
     else await page.locator('#cc-next').click();
   }
