@@ -98,9 +98,28 @@ $e = static fn (string $v): string => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
                 <div><dt>Nhắc học</dt><dd>Thông báo trong ứng dụng</dd></div>
             </dl>
             <div class="cta-row">
-                <a class="btn solid" href="<?= $e($base) ?>/start">Bắt đầu học</a>
-                <a class="btn line" href="<?= $e($base) ?>/login">Đăng nhập</a>
-            </div>
+    <?php if ($navUser !== null): ?>
+        <a class="btn solid"
+           href="<?= $e($base) ?>/learning">
+            Tiếp tục học
+        </a>
+
+        <a class="btn line"
+           href="<?= $e($base) ?>/profile">
+            Hồ sơ của tôi
+        </a>
+    <?php else: ?>
+        <a class="btn solid"
+           href="<?= $e($base) ?>/start">
+            Bắt đầu học
+        </a>
+
+        <a class="btn line"
+           href="<?= $e($base) ?>/login">
+            Đăng nhập
+        </a>
+    <?php endif; ?>
+</div>
         </div>
 
         <div class="col-c">
