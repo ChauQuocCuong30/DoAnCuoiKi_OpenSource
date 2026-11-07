@@ -14,13 +14,14 @@
     if (a.classList.contains('back-link') || a.classList.contains('x') || a.classList.contains('back')) { return true; }
     return /^\s*[←‹«]/.test(a.textContent || '');
   }
-  function go(url, d) {
-    if (reduce) { window.location.href = url; return; }
+  function go(url, d, replace) {
+    var open = function () { if (replace) { window.location.replace(url); } else { window.location.href = url; } };
+    if (reduce) { open(); return; }
     d = d || 'fwd';
     set(d);
     root.setAttribute('data-dl-leave', d);
     if (document.body) { document.body.classList.add('dl-leave'); }
-    setTimeout(function () { window.location.href = url; }, LEAVE);
+    setTimeout(open, LEAVE);
   }
   window.DLNav = { go: go };
   document.addEventListener('click', function (e) {

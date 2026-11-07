@@ -121,7 +121,7 @@ $e = static fn (string $v): string => htmlspecialchars(
         ): ?>
             <a
                 class="back-welcome"
-                href="<?= $e($base) ?>/learning"
+                href="<?= $e($base) ?>/welcome"
             >
                 ← Quay về
             </a>
