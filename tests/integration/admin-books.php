@@ -96,6 +96,29 @@ try {
     $data = ContentInput::word(array_replace($existing, ['is_active' => 0]));
     $repo->saveWord($wordId, $data['word'], $data['source']);
     check((int) $repo->rows('SELECT COUNT(*) n FROM user_review_states WHERE word_id=?', [$wordId])[0]['n'] === 1, 'Hide keeps the word ID and SM-2 state');
+    $beforeReview = $repo->rows('SELECT * FROM user_review_states WHERE word_id=?', [$wordId]);
+    $beforeWords = $db->query('SELECT COUNT(*) FROM words')->fetchColumn();
+    $current = $repo->get('words', $wordId);
+    $stream = fopen('php://temp', 'w+');
+    $headers = ['english', 'vietnamese', 'part_of_speech', 'example', 'ipa', 'image', 'thiings_icon_url', 'image_license'];
+    fputcsv($stream, $headers, ',', '"', '');
+    fputcsv($stream, [$current['english'], $current['vietnamese'], $current['part_of_speech'], $current['example'], '/test/', '/assets/media/images/water.png', 'https://www.thiings.co/things/water', 'Test fixture'], ',', '"', '');
+    rewind($stream);
+    $metadataCsv = (string) stream_get_contents($stream);
+    fclose($stream);
+    $metadataDraft = $importer->preview($metadataCsv, 'update', $topic);
+    check(!$metadataDraft['errors'] && $metadataDraft['valid_count'] === 1, 'CSV accepts IPA/image with a Thiings source column');
+    $metadataResult = $importer->commit($metadataDraft['rows'], 'update');
+    check($metadataResult['updated'] === 1 && $metadataResult['imported'] === 0, 'Metadata reimport updates an existing word');
+    $afterMetadata = $repo->get('words', $wordId);
+    check($afterMetadata['ipa'] === '/test/' && $afterMetadata['image'] === '/assets/media/images/water.png', 'IPA and image are persisted in MySQL');
+    check((int) $afterMetadata['is_active'] === 0 && $db->query('SELECT COUNT(*) FROM words')->fetchColumn() === $beforeWords, 'Metadata update retains hidden state and word ID');
+    check($repo->rows('SELECT * FROM user_review_states WHERE word_id=?', [$wordId]) === $beforeReview, 'Metadata update preserves SM-2 state');
+    $withoutMedia = $importer->preview($header . $current['english'] . ',' . $current['vietnamese'] . ',' . $current['part_of_speech'] . ",An example.\n", 'update', $topic);
+    check(!$withoutMedia['errors'], 'CSV without media remains valid');
+    $importer->commit($withoutMedia['rows'], 'update');
+    check($repo->get('words', $wordId)['image'] === '/assets/media/images/water.png', 'Absent image does not erase the existing picture');
+
 } finally {
     $db->rollBack();
 }

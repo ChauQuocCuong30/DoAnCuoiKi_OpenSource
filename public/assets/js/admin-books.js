@@ -348,6 +348,9 @@
     $("#csv-fields").hidden = !csv;
     $("#sample-fields").hidden = csv;
     $("#csv-file").required = csv;
+    $("#csv-update-row").hidden = !csv;
+    $("#preview-import").textContent = csv
+      ? "Nhập CSV vào CSDL →" : "Kiểm tra & xem trước →";
     $("#sample-key").required = !csv;
   }
   async function importLock(work) {
@@ -467,35 +470,36 @@
     event.preventDefault();
     if (importBusy) return;
     invalidatePreview();
-    const version = previewVersion,
-      form = $("#import-form"),
-      topic = $("#import-topic").value;
-    const mode = $("#skip-duplicates").checked ? "skip" : "error";
+    const version = previewVersion;
+    const form = $("#import-form");
+    const topic = $("#import-topic").value;
     const isSample = form.elements.namedItem("source").value === "sample";
-    const data = isSample
-      ? {
-          topic_id: topic,
-          sample_key: $("#sample-key").value,
-          duplicate_mode: mode,
-          cefr_level: $("#import-level").value,
-        }
-      : new FormData(form);
+    const mode = !isSample && $("#update-existing").checked
+      ? "update" : $("#skip-duplicates").checked ? "skip" : "error";
+    const data = isSample ? {
+      topic_id: topic, sample_key: $("#sample-key").value,
+      duplicate_mode: mode, cefr_level: $("#import-level").value,
+    } : new FormData(form);
     if (!isSample) data.set("duplicate_mode", mode);
-    guard(
-      () =>
-        importLock(async () => {
-          message("Đang kiểm tra dữ liệu…", false, "#import-message");
-          const result = await request(
-            "/admin/content/" + (isSample ? "samples" : "csv") + "/preview",
-            { method: "POST", body: data },
-          );
-          if (version !== previewVersion) return;
-          previewToken = result.preview_token;
-          previewTopic = topic;
-          renderPreview(result);
-        }),
-      "#import-message",
-    );
+    guard(() => importLock(async () => {
+      message(isSample ? "Đang kiểm tra dữ liệu…" : "Đang kiểm tra và lưu CSV vào CSDL…", false, "#import-message");
+      const result = await request(isSample
+        ? "/admin/content/samples/preview" : "/admin/content/csv/import",
+        { method: "POST", body: data });
+      if (version !== previewVersion) return;
+      if (isSample) {
+        previewToken = result.preview_token;
+        previewTopic = topic;
+        renderPreview(result);
+        return;
+      }
+      const notice = `Đã lưu vào CSDL: ${result.imported} từ mới, ${result.updated ?? 0} từ cập nhật, ${result.skipped} từ bỏ qua.`;
+      message(notice, false, "#import-message");
+      message(notice);
+      $("#preview-panel").hidden = true;
+      try { await refresh(); }
+      catch (error) { message(notice + " Chưa tải lại được danh sách: " + error.message, true, "#import-message"); }
+    }), "#import-message");
   });
   $("#commit-import").addEventListener("click", () => {
     if (!previewToken || importBusy) return;

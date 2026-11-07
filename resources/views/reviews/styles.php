@@ -1,520 +1,106 @@
 <style>
-:root {
-    font-family: "Segoe UI", system-ui, sans-serif;
-    color: var(--theme-ink);
-    background: var(--theme-bg);
-    font-synthesis: none;
-
-    --blue: #2563eb;
-    --muted: var(--theme-muted);
-    --line: var(--theme-line);
+.review-shell {
+    max-width: 1160px;
+    margin: 0 auto;
+    font-size: 16px;
 }
 
-* {
-    box-sizing: border-box;
+.review-shell [hidden] {
+    display: none !important;
 }
 
-body {
-    margin: 0;
+.review-shell p {
+    line-height: 1.7;
 }
 
-button,
-input,
-select {
+.review-shell :is(button, select) {
     font: inherit;
 }
 
-button {
+.review-shell :is(button, a, select):focus-visible {
+    outline: 3px solid var(--dq-blue);
+    outline-offset: 4px;
+}
+
+.review-shell button {
     cursor: pointer;
 }
 
-button:disabled {
-    opacity: 0.5;
-    cursor: default;
+.review-shell button:disabled {
+    opacity: .55;
+    cursor: wait;
 }
 
-button:focus-visible,
-select:focus-visible {
-    outline: 3px solid #a9c8ff;
-    outline-offset: 3px;
-}
-
-/* Khung trang */
-.review-shell {
-    max-width: 1020px;
-    margin: auto;
-    padding: 48px 24px;
-}
-
-header {
+.review-shell .review-hero {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    gap: 20px;
-    margin-bottom: 30px;
+    align-items: center;
+    gap: 28px;
+    padding: 32px;
+    border: 2px solid var(--theme-line);
+    border-radius: 24px;
+    background: var(--theme-soft);
 }
 
-.eyebrow {
-    color: var(--theme-muted);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.7px;
+.review-shell .eyebrow,
+.review-shell .guide-kicker {
+    color: var(--theme-good);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
     margin: 0 0 12px;
 }
 
-h1 {
-    font-size: 31px;
-    letter-spacing: -0.8px;
-    margin: 0 0 13px;
-    line-height: 1.4;
+.review-shell h1 {
+    font-size: clamp(28px, 3vw, 40px);
+    line-height: 1.2;
 }
 
-h2 {
-    font-size: 22px;
-    margin: 0 0 12px;
-}
-
-.muted {
-    color: var(--muted);
-    font-size: 13px;
-    line-height: 1.8;
-    margin: 0;
-}
-
-.module-badge {
-    font-size: 10px;
-    white-space: nowrap;
-    padding: 9px 12px;
-    color: var(--theme-muted);
-    border: 1px solid #d9e5fa;
-    background: var(--theme-surface);
-    border-radius: 8px;
-}
-
-/* Ba tab: den han, lich su, nhac hoc */
-.review-tabs {
-    display: flex;
-    gap: 8px;
-    border-bottom: 1px solid var(--line);
-    margin-bottom: 23px;
-    padding-bottom: 11px;
-}
-
-.review-tabs button {
-    background: none;
-    border: 0;
-    border-radius: 8px;
-    color: var(--theme-muted);
-    font-size: 12px;
-    font-weight: 600;
-    padding: 12px 17px;
-}
-
-.review-tabs button.active {
-    color: #356dc2;
-    background: var(--theme-soft);
-}
-
-.review-tabs b {
-    font-size: 10px;
-    background: #d4e4ff;
-    padding: 3px 6px;
-    border-radius: 4px;
-    margin-left: 5px;
-}
-
-/* Bo loc va nut thao tac */
-.toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    gap: 15px;
-}
-
-.toolbar label {
-    font-size: 11px;
-    color: var(--theme-muted);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-select {
-    border: 1px solid #dce5f4;
-    border-radius: 8px;
-    background: var(--theme-surface);
-    padding: 9px 12px;
-    color: var(--theme-muted);
-    font-size: 12px;
-}
-
-.button {
-    border: 1px solid transparent;
-    background: var(--blue);
-    color: white;
-    border-radius: 9px;
-    padding: 11px 18px;
-    font-size: 12px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-}
-
-.button:hover {
-    background: #1d4ed8;
-}
-
-.button.secondary {
-    background: var(--theme-surface);
-    color: var(--theme-muted);
-    border-color: var(--theme-line);
-}
-
-/* Danh sach the */
-.panel {
-    background: var(--theme-surface);
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    padding: 26px;
-    box-shadow: 0 4px 20px #263e6503;
-}
-
-.list {
-    display: grid;
-    gap: 12px;
-}
-
-.row {
-    display: flex;
-    align-items: center;
-    gap: 17px;
-    border: 1px solid #e7edf6;
-    border-radius: 12px;
-    padding: 17px;
-}
-
-.word-text {
-    flex: 1;
-    min-width: 0;
-}
-
-.word-text h3 {
-    font-size: 20px;
-    margin: 0 0 7px;
-    color: var(--theme-ink);
-}
-
-.word-text p {
-    font-size: 12px;
-    line-height: 1.8;
-    color: var(--theme-muted);
-    margin: 0;
-}
-
-.due-tag {
-    font-size: 10px;
-    padding: 5px 8px;
-    background: var(--theme-good-bg);
-    border-radius: 5px;
-    color: #2c8857;
-}
-
-/* Trang thai rong va thong bao */
-.empty {
-    text-align: center;
-    padding: 55px 25px;
-    color: var(--theme-muted);
-    font-size: 13px;
-    line-height: 1.9;
-}
-
-.empty strong {
-    display: block;
-    color: var(--theme-muted);
-    font-size: 19px;
-    margin-bottom: 9px;
-}
-
-.message {
-    padding: 13px 17px;
-    background: var(--theme-soft);
-    border: 1px solid #d4e6ff;
-    border-radius: 9px;
-    color: var(--theme-muted);
-    font-size: 12px;
-    line-height: 1.8;
-    margin-bottom: 19px;
-}
-
-.message.error {
-    background: var(--theme-bad-bg);
-    border-color: var(--theme-line);
-    color: #a95d53;
-}
-
-.message[hidden] {
-    display: none;
-}
-
-/* Flashcard */
-.card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 20px;
-    font-size: 11px;
-    color: var(--theme-muted);
-}
-
-.flashcard {
-    text-align: center;
-    padding: 26px 22px;
-    border: 1px solid #e6edf8;
-    border-radius: 15px;
-    background: var(--theme-surface);
-}
-
-.flashcard h3 {
-    font-size: 34px;
-    margin: 12px 0;
-    letter-spacing: -0.7px;
-    color: var(--theme-ink);
-}
-
-.flashcard .back {
-    font-size: 24px;
-    color: var(--theme-muted);
-    border-top: 1px solid #e5edf8;
-    margin-top: 23px;
-    padding-top: 22px;
-}
-
-.flashcard img {
-    display: block;
-    max-width: 220px;
-    max-height: 160px;
-    object-fit: contain;
-    margin: 0 auto 18px;
-    border-radius: 12px;
-}
-
-.flashcard p {
-    font-size: 12px;
-    color: var(--theme-muted);
-    line-height: 1.9;
-}
-
-.card-actions {
-    text-align: center;
-    margin: 23px 0 0;
-}
-
-.audio-button {
-    background: var(--theme-soft);
-    color: #5183ca;
-    border: 1px solid #dceaff;
-    border-radius: 9px;
-    padding: 10px 17px;
-    font-size: 12px;
-}
-
-/* Sau muc tu danh gia 0-5 */
-.ratings {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 9px;
-    margin-top: 20px;
-}
-
-.rating {
-    background: var(--theme-surface);
-    border: 1px solid #dee8f7;
-    padding: 14px 7px;
-    border-radius: 10px;
-    font-size: 10px;
-    color: var(--theme-muted);
-}
-
-.rating strong {
-    display: block;
-    font-size: 22px;
-    color: var(--theme-muted);
-    margin-bottom: 7px;
-}
-
-.rating:hover {
-    background: var(--theme-soft);
-    border-color: #8ab1ee;
-}
-
-.rating.low strong {
-    color: #bb806b;
-}
-
-.small-note {
-    font-size: 10px;
-    color: #9aa8bd;
-    line-height: 1.9;
-    margin: 17px 0 0;
-}
-
-.more {
-    text-align: center;
-    margin-top: 18px;
-}
-
-/* Lich su va thong bao */
-.history-item,
-.notification {
-    border-bottom: 1px solid #edf1f7;
-    padding: 17px 0;
-}
-
-.history-item:last-child,
-.notification:last-child {
-    border: 0;
-}
-
-.history-item h3 {
-    font-size: 15px;
-    margin: 0 0 8px;
-}
-
-.history-item p,
-.notification p {
-    font-size: 12px;
-    color: #8b9bb3;
-    line-height: 1.8;
-    margin: 0;
-}
-
-.notification.unread {
-    border-left: 3px solid #8aaff0;
-    padding-left: 16px;
-}
-
-.notification .button {
-    margin-top: 12px;
-    padding: 7px 11px;
-    font-size: 10px;
-}
-
-.notification small {
-    display: block;
-    font-size: 10px;
-    color: #a0aec2;
-    margin-top: 9px;
-}
-
-footer {
-    text-align: center;
-    color: #9baac0;
-    font-size: 10px;
-    line-height: 1.9;
-    margin-top: 30px;
-}
-
-footer span {
-    color: #aab6c8;
-}
-
-.result {
-    padding: 25px;
-    background: #eff8f2;
-    color: #397e55;
-    border-radius: 12px;
-    font-size: 13px;
-    line-height: 1.9;
-    margin-bottom: 18px;
-}
-
-/* Hien thi tren dien thoai */
-@media (max-width: 700px) {
-    .review-shell {
-        padding: 29px 18px;
-    }
-
-    header {
-        margin-bottom: 22px;
-    }
-
-    h1 {
-        font-size: 25px;
-    }
-
-    .module-badge {
-        display: none;
-    }
-
-    .ratings {
-        grid-template-columns: repeat(3, 1fr);
-    }
-
-    .row {
-        gap: 11px;
-        padding: 14px;
-    }
-
-    .due-tag {
-        display: none;
-    }
-
-    .word-text h3 {
-        font-size: 18px;
-    }
-
-    .word-text p {
-        font-size: 11px;
-    }
-
-    .row .button {
-        font-size: 11px;
-        padding: 10px 12px;
-    }
-
-    .panel {
-        padding: 20px;
-    }
-
-    .review-tabs {
-        gap: 3px;
-    }
-
-    .review-tabs button {
-        padding: 10px;
-        font-size: 11px;
-    }
-
-    .toolbar label {
-        font-size: 10px;
-        gap: 7px;
-    }
-
-    .flashcard h3 {
-        font-size: 29px;
-    }
-
-    .flashcard .back {
-        font-size: 23px;
-    }
-}
-/* Bo cuc trang on tap */
 .review-shell .hero-description {
-    max-width: 550px;
-    margin: 0 0 18px;
+    max-width: 620px;
+    margin: 16px 0;
     color: var(--theme-muted);
-    font-size: 16px;
-    line-height: 1.8;
+}
+
+.review-shell .muted {
+    color: var(--theme-muted);
+    font-size: 14px;
+}
+
+.review-shell .hero-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.review-shell .review-hero-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 144px;
+    height: 144px;
+    background: var(--theme-selected);
+    color: var(--theme-good);
+    border-radius: 36px;
+}
+
+.review-shell .review-hero-icon .ld-icon {
+    width: 76px;
+    height: 76px;
 }
 
 .review-shell .review-benefits {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
-    margin-bottom: 28px;
+    gap: 16px;
+    margin: 22px 0 28px;
+}
+
+.review-shell :is(.benefit-card, .guide-card, .panel) {
+    border: 2px solid var(--theme-line);
+    border-radius: 20px;
+    background: var(--theme-surface);
+    color: var(--theme-ink);
 }
 
 .review-shell .benefit-card {
@@ -522,94 +108,384 @@ footer span {
     align-items: flex-start;
     gap: 12px;
     padding: 18px;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    background: var(--theme-surface);
 }
 
-.review-shell .benefit-number {
-    display: inline-flex;
-    flex-shrink: 0;
-    justify-content: center;
-    align-items: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    background: var(--green-light);
-    color: var(--green-dark);
-    font-size: 12px;
+.review-shell :is(.benefit-number, .level-badge) {
+    display: grid;
+    place-items: center;
+    flex: 0 0 42px;
+    min-height: 40px;
+    padding: 4px;
+    border-radius: 12px;
+    background: var(--theme-good-bg);
+    color: var(--theme-good);
+    font-size: 13px;
     font-weight: 800;
 }
 
 .review-shell .benefit-card strong {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .review-shell .benefit-card p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.7;
+    color: var(--theme-muted);
+    font-size: 13px;
+    margin-top: 4px;
 }
 
 .review-shell .review-workspace {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 260px;
+    grid-template-columns: minmax(0, 1fr) 280px;
     align-items: start;
-    gap: 22px;
+    gap: 24px;
 }
 
 .review-shell .review-content {
     min-width: 0;
 }
 
+.review-shell .review-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+    scrollbar-width: thin;
+}
+
+.review-shell .review-tabs button {
+    flex-shrink: 0;
+    min-height: 46px;
+    padding: 10px 16px;
+    border: 2px solid transparent;
+    border-radius: 13px;
+    background: var(--theme-soft);
+    color: var(--theme-muted);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.review-shell .review-tabs button.active {
+    background: var(--theme-selected);
+    border-color: var(--dq-green);
+    color: var(--theme-good);
+}
+
+.review-shell .review-tabs b {
+    display: inline-block;
+    min-width: 24px;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: var(--theme-good-bg);
+    color: var(--theme-good);
+}
+
+.review-shell .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.review-shell .toolbar label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.review-shell select {
+    max-width: 100%;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 2px solid var(--theme-line);
+    border-radius: 12px;
+    background: var(--theme-surface);
+    color: var(--theme-ink);
+}
+
+.review-shell .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 11px 18px;
+    border: 2px solid var(--dq-green);
+    border-radius: 13px;
+    background: var(--dq-green);
+    color: var(--dq-on-green);
+    box-shadow: 0 3px 0 var(--dq-green-edge);
+    font-size: 14px;
+    font-weight: 750;
+    text-align: center;
+    text-decoration: none;
+}
+
+.review-shell .button.secondary {
+    border-color: var(--theme-line);
+    background: var(--theme-surface);
+    color: var(--theme-ink);
+    box-shadow: 0 3px 0 var(--theme-line);
+}
+
+.review-shell .button:hover {
+    filter: brightness(.96);
+}
+
+.review-shell .button:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
+
+.review-shell .panel {
+    padding: 24px;
+}
+
+.review-shell .empty {
+    padding: 52px 24px;
+    text-align: center;
+    color: var(--theme-muted);
+    line-height: 1.8;
+}
+
+.review-shell .empty strong {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 21px;
+    color: var(--theme-ink);
+}
+
+.review-shell .list {
+    display: grid;
+    gap: 14px;
+}
+
+.review-shell .row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 18px;
+    border: 1px solid var(--theme-line);
+    border-radius: 15px;
+}
+
+.review-shell .word-text {
+    flex: 1 1 190px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.review-shell .word-text h3 {
+    font-size: 23px;
+    margin-bottom: 8px;
+}
+
+.review-shell .word-text p {
+    font-size: 14px;
+    color: var(--theme-muted);
+}
+
+.review-shell .due-tag {
+    padding: 5px 9px;
+    border-radius: 8px;
+    background: var(--theme-good-bg);
+    color: var(--theme-good);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.review-shell .message {
+    padding: 16px 20px;
+    margin: 0 0 20px;
+    border: 1px solid var(--theme-line);
+    border-radius: 14px;
+    background: var(--theme-good-bg);
+    color: var(--theme-good);
+    line-height: 1.7;
+}
+
+.review-shell .message.error {
+    background: var(--theme-bad-bg);
+    color: var(--theme-bad);
+    border-color: var(--theme-bad);
+}
+
+.review-shell .card-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+    color: var(--theme-muted);
+    font-size: 13px;
+}
+
+.review-shell .flashcard {
+    padding: 28px 18px;
+    border: 1px solid var(--theme-line);
+    border-radius: 18px;
+    text-align: center;
+}
+
+.review-shell .flashcard h3 {
+    margin: 18px 0;
+    font-size: clamp(27px, 3vw, 38px);
+    overflow-wrap: anywhere;
+}
+
+.review-shell .flashcard img {
+    max-width: 100%;
+    max-height: 210px;
+    object-fit: contain;
+    margin: 0 auto 18px;
+}
+
+.review-shell .flashcard .back {
+    margin-top: 24px;
+    padding-top: 22px;
+    border-top: 1px solid var(--theme-line);
+    color: var(--theme-good);
+    font-size: 25px;
+    overflow-wrap: anywhere;
+}
+
+.review-shell .flashcard p {
+    margin-top: 16px;
+    color: var(--theme-muted);
+    line-height: 1.9;
+    overflow-wrap: anywhere;
+}
+
+.review-shell .audio-button {
+    padding: 11px 16px;
+    border: 1px solid var(--theme-line);
+    border-radius: 12px;
+    background: var(--theme-soft);
+    color: var(--dq-blue);
+}
+
+.review-shell .card-actions {
+    margin-top: 22px;
+    text-align: center;
+}
+
+.review-shell .ratings {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.review-shell .rating {
+    padding: 14px 8px;
+    border: 2px solid var(--theme-line);
+    border-radius: 13px;
+    background: var(--theme-surface);
+    color: var(--theme-ink);
+    font-size: 13px;
+}
+
+.review-shell .rating strong {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--theme-good);
+    font-size: 24px;
+}
+
+.review-shell .rating.low strong {
+    color: var(--theme-bad);
+}
+
+.review-shell .rating:hover {
+    border-color: var(--theme-good);
+    background: var(--theme-good-bg);
+}
+
+.review-shell .rating.low:hover {
+    border-color: var(--theme-bad);
+    background: var(--theme-bad-bg);
+}
+
+.review-shell .small-note {
+    margin-top: 16px;
+    color: var(--theme-muted);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.review-shell .more {
+    margin-top: 22px;
+    text-align: center;
+}
+
+.review-shell :is(.history-item, .notification) {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--theme-line);
+    overflow-wrap: anywhere;
+}
+
+.review-shell :is(.history-item, .notification):last-child {
+    border-bottom: 0;
+}
+
+.review-shell .history-item h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.review-shell :is(.history-item p, .notification p, .notification small) {
+    color: var(--theme-muted);
+    line-height: 1.8;
+    font-size: 14px;
+}
+
+.review-shell .notification.unread {
+    padding-left: 16px;
+    border-left: 3px solid var(--dq-green);
+}
+
+.review-shell .notification small {
+    display: block;
+    margin-top: 6px;
+}
+
+.review-shell .notification .button {
+    margin-top: 12px;
+}
+
 .review-shell .review-guide {
     display: grid;
-    gap: 16px;
+    gap: 18px;
 }
 
 .review-shell .guide-card {
     padding: 22px;
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    background: var(--theme-surface);
-}
-
-.review-shell .guide-kicker {
-    margin: 0 0 10px;
-    color: var(--green-dark);
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.8px;
 }
 
 .review-shell .guide-card h2 {
-    margin: 0 0 18px;
+    margin-bottom: 18px;
     font-size: 19px;
-    line-height: 1.4;
-    letter-spacing: -0.3px;
 }
 
 .review-shell .guide-steps {
-    margin: 0;
     padding-left: 20px;
-    color: var(--muted);
-    font-size: 13px;
+    margin: 0;
+    color: var(--theme-muted);
+    font-size: 14px;
+    line-height: 1.8;
 }
 
-.review-shell .guide-steps li {
-    margin-bottom: 12px;
-    padding-left: 3px;
-}
-
-.review-shell .guide-steps li:last-child {
-    margin-bottom: 0;
+.review-shell .guide-steps li + li {
+    margin-top: 12px;
 }
 
 .review-shell .guide-steps li::marker {
-    color: var(--green-dark);
+    color: var(--theme-good);
     font-weight: 800;
 }
 
@@ -620,49 +496,36 @@ footer span {
     margin-bottom: 18px;
 }
 
-.review-shell .level-badge {
-    display: inline-flex;
-    flex-shrink: 0;
-    justify-content: center;
-    align-items: center;
-    min-width: 40px;
-    min-height: 36px;
-    padding: 4px;
-    border-radius: 10px;
-    background: #edf8df;
-    color: #367800;
-    font-size: 13px;
-    font-weight: 800;
-}
-
-.review-shell .level-badge.level-low {
-    background: #fff3df;
-    color: #825900;
-}
-
 .review-shell .memory-level strong {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 13px;
+    font-size: 14px;
 }
 
-.review-shell .memory-level p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.7;
-}
-
+.review-shell .memory-level p,
 .review-shell .guide-note {
-    margin: 0;
-    padding-top: 16px;
-    border-top: 1px dashed var(--border);
-    color: var(--muted);
-    font-size: 12px;
+    margin-top: 4px;
+    color: var(--theme-muted);
+    font-size: 13px;
     line-height: 1.8;
 }
 
-@media (max-width: 1000px) {
+.review-shell .level-low {
+    background: var(--theme-bad-bg);
+    color: var(--theme-bad);
+}
+
+.review-shell .guide-note {
+    padding-top: 16px;
+    border-top: 1px dashed var(--theme-line);
+}
+
+.review-shell footer {
+    margin-top: 28px;
+    text-align: center;
+    color: var(--theme-muted);
+    font-size: 13px;
+}
+
+@media (max-width: 1200px) {
     .review-shell .review-workspace {
         grid-template-columns: minmax(0, 1fr);
     }
@@ -672,22 +535,38 @@ footer span {
     }
 }
 
-@media (max-width: 700px) {
-    .review-shell .review-benefits {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 10px;
+@media (max-width: 680px) {
+    .review-shell .review-hero {
+        padding: 24px 20px;
     }
 
-    .review-shell .benefit-card {
-        padding: 14px 16px;
+    .review-shell .review-hero-icon {
+        display: none;
     }
 
+    .review-shell .review-benefits,
     .review-shell .review-guide {
         grid-template-columns: minmax(0, 1fr);
     }
 
-    .review-shell .hero-description {
-        font-size: 14px;
+    .review-shell .panel {
+        padding: 18px;
+    }
+
+    .review-shell .toolbar {
+        flex-wrap: wrap;
+    }
+
+    .review-shell .review-tabs button {
+        padding: 10px 12px;
+    }
+
+    .review-shell .ratings {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .review-shell .row .button {
+        width: 100%;
     }
 }
 </style>

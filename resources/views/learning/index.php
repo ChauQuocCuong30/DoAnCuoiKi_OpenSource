@@ -543,7 +543,8 @@ require __DIR__ . '/dashboard-shell.php';
 
                 <?php foreach ($stages as $i => $stage): ?>
                     <section
-                        class="ld-stage"
+                        class="ld-stage <?= isset($stage['topic']['chapter']) && !$stage['topic']['chapter']['unlocked'] ? 'chapter-locked' : '' ?>"
+                        data-chapter="<?= (int)$stage['topic']['id'] ?>"
                         id="<?= $e($stage['anchor']) ?>"
                         aria-labelledby="title-<?= $e($stage['anchor']) ?>"
                     >
@@ -560,7 +561,7 @@ require __DIR__ . '/dashboard-shell.php';
 
                             <div class="ld-stage-title">
                                 <span>
-                                    CHẶNG <?= str_pad(
+                                    CHƯƠNG <?= str_pad(
                                         (string) ($i + 1),
                                         2,
                                         '0',
@@ -584,6 +585,16 @@ require __DIR__ . '/dashboard-shell.php';
                             ></span>
                         </div>
 
+                        <div class="chapter-actions">
+                            <?php if (!empty($stage['topic']['chapter']['passed'])): ?>
+                                <p class="chapter-passed">✓ Đã học vượt · Toàn bộ bài trong chương đã mở</p>
+                            <?php else: ?>
+                                <p><?= isset($stage['topic']['chapter']) && !$stage['topic']['chapter']['unlocked'] ? 'Hoàn thành chương trước hoặc kiểm tra để mở chương này.' : 'Học lần lượt từng bài hoặc kiểm tra kiến thức để mở toàn bộ chương.' ?></p>
+                            <?php endif; ?>
+                            <?php if ($stage['total'] > 0): ?>
+                                <a class="ld-btn ld-btn-small" data-chapter-challenge="<?= (int)$stage['topic']['id'] ?>" href="<?= $e($b) ?><?= $isGuest ? '/login?next=learning' : '/learning/chapters/'.(int)$stage['topic']['id'].'/challenge' ?>">⚡ Học vượt chương</a>
+                            <?php endif; ?>
+                        </div>
                         <ol class="ld-lessons">
                             <?php foreach ($stage['lessons'] as $lesson):
                                 $current = $next !== null

@@ -32,7 +32,7 @@
         const back = direction === 'en_vi' ? word.vietnamese
             : direction === 'listening' ? word.english + ' — ' + word.vietnamese : word.english;
         return `<div class="flashcard">
-            ${image && direction === 'en_vi' ? `<img src="${escape(image)}" alt="Hình minh họa">` : ''}
+            ${image && (direction === 'en_vi' || revealed) ? `<img src="${escape(image)}" alt="Hình minh họa">` : ''}
             <h3>${escape(front)}</h3>
             ${(direction === 'en_vi' || direction === 'listening' || revealed) ? `<button type="button" class="audio-button" data-audio="${escape(audio)}" data-speak-word="${escape(word.english)}">♫ Nghe phát âm</button>` : ''}
             ${revealed ? `<div class="back">${escape(back)}</div><p>${escape(word.ipa)}<br>${escape(word.example)}<br>${escape(word.example_translation)}</p>` : ''}

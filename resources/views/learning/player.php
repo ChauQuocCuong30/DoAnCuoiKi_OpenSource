@@ -73,10 +73,10 @@ $boot = [
     <link rel="stylesheet" href="<?= $e($b) ?>/assets/css/learning-interactions.css?v=3">
     <script defer src="<?= $e($b) ?>/assets/js/learning-media.js?v=1"></script>
     <script defer src="<?= $e($b) ?>/assets/js/learning-audio.js?v=2"></script>
-    <script defer src="<?= $e($b) ?>/assets/js/learning-question-ui.js?v=2"></script>
+    <script defer src="<?= $e($b) ?>/assets/js/learning-question-ui.js?v=3"></script>
     <script defer src="<?= $e($b) ?>/assets/js/learning-feedback-sound.js?v=1"></script>
     <script defer src="<?= $e($b) ?>/assets/js/learning-ui.js?v=17"></script>
-<?php require dirname(__DIR__) . '/layouts/theme-head.php'; ?></head>
+<?php require dirname(__DIR__) . '/layouts/theme-head.php'; ?><link rel="stylesheet" href="<?= $e($b) ?>/assets/css/chapter-path.css?v=1"></head>
 
 <body class="lu dq-lesson">
 <div class="shell">

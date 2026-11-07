@@ -132,3 +132,10 @@ jobs:
         run: |
           php tests/integration/media-fallback.php --short
           TEST_BASE_URL=http://127.0.0.1:8085 NODE_PATH=/tmp/learning-playwright/node_modules node tests/e2e/lesson-polish.cjs
+
+      - name: Chapter path, vocabulary artwork and persisted skip tests
+        run: |
+          php scripts/install-chapters.php
+          php scripts/install-chapters.php
+          php tests/integration/chapters.php
+          TEST_BASE_URL=http://127.0.0.1:8085 NODE_PATH=/tmp/learning-playwright/node_modules node tests/e2e/chapters.cjs
