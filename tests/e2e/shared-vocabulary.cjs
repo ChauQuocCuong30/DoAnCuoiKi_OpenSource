@@ -40,15 +40,16 @@ if(!base)throw Error('Set TEST_BASE_URL on a migrated disposable test database.'
     const right=q.content.right;
     for(const left of q.content.left){const match=right.find(item=>item.text===byEnglish.get(left.text));assert(match);await page.locator('#lu-controls select').nth(q.content.left.indexOf(left)).selectOption(match.id);}
    }else if(q.type==='token_order'){
-    const word=details.find(w=>w.example_translation===q.content.prompt);assert(word);
-    for(const token of word.example.split(/\s+/)) await page.locator('.token-bank button:enabled').filter({hasText:new RegExp('^'+token.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'$')}).first().click();
+    const word=details.find(w=>(q.content.answer_lang==='vi'?w.example:w.example_translation)===q.content.prompt);assert(word);
+    for(const token of (q.content.answer_lang==='vi'?word.example_translation:word.example).split(/\s+/)) await page.locator('.token-bank button:enabled').filter({hasText:new RegExp('^'+token.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'$')}).first().click();
    }else if(['translate_text','fill_blank'].includes(q.type)){
     const meaning=q.type==='fill_blank'?q.content.instruction.replace('Điền từ tiếng Anh: ',''):q.content.prompt;
     const answer=byVietnamese.get(meaning);assert(answer);await page.locator('#lu-controls input[type=text]').fill(answer);
    }else throw Error('Unexpected first-level question '+q.type);
    const response=page.waitForResponse(r=>r.request().method()==='POST'&&r.url().endsWith('/answers'));
    await page.locator('#lu-submit').click();const result=await response;assert.equal(result.status(),200,await result.text());const data=(await result.json()).data;assert.equal(data.is_correct,true);state=data.session;seen++;
-   if(state.status==='in_progress'){await page.locator('#lu-next-question').waitFor({state:'visible'});await page.locator('#lu-next-question').click();}
+   await page.locator('#lu-next-question').waitFor({state:'visible'});await page.locator('#lu-next-question').click();
+   if(state.status==='in_progress')await page.waitForFunction(id=>document.getElementById('lu-question').dataset.questionId===String(id)&&!document.getElementById('lu-question').hasAttribute('aria-busy'),state.question.id);
   }
   assert.equal(seen,11);assert.equal(state.status,'completed');await page.locator('#lu-result').waitFor({state:'visible'});
   await page.goto(base+'/learning/practice?topic='+topic);assert.equal(await page.locator('.ls-card').nth(1).getByRole('link',{name:/Vào luyện tập/}).count(),1,'Next generated level unlocks');

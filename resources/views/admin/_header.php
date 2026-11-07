@@ -7,6 +7,7 @@ declare(strict_types=1);
         <?php foreach (['words'=>'Kệ sách','topics'=>'Chủ đề','learners'=>'Học viên'] as $adminPath=>$adminLabel): ?>
         <a <?= $activeAdminPage === $adminPath ? 'class="nav-current" aria-current="page"' : '' ?> href="<?= $escape($appBase . '/admin/' . $adminPath) ?>"><?= $escape($adminLabel) ?></a>
         <?php endforeach; ?>
+        <?php require dirname(__DIR__) . "/layouts/theme-toggle.php"; ?>
         <details class="more-nav"><summary>Tài khoản</summary><div>
             <a href="<?= $escape($appBase . '/profile') ?>">Hồ sơ của tôi</a>
             <a href="<?= $escape($appBase . '/learning') ?>">Học thử</a>

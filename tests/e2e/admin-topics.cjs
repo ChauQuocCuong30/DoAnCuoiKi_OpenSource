@@ -30,7 +30,7 @@ if (!base) throw new Error('Set TEST_BASE_URL to the isolated test server.');
         assert.equal(await page.locator('#topic-form [name=id]').inputValue(), '');
         assert.equal(await page.locator('#topic-code').textContent(), 'Tự động khi lưu');
         assert.equal(await page.locator('#topic-position').textContent(), 'Tự xếp cuối kệ');
-        assert.equal(await page.locator('body').evaluate((el) => getComputedStyle(el).backgroundColor), 'rgb(234, 240, 220)');
+        assert.equal(await page.locator('body').evaluate((el) => getComputedStyle(el).backgroundColor), 'rgb(255, 255, 255)');
         const title = 'Thế giới hoang dã';
         await page.getByLabel('Tên chủ đề', { exact: true }).fill(title);
         await page.getByLabel(/Mô tả/).fill('Khám phá từ vựng về thiên nhiên và động vật.');

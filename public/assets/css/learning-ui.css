@@ -1,8 +1,8 @@
 .lu {
-    --ink: #123e2a;
-    --muted: #69836b;
-    --paper: #eaf0dc;
-    --line: #d7e3cb;
+    --ink: var(--theme-ink);
+    --muted: var(--theme-muted);
+    --paper: var(--theme-bg);
+    --line: var(--theme-line);
     --green: #3e8b52;
     margin: 0;
     background: var(--paper);
@@ -815,7 +815,7 @@
     border: 1px dashed #bfd3a7;
     min-height: 63px;
     border-radius: 13px;
-    background: #f6faee;
+    background: var(--theme-soft);
 }
 
 .lu .pair {
@@ -873,9 +873,9 @@
     width: calc(100% - 36px);
     max-width: 430px;
     padding: 28px;
-    border: 1px solid #d6e4c3;
+    border: 1px solid var(--theme-line);
     border-radius: 25px;
-    background: #faffef;
+    background: var(--theme-surface);
     color: var(--ink);
     box-shadow: 0 30px 100px #254b3329;
     text-align: center;
@@ -891,7 +891,7 @@
 }
 
 .lu dialog p {
-    color: #829671;
+    color: var(--theme-muted);
     font-size: 14px;
     margin: 12px 0 20px;
 }

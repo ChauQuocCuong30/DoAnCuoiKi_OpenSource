@@ -12,7 +12,23 @@ final class OnboardingController
 {
     public function start(array $params): void
     {
-        $this->render('start', 'Chào mừng');
+        $this->render('survey', 'Bắt đầu học');
+    }
+
+    public function answers(array $params): void
+    {
+        $user=\App\Core\Session::userId()===null?null:\App\Middleware\Auth::user();
+        $db=\App\Core\Database::connection();
+        $service=new \App\Modules\Auth\Services\OnboardingService($db);
+        if(($_SERVER['REQUEST_METHOD']??'GET')==='POST') {
+            \App\Core\Session::verifyCsrf();
+            $answers=$service->save($user===null?null:(int)$user['id'],\App\Core\Request::json());
+        } else $answers=$service->read($user===null?null:(int)$user['id']);
+        $repo=new \App\Modules\Learning\Repositories\LearningRepository($db);
+        $first=(new \App\Modules\Learning\Services\GuestLearningService($repo,new \App\Modules\Learning\Repositories\GuestClaimRepository($db)))->firstLesson();
+        $base=rtrim(str_replace('\\','/',dirname($_SERVER['SCRIPT_NAME']??'')),'/');
+        \App\Core\Response::data(['answers'=>$answers,'signed_in'=>$user!==null,'schema_ready'=>$service->ready(),
+            'learning_url'=>$base.($first?'/learning/lesson/'.(int)$first['id'].'?focus=practice&onboarding=1':'/learning')]);
     }
 
     public function level(array $params): void

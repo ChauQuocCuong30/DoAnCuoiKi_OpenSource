@@ -28,7 +28,7 @@ $reviewApiBase = $reviewApiBase ?? rtrim(
             ) ?>
         };
     </script>
-</head>
+<?php require dirname(__DIR__) . '/layouts/theme-head.php'; ?></head>
 <body>
 <?php require dirname(__DIR__) . '/layouts/account-nav.php'; ?>
     <main class="review-shell">
@@ -196,6 +196,8 @@ $reviewApiBase = $reviewApiBase ?? rtrim(
     </main>
 
     <script src="<?= htmlspecialchars($reviewApiBase . '/assets/js/learning.js', ENT_QUOTES, 'UTF-8') ?>"></script>
+    <script src="<?= htmlspecialchars($reviewApiBase . '/assets/js/learning-media.js?v=1', ENT_QUOTES, 'UTF-8') ?>"></script>
+    <script src="<?= htmlspecialchars($reviewApiBase . '/assets/js/learning-audio.js?v=2', ENT_QUOTES, 'UTF-8') ?>"></script>
     <?php require __DIR__ . '/script.php'; ?>
 </body>
 </html>

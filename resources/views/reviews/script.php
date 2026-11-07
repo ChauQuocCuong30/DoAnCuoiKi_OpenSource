@@ -68,6 +68,7 @@
     }
 
     let audio;
+    let lastSpokenCard = null;
 
     function message(text, error = false) {
         $('review-message').textContent = text;
@@ -285,6 +286,8 @@
     function renderCard() {
         const item = S.card;
         const word = item.card;
+        window.DLAudio?.configure({base: window.TuanReviewConfig.baseUrl, onStatus: text => message(text)});
+        window.DLAudio?.stop();
 
         let front;
         let back;
@@ -403,6 +406,11 @@
                 `}
             </section>
         `;
+        const speechKey = item.session_question_id + ':' + S.revealed;
+        if (speechKey !== lastSpokenCard && (item.direction === 'en_vi' || item.direction === 'listening' || S.revealed)) {
+            lastSpokenCard = speechKey;
+            window.DLAudio?.speak(word.english, {lang:'en', src:word.audio});
+        }
     }
 
     // Lich su on tap.
@@ -526,6 +534,11 @@
 
         if (!button || button.disabled || S.busy) return;
 
+        if (button.hasAttribute('data-speak-word')) {
+            window.DLAudio?.speak(button.dataset.speakWord, {lang:'en', src:button.dataset.audio});
+            return;
+        }
+        if (button.dataset.action === 'back' || button.dataset.tab) window.DLAudio?.stop();
         if (button.dataset.audio) {
             if (audio) audio.pause();
 

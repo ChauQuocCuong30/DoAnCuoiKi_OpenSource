@@ -44,6 +44,10 @@ final class ExerciseService
             $type = $exercise['type'];
             $public = ['instruction' => (string) ($content['instruction'] ?? ''),
                 'prompt' => (string) ($content['prompt'] ?? '')];
+            foreach (['prompt_lang', 'answer_lang', 'left_lang', 'right_lang'] as $field) {
+                if (isset($content[$field]) && in_array($content[$field], ['en', 'vi'], true)) { $public[$field] = $content[$field]; }
+            }
+            if (isset($content['prompt_audio']) && ($url = self::media($content['prompt_audio'])) !== null) { $public['prompt_audio'] = $url; }
             if (in_array($type, self::SELECT, true)) {
                 $options = $this->items($content['options'] ?? [], $type === 'choose_image' ? 'image' : 'text');
                 $correct = $answer['correct_option_ids'] ?? [];
@@ -91,9 +95,41 @@ final class ExerciseService
                 $public['audio'] = $audio;
             }
             // Private immutable targets for the lesson -> SM-2 bridge; not part of public content.
-            return ['type' => $type, 'content' => $public, 'answer' => $answer,
+            $snapshot = ['type' => $type, 'content' => $public, 'answer' => $answer,
                 'target_word_ids' => array_values(array_unique($targets))];
+            $snapshot['content'] = $this->publicContent($snapshot, $words);
+            return $snapshot;
         } catch (\JsonException | \TypeError $e) { return null; }
+    }
+
+    /** A text equivalent for missing audio; never expose accepted answers or option keys. */
+    public function publicContent(array $snapshot, array $words): array
+    {
+        $content = $snapshot['content'];
+        if (isset($content['media_fallback'])) { return $content; }
+        if (!in_array($snapshot['type'], ['listen_type', 'listen_select'], true)) { return $content; }
+        $word = null;
+        foreach ($words as $candidate) {
+            if (in_array((int) $candidate['id'], $snapshot['target_word_ids'], true)) { $word = $candidate; break; }
+        }
+        if ($word === null || trim((string) ($word['vietnamese'] ?? '')) === '') { return $content; }
+        if ($snapshot['type'] === 'listen_type') {
+            // Only word dictation can use a word translation; sentence dictation must keep its own clue.
+            $answers = array_map(static fn ($v) => mb_strtolower(trim($v)), $snapshot['answer']['accepted_answers'] ?? []);
+            if (!in_array(mb_strtolower(trim($word['english'])), $answers, true)) { return $content; }
+            $content['media_fallback'] = ['type' => 'translate_text', 'instruction' => 'Viết từ tiếng Anh',
+                'prompt' => $word['vietnamese'], 'prompt_lang' => 'vi', 'answer_lang' => 'en'];
+        } else {
+            $correct = $snapshot['answer']['correct_option_ids'][0] ?? null;
+            foreach ($content['options'] ?? [] as $option) {
+                if ($option['id'] === $correct && mb_strtolower(trim($option['text'])) === mb_strtolower(trim($word['vietnamese']))) {
+                    $content['media_fallback'] = ['type' => 'choose_meaning', 'instruction' => 'Chọn nghĩa tiếng Việt',
+                        'prompt' => $word['english'], 'prompt_lang' => 'en', 'answer_lang' => 'vi'];
+                    break;
+                }
+            }
+        }
+        return $content;
     }
 
     private function items(mixed $items, string $field): ?array
@@ -106,6 +142,9 @@ final class ExerciseService
             if ($field === 'image' && self::media($item[$field]) === null) { return null; }
             $seen[$item['id']] = true;
             $result[] = ['id' => $item['id'], $field => $item[$field]];
+            $last = array_key_last($result);
+            if (in_array($item['lang'] ?? null, ['en', 'vi'], true)) { $result[$last]['lang'] = $item['lang']; }
+            if (($audio = self::media($item['audio'] ?? null)) !== null) { $result[$last]['audio'] = $audio; }
         }
         return $result;
     }
@@ -171,5 +210,25 @@ final class ExerciseService
         $expected = array_map(static fn ($pair) => ['left_id' => $pair['left_id'], 'right_id' => $pair['right_id']], $answer['pairs']);
         usort($expected, static fn ($a, $b) => strcmp($a['left_id'], $b['left_id']));
         return $input['pairs'] === $expected;
+    }
+
+    /** Reveal corrections only after the server has accepted and graded this submission. */
+    public function feedback(array $snapshot, array $input): array
+    {
+        $content = $snapshot['content']; $answer = $snapshot['answer'];
+        if (isset($content['options'])) {
+            $options = array_map(static fn($o) => ['id'=>$o['id'], 'is_correct'=>in_array($o['id'],$answer['correct_option_ids'],true)], $content['options']);
+            $texts = array_map(static fn($o) => $o['text'] ?? 'Hình minh họa', array_filter($content['options'], static fn($o) => in_array($o['id'],$answer['correct_option_ids'],true)));
+            return ['correct_text'=>implode(', ', $texts), 'option_results'=>$options];
+        }
+        if ($snapshot['type'] === 'token_order') {
+            $tokens = array_column($content['tokens'], 'text', 'id');
+            return ['correct_text'=>implode(' ', array_map(static fn($id) => $tokens[$id], $answer['accepted_sequences'][0]))];
+        }
+        if ($snapshot['type'] === 'match_pairs') {
+            $expected = array_column($answer['pairs'], 'right_id', 'left_id');
+            return ['pairs'=>array_map(static fn($p) => $p+['is_correct'=>($expected[$p['left_id']] ?? null)===$p['right_id']], $input['pairs'])];
+        }
+        return ['correct_text'=>$answer['accepted_answers'][0] ?? ''];
     }
 }

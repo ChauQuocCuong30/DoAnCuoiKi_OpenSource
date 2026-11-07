@@ -32,10 +32,10 @@ $tones = ['mint', 'blue', 'lilac', 'peach'];
         <div class="ld-hero-actions">
             <a
                 class="ld-btn ld-btn-yellow"
-                href="<?= $e($b) ?>/learning/<?= $isGuest ? 'explore' : 'practice' ?>"
+                href="<?= $e($b) ?><?= $isGuest ? '/start' : '/learning/practice' ?>"
             >
                 <?= $isGuest
-                    ? 'Khám phá từ mới'
+                    ? 'Bắt đầu học'
                     : 'Bắt đầu luyện tập' ?>
 
                 <?= $icon('arrow') ?>
@@ -76,7 +76,7 @@ $tones = ['mint', 'blue', 'lilac', 'peach'];
                 </span>
 
                 <strong><?= $e($heroWords[0]['english'] ?? 'Học mỗi ngày') ?></strong>
-                <small><?= $e($heroWords[0]['vietnamese'] ?? 'Khám phá từ mới') ?></small>
+                <small><?= $e($heroWords[0]['vietnamese'] ?? 'Bắt đầu học') ?></small>
             </div>
 
             <div class="ld-word-chip ld-word-two">

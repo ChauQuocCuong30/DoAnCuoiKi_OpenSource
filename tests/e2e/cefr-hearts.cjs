@@ -33,7 +33,7 @@ const levels=['A1','A2','B1','B2','C1','C2'];
     const expected=byEn.get(q.content.prompt)?.vietnamese||byVi.get(q.content.prompt)?.english;assert(expected);
     const option=q.content.options.find(o=>correct?o.text===expected:o.text!==expected);assert(option);await page.locator('#lu-controls input[value="'+option.id+'"]').check();
    }else if(q.type==='token_order'){
-    const word=words.find(w=>w.example_translation===q.content.prompt);assert(word);let tokens=word.example.split(/\s+/);if(!correct)tokens.reverse();for(const token of tokens)await page.locator('.token-bank button:enabled').filter({hasText:new RegExp('^'+token.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'$')}).first().click();
+    const word=words.find(w=>(q.content.answer_lang==='vi'?w.example:w.example_translation)===q.content.prompt);assert(word);let tokens=(q.content.answer_lang==='vi'?word.example_translation:word.example).split(/\s+/);if(!correct)tokens.reverse();for(const token of tokens)await page.locator('.token-bank button:enabled').filter({hasText:new RegExp('^'+token.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'$')}).first().click();
    }else if(q.type==='match_pairs'){
     for(const [i,left]of q.content.left.entries()){const match=q.content.right.find(r=>r.text===byEn.get(left.text)?.vietnamese);assert(match);await page.locator('#lu-controls select').nth(i).selectOption(match.id);}
    }else {
@@ -41,7 +41,8 @@ const levels=['A1','A2','B1','B2','C1','C2'];
     assert(byVi.has(meaning));await page.locator('#lu-controls input[type=text]').fill(correct?byVi.get(meaning).english:'incorrect text');
    }
    const response=page.waitForResponse(r=>r.request().method()==='POST'&&r.url().endsWith('/answers'));await page.locator('#lu-submit:enabled').click();const r=await response;assert.equal(r.status(),200,await r.text());const data=(await r.json()).data;assert.equal(data.is_correct,correct);state=data.session;
-   if(state.status==='in_progress'){await page.locator('#lu-next-question').waitFor({state:'visible'});await page.locator('#lu-next-question').click();}
+   await page.locator('#lu-next-question').waitFor({state:'visible'});await page.locator('#lu-next-question').click();
+   if(state.status==='in_progress')await page.waitForFunction(id=>document.getElementById('lu-question').dataset.questionId===String(id)&&!document.getElementById('lu-question').hasAttribute('aria-busy'),state.question.id);
    return state;
   }
   let startResponse=page.waitForResponse(r=>r.request().method()==='POST'&&r.url().endsWith('/sessions'));await page.locator('.ls-card').first().getByRole('link',{name:/Vào luyện tập/}).click();let state=(await (await startResponse).json()).data;const lesson=state.lesson_id,session=state.id;

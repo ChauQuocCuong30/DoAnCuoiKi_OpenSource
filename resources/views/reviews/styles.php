@@ -1,13 +1,13 @@
 <style>
 :root {
     font-family: "Segoe UI", system-ui, sans-serif;
-    color: #243653;
-    background: #f5f8fc;
+    color: var(--theme-ink);
+    background: var(--theme-bg);
     font-synthesis: none;
 
     --blue: #2563eb;
-    --muted: #7d8da5;
-    --line: #e2e9f4;
+    --muted: var(--theme-muted);
+    --line: var(--theme-line);
 }
 
 * {
@@ -55,7 +55,7 @@ header {
 }
 
 .eyebrow {
-    color: #8c9db8;
+    color: var(--theme-muted);
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 1.7px;
@@ -85,9 +85,9 @@ h2 {
     font-size: 10px;
     white-space: nowrap;
     padding: 9px 12px;
-    color: #6585b8;
+    color: var(--theme-muted);
     border: 1px solid #d9e5fa;
-    background: white;
+    background: var(--theme-surface);
     border-radius: 8px;
 }
 
@@ -104,7 +104,7 @@ h2 {
     background: none;
     border: 0;
     border-radius: 8px;
-    color: #8192ae;
+    color: var(--theme-muted);
     font-size: 12px;
     font-weight: 600;
     padding: 12px 17px;
@@ -112,7 +112,7 @@ h2 {
 
 .review-tabs button.active {
     color: #356dc2;
-    background: #eaf2ff;
+    background: var(--theme-soft);
 }
 
 .review-tabs b {
@@ -134,7 +134,7 @@ h2 {
 
 .toolbar label {
     font-size: 11px;
-    color: #8a9bb5;
+    color: var(--theme-muted);
     display: flex;
     align-items: center;
     gap: 12px;
@@ -143,9 +143,9 @@ h2 {
 select {
     border: 1px solid #dce5f4;
     border-radius: 8px;
-    background: white;
+    background: var(--theme-surface);
     padding: 9px 12px;
-    color: #6882aa;
+    color: var(--theme-muted);
     font-size: 12px;
 }
 
@@ -167,14 +167,14 @@ select {
 }
 
 .button.secondary {
-    background: white;
-    color: #718ab0;
-    border-color: #dce6f5;
+    background: var(--theme-surface);
+    color: var(--theme-muted);
+    border-color: var(--theme-line);
 }
 
 /* Danh sach the */
 .panel {
-    background: white;
+    background: var(--theme-surface);
     border: 1px solid var(--line);
     border-radius: 18px;
     padding: 26px;
@@ -203,20 +203,20 @@ select {
 .word-text h3 {
     font-size: 20px;
     margin: 0 0 7px;
-    color: #3f5d86;
+    color: var(--theme-ink);
 }
 
 .word-text p {
     font-size: 12px;
     line-height: 1.8;
-    color: #8a9db9;
+    color: var(--theme-muted);
     margin: 0;
 }
 
 .due-tag {
     font-size: 10px;
     padding: 5px 8px;
-    background: #eaf8ee;
+    background: var(--theme-good-bg);
     border-radius: 5px;
     color: #2c8857;
 }
@@ -225,32 +225,32 @@ select {
 .empty {
     text-align: center;
     padding: 55px 25px;
-    color: #8a9bb6;
+    color: var(--theme-muted);
     font-size: 13px;
     line-height: 1.9;
 }
 
 .empty strong {
     display: block;
-    color: #4c6a96;
+    color: var(--theme-muted);
     font-size: 19px;
     margin-bottom: 9px;
 }
 
 .message {
     padding: 13px 17px;
-    background: #eaf3ff;
+    background: var(--theme-soft);
     border: 1px solid #d4e6ff;
     border-radius: 9px;
-    color: #5279b4;
+    color: var(--theme-muted);
     font-size: 12px;
     line-height: 1.8;
     margin-bottom: 19px;
 }
 
 .message.error {
-    background: #fff3f2;
-    border-color: #f5d7d4;
+    background: var(--theme-bad-bg);
+    border-color: var(--theme-line);
     color: #a95d53;
 }
 
@@ -266,7 +266,7 @@ select {
     gap: 10px;
     margin-bottom: 20px;
     font-size: 11px;
-    color: #8c9fbb;
+    color: var(--theme-muted);
 }
 
 .flashcard {
@@ -274,19 +274,19 @@ select {
     padding: 26px 22px;
     border: 1px solid #e6edf8;
     border-radius: 15px;
-    background: #fcfdff;
+    background: var(--theme-surface);
 }
 
 .flashcard h3 {
     font-size: 34px;
     margin: 12px 0;
     letter-spacing: -0.7px;
-    color: #355985;
+    color: var(--theme-ink);
 }
 
 .flashcard .back {
     font-size: 24px;
-    color: #4e73a2;
+    color: var(--theme-muted);
     border-top: 1px solid #e5edf8;
     margin-top: 23px;
     padding-top: 22px;
@@ -303,7 +303,7 @@ select {
 
 .flashcard p {
     font-size: 12px;
-    color: #8b9fbb;
+    color: var(--theme-muted);
     line-height: 1.9;
 }
 
@@ -313,7 +313,7 @@ select {
 }
 
 .audio-button {
-    background: #eff6ff;
+    background: var(--theme-soft);
     color: #5183ca;
     border: 1px solid #dceaff;
     border-radius: 9px;
@@ -330,23 +330,23 @@ select {
 }
 
 .rating {
-    background: white;
+    background: var(--theme-surface);
     border: 1px solid #dee8f7;
     padding: 14px 7px;
     border-radius: 10px;
     font-size: 10px;
-    color: #7390b5;
+    color: var(--theme-muted);
 }
 
 .rating strong {
     display: block;
     font-size: 22px;
-    color: #4774b0;
+    color: var(--theme-muted);
     margin-bottom: 7px;
 }
 
 .rating:hover {
-    background: #f0f6ff;
+    background: var(--theme-soft);
     border-color: #8ab1ee;
 }
 
@@ -505,7 +505,7 @@ footer span {
 .review-shell .hero-description {
     max-width: 550px;
     margin: 0 0 18px;
-    color: #52644a;
+    color: var(--theme-muted);
     font-size: 16px;
     line-height: 1.8;
 }
@@ -524,7 +524,7 @@ footer span {
     padding: 18px;
     border: 1px solid var(--border);
     border-radius: 16px;
-    background: #ffffff;
+    background: var(--theme-surface);
 }
 
 .review-shell .benefit-number {
@@ -574,7 +574,7 @@ footer span {
     padding: 22px;
     border: 1px solid var(--border);
     border-radius: 18px;
-    background: #ffffff;
+    background: var(--theme-surface);
 }
 
 .review-shell .guide-kicker {

@@ -1,4 +1,4 @@
-:root { --paper: #eaf0dc; --paper2: #e0e8cf; --card: #f6fbe9; --ink: #123524; --body: rgba(18, 53, 36, .72); --gold: #b8862b; --green: #3f7d4f; --green2: #2f6a41;
+:root { --paper: var(--theme-bg); --paper2: var(--theme-soft); --card: #f6fbe9; --ink: var(--theme-ink); --body: rgba(18, 53, 36, .72); --gold: #b8862b; --green: #3f7d4f; --green2: #2f6a41;
   --line: rgba(18, 53, 36, .16); --bad: #b4412f; --serif: "Playfair Display", Georgia, "Times New Roman", serif; --sans: Inter, system-ui, sans-serif; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { min-height: 100vh; background: var(--paper); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }

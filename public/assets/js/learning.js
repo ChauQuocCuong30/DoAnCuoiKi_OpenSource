@@ -7,7 +7,10 @@
     })[character]);
     const media = value => {
         if (typeof value !== 'string' || /[\s<>"'\\]/.test(value)) return '';
-        if (value.startsWith('/') && !value.startsWith('//')) return value;
+        if (value.startsWith('/') && !value.startsWith('//')) {
+            const path = window.TuanReviewConfig?.baseUrl ? new URL(window.TuanReviewConfig.baseUrl, location.origin).pathname.replace(/\/$/, '') : '';
+            return path && !value.startsWith(path + '/') ? path + value : value;
+        }
         try {
             const url = new URL(value);
             return url.protocol === 'https:' && !url.username && !url.password ? url.href : '';
@@ -31,7 +34,7 @@
         return `<div class="flashcard">
             ${image && direction === 'en_vi' ? `<img src="${escape(image)}" alt="Hình minh họa">` : ''}
             <h3>${escape(front)}</h3>
-            ${audio ? `<button type="button" class="audio-button" data-audio="${escape(audio)}">♫ Nghe phát âm</button>` : ''}
+            ${(direction === 'en_vi' || direction === 'listening' || revealed) ? `<button type="button" class="audio-button" data-audio="${escape(audio)}" data-speak-word="${escape(word.english)}">♫ Nghe phát âm</button>` : ''}
             ${revealed ? `<div class="back">${escape(back)}</div><p>${escape(word.ipa)}<br>${escape(word.example)}<br>${escape(word.example_translation)}</p>` : ''}
         </div>`;
     };

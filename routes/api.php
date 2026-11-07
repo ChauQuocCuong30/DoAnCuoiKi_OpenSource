@@ -10,6 +10,8 @@ use App\Modules\Learning\Controllers\LearningController;
 use App\Modules\Learning\Controllers\GuestLearningController;
 
 return static function (Router $router): void {
+    $router->get('/api/v1/onboarding', [\App\Modules\Auth\Controllers\OnboardingController::class, 'answers']);
+    $router->post('/api/v1/onboarding', [\App\Modules\Auth\Controllers\OnboardingController::class, 'answers']);
     ContentApiController::register($router);
     $router->get('/api/v1/learning/hearts', [\App\Modules\Learning\Controllers\HeartPracticeController::class, 'summary']);
     $router->post('/api/v1/learning/hearts/start', [\App\Modules\Learning\Controllers\HeartPracticeController::class, 'start']);

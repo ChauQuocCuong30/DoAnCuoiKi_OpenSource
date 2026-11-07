@@ -507,22 +507,13 @@ function silentWav() {
             mediaState = result.session;
             noAnswerKeys(mediaState);
 
+            await page.locator('#lu-next-question').waitFor({state:'visible'});
+            assert.match(await page.locator('#lu-answer-feedback').textContent(), /Chính xác!/);
+            await page.locator('#lu-next-question').click();
             if (mediaState.status === 'in_progress') {
-                await page.locator(
-                    '#lu-next-question'
-                ).waitFor({
-                    state: 'visible'
-                });
-
-                assert.equal(
-                    await page.locator(
-                        '#lu-feedback'
-                    ).textContent(),
-                    'Chính xác!'
-                );
-
-                await page.locator('#lu-next-question').click();
+                await page.waitForFunction(id => document.getElementById('lu-question').dataset.questionId === String(id), mediaState.question.id);
             }
+
         }
 
         assert.deepEqual(
@@ -554,7 +545,7 @@ function silentWav() {
 
         assert.equal(
             await page.locator('#lu-hearts').textContent(),
-            ''
+            '♥ ' + mediaState.current_hp + '/' + mediaState.max_hp
         );
 
         await page.setViewportSize({

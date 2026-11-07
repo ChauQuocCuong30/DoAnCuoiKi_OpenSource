@@ -80,6 +80,9 @@ final class ContentInput
         if ($v === '') {
             return null;
         }
+        if (in_array($key, ['image','audio','image_source','audio_source'], true)
+            && preg_match('~^/assets/media/(?:[A-Za-z0-9_-]+/)*[A-Za-z0-9_.-]+\.(?:png|jpg|jpeg|webp|gif|mp3|wav|ogg|m4a)$~D', $v)
+            && !str_contains($v, '..')) { return $v; }
         if (
             !filter_var($v, FILTER_VALIDATE_URL) ||
             parse_url($v, PHP_URL_SCHEME) !== 'https' ||

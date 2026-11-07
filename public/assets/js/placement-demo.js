@@ -21,9 +21,7 @@
   function el(html) { var d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function speak(text) {
-    if (!('speechSynthesis' in window)) { return; }
-    var u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.9;
-    window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
+    window.DLAudio?.configure({base:base}); window.DLAudio?.speak(text,{lang:'en'});
   }
   var speakerSvg = '<svg viewBox="0 0 24 24"><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5Z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>';
 
@@ -124,6 +122,7 @@
       showResult = function () {
         stage.innerHTML = resultHtml;
         $('goOn').onclick = function () {
+          if (new URLSearchParams(location.search).get('onboarding') === '1') { location.assign(base + '/start?step=ready'); return; }
           fetch(base + '/api/v1/users/me', { credentials: 'same-origin' }).then(function (r) { if (r.ok) { window.location.href = base + '/'; } else { showPrompt(); } }).catch(showPrompt);
         };
       };

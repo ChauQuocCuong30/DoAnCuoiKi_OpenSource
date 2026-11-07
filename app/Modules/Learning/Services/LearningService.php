@@ -156,7 +156,7 @@ final class LearningService
                     || json_decode($old['answer_json'], true) !== $answer) {
                     throw new ApiException('REQUEST_KEY_CONFLICT', 'request_key đã dùng cho thao tác khác.', 409);
                 }
-                return ['is_correct' => (bool) $old['is_correct'], 'replayed' => true, 'session' => $this->state($user, $session)];
+                return ['is_correct' => (bool) $old['is_correct'], 'replayed' => true, 'feedback'=>$this->grader->feedback($snapshot,$answer), 'session' => $this->state($user, $session)];
             }
             $current = $this->current($questions);
             if ($session['status'] !== 'in_progress' || $current === null || (int) $current['id'] !== $questionId) {
@@ -194,7 +194,7 @@ final class LearningService
                     $this->repo->initializeReviews($userId, $id);
                 }
             }
-            return ['is_correct' => $correct, 'replayed' => false,
+            return ['is_correct' => $correct, 'replayed' => false, 'feedback'=>$this->grader->feedback($snapshot,$answer),
                 'session' => $this->state($user, $this->requireSession($userId, $id))];
         });
     }
@@ -221,7 +221,9 @@ final class LearningService
         if ($question !== null) {
             $snapshot = json_decode($question['snapshot_json'], true, 512, JSON_THROW_ON_ERROR);
             $public = ['id' => (int) $question['id'], 'phase' => $question['phase'], 'position' => (int) $question['position'],
-                'type' => $snapshot['type'], 'content' => $snapshot['content']];
+                'type' => $snapshot['type'], 'content' => $this->grader->publicContent($snapshot,
+                    in_array($snapshot['type'], ['listen_type', 'listen_select'], true)
+                        ? $this->repo->getWordsByLessonId((int) $session['lesson_id']) : [])];
         }
         $rules = json_decode($session['rules_json'], true, 512, JSON_THROW_ON_ERROR);
         return ['id' => (int) $session['id'], 'lesson_id' => (int) $session['lesson_id'], 'status' => $session['status'],

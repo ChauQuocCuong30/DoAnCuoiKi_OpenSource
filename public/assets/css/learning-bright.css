@@ -1,10 +1,10 @@
 .lu {
-    --ink: #11552f;
-    --muted: #718679;
-    --paper: #f4fcf7;
-    --line: #dcece2;
+    --ink: var(--theme-ink);
+    --muted: var(--theme-muted);
+    --paper: var(--theme-bg);
+    --line: var(--theme-line);
     --green: #20b65e;
-    --green-dark: #168744;
+    --green-dark: var(--theme-good);
     --gold: #ffcc3d;
 
     margin: 0;
@@ -88,7 +88,7 @@
     display: inline-flex;
     align-items: center;
     gap: 14px;
-    color: #075737;
+    color: var(--theme-ink);
     font-family: inherit;
     font-size: 32px;
     font-weight: 800;
@@ -139,7 +139,7 @@
     padding: 9px 17px;
     border: 1px solid var(--line);
     border-radius: 14px;
-    background: #fff;
+    background: var(--theme-surface);
     color: var(--green-dark);
     font-weight: 700;
 }
@@ -156,7 +156,7 @@
     border: 1px solid #cfe6d7;
     border-bottom: 4px solid #dbece1;
     border-radius: 17px;
-    background: #fff;
+    background: var(--theme-surface);
     color: var(--green-dark);
     font-weight: 700;
     text-align: center;
@@ -165,7 +165,7 @@
 }
 
 .lu .btn:hover {
-    background: #effbf3;
+    background: var(--theme-soft);
 }
 
 .lu .btn:active {
@@ -322,7 +322,7 @@
     border: 1px solid #e2eee6;
     border-bottom: 7px solid #f2c541;
     border-radius: 20px;
-    background: #fff;
+    background: var(--theme-surface);
     box-shadow: 0 16px 25px #14532d20;
     color: #145c32;
     text-align: center;
@@ -372,7 +372,7 @@
     padding: 24px 28px 28px;
     border: 1px solid var(--line);
     border-radius: 28px;
-    background: #fff;
+    background: var(--theme-surface);
     box-shadow: 0 12px 32px #14532d08;
     transition: transform .2s ease, box-shadow .2s ease;
 }
@@ -458,7 +458,7 @@
 .lu #lu-words {
     border: 1px solid var(--line);
     border-radius: 30px;
-    background: #fff;
+    background: var(--theme-surface);
     box-shadow: 0 12px 32px #14532d08;
 }
 
@@ -492,7 +492,7 @@
     padding: 20px 24px;
     border: 1px solid #dcefe3;
     border-radius: 18px;
-    background: #effaf3;
+    background: var(--theme-good-bg);
     color: #174f30;
     font-size: 25px;
 }
@@ -519,9 +519,9 @@
     gap: 12px;
     min-width: 0;
     padding: 17px 19px;
-    border: 2px solid #dcece2;
+    border: 2px solid var(--theme-line);
     border-radius: 18px;
-    background: #fff;
+    background: var(--theme-surface);
     cursor: pointer;
 }
 
@@ -562,7 +562,7 @@
     padding: 15px 20px;
     border: 2px solid #d7e9de;
     border-radius: 18px;
-    background: #fff;
+    background: var(--theme-surface);
     color: var(--ink);
 }
 
@@ -740,7 +740,7 @@
 .lu .stage,
 .lu .panel {
     border-color: var(--line);
-    background-color: #fff;
+    background-color: var(--theme-surface);
 }
 
 /* Xếp từ và ghép cặp */
@@ -773,7 +773,7 @@
     padding: 10px;
     border: 1px solid var(--line);
     border-radius: 12px;
-    background: #fff;
+    background: var(--theme-surface);
     color: var(--ink);
 }
 
@@ -786,7 +786,7 @@
     overflow: auto;
     border: 1px solid var(--line);
     border-radius: 28px;
-    background: #fff;
+    background: var(--theme-surface);
     color: var(--ink);
     box-shadow: 0 30px 100px #123b2a30;
 }
@@ -815,7 +815,7 @@
     padding: 14px 20px;
     border: 1px solid var(--line);
     border-radius: 18px;
-    background: #fff;
+    background: var(--theme-surface);
     box-shadow: 0 15px 40px #14532d20;
 }
 

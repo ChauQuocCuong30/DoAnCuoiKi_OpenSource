@@ -45,7 +45,7 @@ final class VocabularyLearningSynchronizer
                 $band=\App\Shared\Cefr::LEVELS[$level-1];
                 $pool=$cefr?array_values(array_filter($words,static fn($w)=>$w['cefr_level']===$band)):$words;
                 $label=$cefr?$band:'Mức '.$level;
-                $hash=hash('sha256','mixed-vocabulary-v4:'.json_encode([$topic['name'],$pool,$cefr,$band],JSON_THROW_ON_ERROR));
+                $hash=hash('sha256','mixed-vocabulary-v5-speech:'.json_encode([$topic['name'],$pool,$cefr,$band],JSON_THROW_ON_ERROR));
                 $map=$mappings[$level]??null;
                 if($map===null) {
                     // Adopt an existing active level to preserve its ID and completion history.

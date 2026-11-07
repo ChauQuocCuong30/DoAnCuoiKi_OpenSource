@@ -18,3 +18,5 @@ foreach ($adminStyles as $adminStyle):
 ?>
 <link rel="stylesheet" href="<?= $escape($appBase . $adminAsset . '?v=' . $adminVersion) ?>">
 <?php endforeach; ?>
+
+<?php require dirname(__DIR__) . '/layouts/theme-head.php'; ?>
